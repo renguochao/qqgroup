@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="设置" >
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="isTouch"
+        android:summaryOff="关闭"
+        android:summaryOn="开启"
+        android:title="主题文章阅读手势识别" >
+    </CheckBoxPreference>
+
+    <ListPreference
+        android:dialogTitle="图片显示条件"
+        android:defaultValue="1"
+        android:entries="@array/pic_text"
+        android:entryValues="@array/pic_value"
+        android:key="picDS"
+        android:summary="在何种情况下显示图片"
+        android:title="图片显示" >
+    </ListPreference>
+
+</PreferenceScreen>
