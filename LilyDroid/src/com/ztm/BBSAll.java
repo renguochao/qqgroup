@@ -3,6 +3,85 @@ package com.ztm;
 import java.util.HashMap;
 
 public class BBSAll {
+	
+	
+	/**
+	 * 表情集合
+	 * @return
+	 */
+	public static HashMap<String,Integer> getSmilyAll() {
+		HashMap<String,Integer> hm = new HashMap<String,Integer>();
+		hm.put("[:s]",  R.drawable.face9);
+		hm.put("[:O]",  R.drawable.face9);
+		hm.put("[:|]",  R.drawable.face9);
+		hm.put("[:]", R.drawable.face9);
+		hm.put("[:X]",  R.drawable.face9);
+		
+		hm.put("[:'(]", R.drawable.face9);
+		hm.put("[:-|]", R.drawable.face9);
+		hm.put("[:@]", R.drawable.face9);
+		hm.put("[:P]", R.drawable.face9);
+		hm.put("[:D]", R.drawable.face9);
+		hm.put("[:)]", R.drawable.face9);
+		hm.put("[:(]", R.drawable.face9);
+		hm.put("[:Q]", R.drawable.face9);
+		hm.put("[:T]", R.drawable.face9);
+		
+		hm.put("[;P]", R.drawable.face9);
+		hm.put("[;-D]", R.drawable.face9);
+		hm.put("[:!]", R.drawable.face9);
+		hm.put("[:L]", R.drawable.face9);
+		hm.put("[:?]", R.drawable.face9);
+		hm.put("[:U]", R.drawable.face9);
+		hm.put("[:K]", R.drawable.face9);
+		hm.put("[;X]", R.drawable.face9);
+		hm.put("[:H]", R.drawable.face9);
+		
+		hm.put("[;bye]", R.drawable.face9);
+		hm.put("[;cool]", R.drawable.face9);
+		hm.put("[:-b]", R.drawable.face9);
+		hm.put("[:-8]", R.drawable.face9);
+		hm.put("[;PT]", R.drawable.face9);
+		hm.put("[:hx]", R.drawable.face9);
+		hm.put("[;K]", R.drawable.face9);
+		hm.put("[:E]", R.drawable.face9);
+		hm.put("[:-(]", R.drawable.face9);
+		
+		hm.put("[;hx]", R.drawable.face9);
+		hm.put("[:-v]", R.drawable.face9);
+		hm.put("[;xx]", R.drawable.face9);
+		return hm;
+	}
+	
+	
+	/**
+	 * 颜色集合
+	 * @return
+	 */
+	public static HashMap<String,String> getFColorAll() {
+		HashMap<String,String> hm = new HashMap<String,String>();
+		hm.put("[1;31m", "</font><font color=red >");
+		hm.put("[1;32m", "</font><font color=green >");
+		hm.put("[1;33m", "</font><font color=#808000 >");
+		hm.put("[1;34m", "</font><font color=blue >");
+		hm.put("[1;35m", "</font><font color=#D000D0 >");
+		hm.put("[1;36m", "</font><font color=#33A0A0 >");
+		hm.put("[32m", "</font><font color=#808000 >");
+		hm.put("[37;1m", "");
+		
+		
+		
+		
+		
+		
+		return hm;
+	}
+	
+	
+	/**
+	 * 版面集合
+	 * @return
+	 */
 	public static HashMap<String,String> getBBSAll() {
 		HashMap<String,String> hm = new HashMap<String,String>();
 		hm.put("南京大屠杀", "1937_12_13");

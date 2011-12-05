@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
@@ -44,6 +46,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
@@ -54,6 +57,7 @@ import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -61,13 +65,20 @@ import android.os.Message;
 import android.text.ClipboardManager;
 import android.text.Editable;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.webkit.WebView;
@@ -87,24 +98,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class TestAndroidActivity extends Activity {
+public class TestAndroidActivity extends Activity implements OnTouchListener,
+OnGestureListener {
 
-	private static final int MSGWHAT = 0x000000;
-
-	private static final int MSGTOPIC = 0x000001;
-
-	private static final int MSGTOPICNEXT = 0x000002;
-
-	private static final int MSGAREA = 0x000003;
-	private static final int MSGAREAPAGES = 0x000004;
-
-	private static final int MSGLOGIN = 0x000005;
-
-	private static final int MSGPST = 0x000006;
-
-	private static final int MSGPSTNEW = 0x000007;
-
-	private static final int MSGTOPICREFREASH = 0x000008;
+	private GestureDetector mGestureDetector;
+	
+	
 
 	// 控件
 
@@ -112,6 +111,7 @@ public class TestAndroidActivity extends Activity {
 
 	private ListView listView;
 
+	
 	private Button btnLink;
 
 	// 全局变量
@@ -128,11 +128,15 @@ public class TestAndroidActivity extends Activity {
 
 	private String huifuUrl;
 
-	int curStatus = 0;// 1 表示从10大跳转过去的，2表示从讨论区跳转过去的
+	
+	// 1 表示从10大跳转过去的，2表示从讨论区跳转过去的，3表示从各区热点跳过去
+	int curStatus = 0;
 
 	List<TopicInfo> areaTopic;
 
 	int areaNowTopic = 0;
+	
+	boolean isWifi = false;
 
 	private int nowPos;
 
@@ -141,11 +145,14 @@ public class TestAndroidActivity extends Activity {
 	String curAreaName = "";
 
 	String curTopicId = "";
-
+	
+	String isPic;
 	String isRem = "false";
-
+	boolean isTouch ;
 	String loginId = "";
 	String loginPwd = "";
+	
+	int runningTasks = 0;
 
 	private ProgressDialog progressDialog = null;
 
@@ -164,14 +171,22 @@ public class TestAndroidActivity extends Activity {
 	Spanned topicData;
 
 	int scrollY = 0;
+	
+	boolean topicWithImg = false;
+	
 	HashMap<String, String> bbsAll;
+	
+	HashMap<String, Integer> smilyAll;
+	
+	HashMap<String, String> fFolorAll;
+	
 	ArrayAdapter<String> bbsAlladapter;
 
-	String loginURL = "http://bbs.nju.edu.cn/bbslogin?type=2";// &id=tiztm&pw=6116938
+	String loginURL = "http://bbs.nju.edu.cn/bbslogin?type=2";
 
 	String loginoutURL = "http://bbs.nju.edu.cn/bbslogout";
 
-	String pstURL = "http://bbs.nju.edu.cn/vd94982/bbspst?board=Pictures&file=M.1322474567.A";
+	
 	Drawable xianDraw;
 	int sWidth = 480;
 	int sLength = 800;
@@ -182,6 +197,8 @@ public class TestAndroidActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mGestureDetector = new GestureDetector(this);
+
 		Resources res = getResources();
 		Drawable drawable = res.getDrawable(R.drawable.bkcolor);
 		xianDraw = res.getDrawable(R.drawable.xian);
@@ -189,11 +206,11 @@ public class TestAndroidActivity extends Activity {
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
 		sWidth = metric.widthPixels - 30; // 屏幕宽度（像素）
 		sLength = metric.heightPixels - 40; // 屏幕宽度（像素）
-		// float density = metric.density; // 屏幕密度（0.75 / 1.0 / 1.5）
-		// sWidth = (int)(width*density -20);
 
 		this.getWindow().setBackgroundDrawable(drawable);
 		bbsAll = BBSAll.getBBSAll();
+		fFolorAll = BBSAll.getFColorAll();
+		smilyAll = BBSAll.getSmilyAll();
 		String[] bbsAllArray = getArray(bbsAll);
 		bbsAlladapter = new ArrayAdapter<String>(TestAndroidActivity.this,
 				android.R.layout.simple_dropdown_item_1line, bbsAllArray);
@@ -225,7 +242,7 @@ public class TestAndroidActivity extends Activity {
 				loginId = textName.getText().toString();
 				loginPwd = textPwd.getText().toString();
 				String url = loginURL + "&id=" + loginId + "&pw=" + loginPwd;
-				getUrlHtml(url, MSGLOGIN);
+				getUrlHtml(url, Const.MSGLOGIN);
 			}
 
 		});
@@ -305,7 +322,7 @@ public class TestAndroidActivity extends Activity {
 												+ areaText;
 										curAreaName = "" + areaText;
 
-										getUrlHtml(urlString, MSGAREA);
+										getUrlHtml(urlString, Const.MSGAREA);
 
 									}
 								}).setNegativeButton("取消",
@@ -359,7 +376,7 @@ public class TestAndroidActivity extends Activity {
 										+ areaText;
 								curAreaName = "" + areaText;
 								dialoginterface.dismiss();
-								getUrlHtml(urlString, MSGAREA);
+								getUrlHtml(urlString, Const.MSGAREA);
 
 							}
 						});
@@ -377,18 +394,60 @@ public class TestAndroidActivity extends Activity {
 
 		});
 
-		Button btnExit = (Button) findViewById(R.id.btn_exit);
+		Button btnSet = (Button) findViewById(R.id.btn_set);
 
-		btnExit.setOnClickListener(new OnClickListener() {
+		btnSet.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View arg0) {
 
-				exitPro();
+				//exitPro();
 			}
 
 		});
 
 	}
+	
+	
+	// 菜单项   
+    final private int menuSettings=Menu.FIRST;  
+    private static final int REQ_SYSTEM_SETTINGS = 0;    
+
+    //创建菜单   
+    @Override    
+    public boolean onPrepareOptionsMenu(Menu menu) 
+    {        
+    	return true;
+    }
+
+    @Override  
+    public boolean onCreateOptionsMenu(Menu menu)  
+    {  
+        // 建立菜单   
+        menu.add(Menu.NONE, menuSettings, 2, "设置");  
+        return super.onCreateOptionsMenu(menu);  
+    }  
+    //菜单选择事件处理   
+    @Override  
+    public boolean onMenuItemSelected(int featureId, MenuItem item)  
+    {  
+        switch (item.getItemId())  
+        {  
+            case menuSettings:  
+                //转到Settings设置界面   
+                startActivityForResult(new Intent(this, Settings.class), REQ_SYSTEM_SETTINGS);  
+                break;  
+            default:  
+                break;  
+        }  
+        return super.onMenuItemSelected(featureId, item);  
+    }  
+    //Settings设置界面返回的结果   
+    protected  void onActivityResult(int requestCode, int resultCode, Intent data) {  
+    	myParams();
+    }  
+    
+    
+
 
 	/**
 	 * 捕获按键事件
@@ -406,10 +465,13 @@ public class TestAndroidActivity extends Activity {
 			} else if (curStatus == 0) {
 				exitPro();
 			}
+			return true;
 
 		}
-
-		return true;// super.onKeyDown(keyCode, event);
+		else
+		{
+		return  super.onKeyDown(keyCode, event);
+		}
 	}
 
 	private String[] getArray(HashMap<String, String> bbsAll2) {
@@ -432,7 +494,13 @@ public class TestAndroidActivity extends Activity {
 		isRem = sharedPreferences.getString("isRem", "false");
 		loginId = sharedPreferences.getString("loginId", "");
 		loginPwd = sharedPreferences.getString("loginPwd", "");
-
+		 myParams();
+		WifiManager mWiFiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+		if(mWiFiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED )
+		{
+			isWifi = true;
+		}
+		
 		if (name == null || name.length() < 1)
 			return;
 
@@ -440,7 +508,14 @@ public class TestAndroidActivity extends Activity {
 		for (String string : split) {
 			areaNamList.add(string);
 		}
-
+	}
+	
+	private void myParams()
+	{
+		SharedPreferences sp = getSharedPreferences("com.ztm_preferences",
+				Context.MODE_PRIVATE);
+		isPic = sp.getString("picDS", "1");
+		isTouch = sp.getBoolean("isTouch", true);
 	}
 
 	/**
@@ -450,26 +525,29 @@ public class TestAndroidActivity extends Activity {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+			
+			runningTasks--;
+			
 			if (data.equals("error")) {
 				Toast.makeText(TestAndroidActivity.this, "你的网络貌似有点小问题~",
 						Toast.LENGTH_SHORT).show();
-				progressDialog.dismiss();
-				return;
+				
 			}
-
+			else
+			{
 			switch (msg.what) {
-			case MSGWHAT:
+			case Const.MSGWHAT:
 				// 设置显示文本
 				// 处理解析data数据
 				top10TopicList = getTop10Topic(data);
 				setTopics();
 				break;
-			case MSGTOPIC:
+			case Const.MSGTOPIC:
 				// 设置显示文本
 
 				chaToTopic(topicData);
 				break;
-			case MSGTOPICNEXT:
+			case Const.MSGTOPICNEXT:
 
 				textView = (TextView) findViewById(R.id.label);
 				ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
@@ -477,25 +555,29 @@ public class TestAndroidActivity extends Activity {
 				textView.setText(topicData);
 
 				break;
-			case MSGTOPICREFREASH:
+			case Const.MSGTOPICREFREASH:
 				textView = (TextView) findViewById(R.id.label);
-				textView.setText(topicData);
+				if(textView!=null)
+					textView.setText(topicData);
 				break;
-			case MSGAREA:
+			case Const.MSGAREA:
 				chaToArea(data);
 				break;
 
-			case MSGAREAPAGES:
+			case Const.MSGAREAPAGES:
 				areaPages(data);
 				break;
 
-			case MSGLOGIN:
+			case Const.MSGLOGIN:
 				checkLogin(data);
 				break;
-			case MSGPST:
+			case Const.MSGAUTOLOGIN:
+				checkAutoLogin(data);
+				break;
+			case Const.MSGPST:
 				checkForm(data);
 				break;
-			case MSGPSTNEW:
+			case Const.MSGPSTNEW:
 				// 发文可能会失败，注意保留文章
 				checkRst(data);
 				break;
@@ -504,7 +586,13 @@ public class TestAndroidActivity extends Activity {
 				break;
 
 			}
-			progressDialog.dismiss();
+			}
+			if(runningTasks<1)
+			{
+				runningTasks = 0;
+				progressDialog.dismiss();
+			}
+			
 		}
 
 	};
@@ -515,6 +603,20 @@ public class TestAndroidActivity extends Activity {
 	private void checkRst(String data) {
 
 		if (data.contains("http-equiv='Refresh'")) {
+			
+			if(reid.equals("0"))
+			{
+				//发新文章完成
+				getUrlHtml(urlString, Const.MSGAREAPAGES);
+			}
+			else
+			{
+				//回复完成
+				getUrlHtml(topicUrl + "&start="
+						+ nowPos, Const.MSGTOPICREFREASH);
+			}
+			
+			
 			Toast.makeText(TestAndroidActivity.this, "发文成功！",
 					Toast.LENGTH_SHORT).show();
 		}
@@ -582,6 +684,44 @@ public class TestAndroidActivity extends Activity {
 		}
 		return;
 	}
+	
+	
+	/**
+	 * 检测是否！自动！登录成功
+	 * 
+	 * @param data
+	 */
+	private void checkAutoLogin(String data) {
+		Document doc = Jsoup.parse(data);
+		Elements scs = doc.getElementsByTag("script");
+		if (scs.size() == 3) {
+			String element = scs.get(1).toString();
+
+			setCookies(element.substring(27, element.length() - 12));
+
+			Toast.makeText(TestAndroidActivity.this, "登录成功！",
+					Toast.LENGTH_SHORT).show();
+			isLogin = true;
+		} else if (scs.size() == 1) {
+			if (data.contains("密码错误") || data.contains("错误的使用者帐号")) {
+				Toast.makeText(TestAndroidActivity.this, "用户名或密码错！",
+						Toast.LENGTH_SHORT).show();
+			} else if (data.contains("此帐号本日login次数过多")) {
+				Toast.makeText(TestAndroidActivity.this, "此帐号本日login次数过多！",
+						Toast.LENGTH_SHORT).show();
+			}
+			else {
+				Toast.makeText(TestAndroidActivity.this, "登陆失败！",
+						Toast.LENGTH_SHORT).show();
+			}
+			isLogin = false;
+
+		}
+		return;
+	}
+	
+	
+	
 
 	String pid;
 	String reid;
@@ -601,7 +741,18 @@ public class TestAndroidActivity extends Activity {
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int id) {
-										chaToLogin();
+										if(isRem.equals("true"))
+										{
+											//自动登录的话，自动登录
+											String url = loginURL + "&id=" + loginId + "&pw=" + loginPwd;
+											getUrlHtml(url, Const.MSGAUTOLOGIN);
+										}
+										else
+										{
+											chaToLogin();
+										}
+										
+										
 									}
 								}).setNegativeButton("算了",
 								new DialogInterface.OnClickListener() {
@@ -616,7 +767,7 @@ public class TestAndroidActivity extends Activity {
 				Toast.makeText(TestAndroidActivity.this, "您无权在此讨论区发文",
 						Toast.LENGTH_SHORT).show();
 			} else {
-				Toast.makeText(TestAndroidActivity.this, "发文失败",
+				Toast.makeText(TestAndroidActivity.this, "由于未知错误发文失败",
 						Toast.LENGTH_SHORT).show();
 			}
 
@@ -664,7 +815,7 @@ public class TestAndroidActivity extends Activity {
 
 										nvpCont = newVp;
 
-										getUrlHtml(url, MSGPSTNEW);
+										getUrlHtml(url, Const.MSGPSTNEW);
 									} catch (UnsupportedEncodingException e) {
 										e.printStackTrace();
 									}
@@ -753,7 +904,15 @@ public class TestAndroidActivity extends Activity {
 
 		String id = cookStr.substring(sp1 + 1, sp2);
 		String KEY = (Integer.parseInt(cookStr.substring(sp2 + 1)) - 2) + "";
+		//saveMyCookie( NUM, id , KEY);
+		setMyCookie( NUM, id , KEY);
+		
+		
 
+	}
+
+	private void setMyCookie(String NUM,String id ,String KEY)
+	{
 		cookies = new Cookie[3];
 
 		cookies[0] = new Cookie();
@@ -773,8 +932,39 @@ public class TestAndroidActivity extends Activity {
 		cookies[2].setPath("/");
 		cookies[2].setName("_U_KEY");
 		cookies[2].setValue(KEY);
-
 	}
+	
+	/*
+	private void saveMyCookie(String NUM,String id ,String KEY)
+	{
+		Editor editor = sharedPreferences.edit();// 获取编辑器
+		editor.putString("NUM", NUM);
+		editor.putString("id", id);
+		editor.putString("KEY", KEY);
+		editor.commit();
+	}
+	
+	
+	private boolean getMyCookie()
+	{
+
+		String NUM = sharedPreferences.getString("NUM", null);
+		String id  = sharedPreferences.getString("id", null);
+		String KEY = sharedPreferences.getString("KEY", null);
+		
+		if(NUM==null)
+		{
+			return false;
+		}
+		else 
+		{
+			setMyCookie( NUM, id , KEY);
+			return true;
+		}
+		
+	}
+	*/
+	
 
 	/**
 	 * 将由HTML页面转出的数据转化为ListView可读的形式 供10大使用
@@ -816,7 +1006,7 @@ public class TestAndroidActivity extends Activity {
 					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
 					curStatus = 1;
 					nowPos = 0;
-					getUrlHtml(topicUrl, MSGTOPIC);
+					getUrlHtml(topicUrl, Const.MSGTOPIC);
 
 				}
 			});
@@ -876,7 +1066,7 @@ public class TestAndroidActivity extends Activity {
 					nowPos = 0;
 					scrollY = listView.getFirstVisiblePosition();
 
-					getUrlHtml(topicUrl, MSGTOPIC);
+					getUrlHtml(topicUrl, Const.MSGTOPIC);
 
 				}
 			});
@@ -898,6 +1088,7 @@ public class TestAndroidActivity extends Activity {
 		String backS = s + "";
 		data = data.replaceAll(backS, "<br>");
 		Document doc = Jsoup.parse(data);
+		topicWithImg = false;
 
 		Elements tds = doc.getElementsByTag("textarea");
 		int k = 0;
@@ -945,6 +1136,16 @@ public class TestAndroidActivity extends Activity {
 				}
 
 			}
+			
+			
+			
+			 if(k==0) {
+				 int areaNo = text.indexOf("信区:");
+					int titleNo = text.indexOf("标 题:"); 
+				 String area =text.substring(areaNo+4, titleNo); 
+				 curAreaName =  area.replaceAll("<br>", ""); 
+			 }
+			
 
 			k++;
 
@@ -980,6 +1181,7 @@ public class TestAndroidActivity extends Activity {
 										nbs)
 										.append(sconA.substring(inArea + 1))
 										.append(nbs);
+								
 							} else {
 								sb.append("<font color=#0000EE >").append(
 										sconA.substring(0, ind)).append(
@@ -1014,13 +1216,19 @@ public class TestAndroidActivity extends Activity {
 						continue;
 					}
 					sconA = sconA.trim();
-					if (sconA.toLowerCase().startsWith("http:")
-							&& (sconA.toLowerCase().endsWith(".jpg") || sconA
-									.toLowerCase().endsWith(".png")||sconA.toLowerCase().endsWith(".jpeg"))) {
-
-						sb.append("<img src='").append(sconA).append("'><br>");
-
-						continue;
+					if(isPic.equals(Const.AllPic)||(isWifi &&isPic.equals(Const.WIFIPic)))
+						
+						
+					{
+						if (sconA.toLowerCase().startsWith("http:")
+								&& (sconA.toLowerCase().endsWith(".jpg") || sconA
+										.toLowerCase().endsWith(".png")||sconA.toLowerCase().endsWith(".jpeg"))) {
+							
+	
+							sb.append("<img src='").append(sconA).append("'><br>");
+							topicWithImg = true;
+							continue;
+						}
 					}
 
 					tempBr = 0;
@@ -1051,8 +1259,47 @@ public class TestAndroidActivity extends Activity {
 				// +="<B><font color=#0080ff >"+nowP+"楼:</font>"+nbs+content+"<br><br>";//+au+"</font></B>"
 			}
 		}
-		return tiList.toString();
+		return addSmileySpans(tiList.toString());
 	}
+	
+	
+    public String addSmileySpans(String text) {
+        
+    	//替换表情
+        Pattern mPattern = Pattern.compile("\\[(;|:).{1,4}\\]");
+        Matcher matcher = mPattern.matcher(text);
+       
+        StringBuffer sb = new StringBuffer();
+
+        while (matcher.find()) {
+        	matcher.appendReplacement(sb, "<img src='"+matcher.group()+"'>");
+        }
+        
+        
+        matcher.appendTail(sb);
+       
+        //String ma = sb.toString();
+        
+        //替换字体颜色
+        StringBuffer sb2= new StringBuffer();
+        mPattern = Pattern.compile("\\[(1;.*?|37;1|32)m");
+        matcher = mPattern.matcher(sb);
+
+        while (matcher.find()) {
+        	matcher.appendReplacement(sb2, fFolorAll.get(matcher.group(0)));
+        }
+        
+        
+        matcher.appendTail(sb2);
+
+        
+        
+        
+        sb2.append("</font>");
+ 
+        return sb2.toString().replaceAll("\\[\\+reset\\]|\\[m|\\[(0|[0-9]{1,2})m", "</font>");
+    }
+	
 
 	/**
 	 * 解析获取的页面 处理讨论区的话题列表
@@ -1145,7 +1392,7 @@ public class TestAndroidActivity extends Activity {
 				 * chaToMain(); if(top10TopicList!=null) { setTopics(); }
 				 * 
 				 */
-				getUrlHtml(newUrl, MSGPST);
+				getUrlHtml(newUrl, Const.MSGPST);
 
 			}
 		});
@@ -1236,7 +1483,7 @@ public class TestAndroidActivity extends Activity {
 			startPage = 0;
 		}
 
-		getUrlHtml(urlString + "&start=" + startPage, MSGAREAPAGES);
+		getUrlHtml(urlString + "&start=" + startPage, Const.MSGAREAPAGES);
 
 	}
 
@@ -1248,6 +1495,9 @@ public class TestAndroidActivity extends Activity {
 	}
 
 	int textViewY = 0;
+	
+	
+	
 
 	/**
 	 * 跳转到某个话题界面
@@ -1260,6 +1510,19 @@ public class TestAndroidActivity extends Activity {
 		textView = (TextView) findViewById(R.id.label);
 		textView.setText(topicData);
 
+		
+		//textView.
+		if(isTouch)
+		{
+			textView.setOnTouchListener(this);
+			textView.setFocusable(true);
+
+			textView.setClickable(true);
+
+			textView.setLongClickable(true);
+
+		}
+		
 		// WebView mWebView = (WebView) findViewById(R.id.label);
 		// mWebView.loadData(getTopicInfo(data), "text/html", "iso-8859-1");
 
@@ -1283,7 +1546,7 @@ public class TestAndroidActivity extends Activity {
 		btnHuifu.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				getUrlHtml(huifuUrl, MSGPST);
+				getUrlHtml(huifuUrl, Const.MSGPST);
 			}
 		});
 
@@ -1298,7 +1561,7 @@ public class TestAndroidActivity extends Activity {
 
 				}
 				nowPos = nowPos - 30;
-				getUrlHtml(topicUrl + "&start=" + nowPos, MSGTOPICNEXT);
+				getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICNEXT);
 
 			}
 		});
@@ -1317,7 +1580,7 @@ public class TestAndroidActivity extends Activity {
 				// }
 				if (isNext) {
 					nowPos = nowPos + 30;
-					getUrlHtml(topicUrl + "&start=" + nowPos, MSGTOPICNEXT);
+					getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICNEXT);
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							TestAndroidActivity.this);
@@ -1327,7 +1590,7 @@ public class TestAndroidActivity extends Activity {
 										public void onClick(
 												DialogInterface dialog, int id) {
 											getUrlHtml(topicUrl + "&start="
-													+ nowPos, MSGTOPICREFREASH);
+													+ nowPos, Const.MSGTOPICREFREASH);
 										}
 									}).setNegativeButton("算了",
 									new DialogInterface.OnClickListener() {
@@ -1349,18 +1612,20 @@ public class TestAndroidActivity extends Activity {
 
 	private void getTop10() {
 		String urlString = getResources().getString(R.string.bbstop10);
-		getUrlHtml(urlString, MSGWHAT);
+		getUrlHtml(urlString, Const.MSGWHAT);
 	}
 
 	private String dataUrl = "";
 	private int datamsg = -1;
 	NameValuePair[] nvpCont = null;
+	Thread imageTrd;
 
 	private void getUrlHtml(String url, int msg) {
-		if (progressDialog == null || !progressDialog.isShowing()) {
+		if (msg ==123 ||progressDialog == null || !progressDialog.isShowing()) {
 			progressDialog = ProgressDialog.show(TestAndroidActivity.this,
 					"请稍等...", "抓取网页信息中...", true);
 		}
+		runningTasks++;
 
 		dataUrl = url;
 		datamsg = msg;
@@ -1381,63 +1646,88 @@ public class TestAndroidActivity extends Activity {
 					data = "error";
 				}
 
-				if (datamsg == MSGTOPIC || datamsg == MSGTOPICNEXT
-						|| datamsg == MSGTOPICREFREASH)
-					topicData = Html.fromHtml(getTopicInfo(data),
-							new Html.ImageGetter() {
+				if (datamsg == Const.MSGTOPIC || datamsg == Const.MSGTOPICNEXT
+						|| datamsg == Const.MSGTOPICREFREASH)
+				{
+					
+					if(imageTrd!=null&&imageTrd.isAlive())
+					{
+						imageTrd.setName("NoUse");
+					}
+					final  String topicDataInfo = getTopicInfo(data);
 
+					topicData = Html.fromHtml(topicDataInfo,
+							new Html.ImageGetter() {
 								public Drawable getDrawable(String source) {
-									// 异步加载图片
-									// Drawable drawable =
-									// asyncImageLoader.loadDrawable(
-									// source, new ImageCallback() {
-									//   
-									// @Override
-									// public void imageLoaded(Drawable
-									// imageDrawable,
-									// String imageUrl) {
-									// if (imageDrawable == null) {
-									// } else {
-									// imageDrawable.setBounds(0, 0,
-									// imageDrawable.getIntrinsicWidth(),
-									// imageDrawable
-									// .getIntrinsicHeight());
-									// }
-									// dra = imageDrawable;
-									// }
-									// });
-									// if(source.equals("1")){
-									// drawable =
-									// Main.this.getResources().getDrawable(R.drawable.aa);
-									// } else if (source.equals("2")){
-									// drawable =
-									// Main.this.getResources().getDrawable(R.drawable.b);
-									// } else {
-									// drawable =
-									// Main.this.getResources().getDrawable(R.drawable.icon);
-									// }
-									URL url;
+									
 									Drawable drawable = null;
-									if (source.equals("xian")) {
+									if ("xian".equals(source)) {
 										drawable = xianDraw;
 										drawable.setBounds(0, 0, sWidth, 2);
-									} else {
-										try {
-											// URL myFileUrl = new URL(source);
-											drawable = fetchDrawable(source); // Drawable.createFromStream(myFileUrl.openStream(),
-																				// "is");
-										} catch (Exception e) {
-											return null;
-										}
+									}
+									else if (source.startsWith("[")) 
+									{
+										Resources res = getResources();
+										Integer i = smilyAll.get(source);
+										if(i!=null)
+										{
+										drawable = res.getDrawable( i);
 										int iw = drawable.getIntrinsicWidth();
 										drawable.setBounds(0, 0, iw, drawable
 												.getIntrinsicHeight());
+										}
+										//String faceNo = source.substring(5)
 									}
 									return drawable;
 
 								}
 							}, null);
+					if(topicWithImg)
+					{
+					imageTrd = new Thread(topicDataInfo) {
 
+						@Override
+						public void interrupt() {
+							this.stop();
+						}
+
+						@Override
+						public void run() {
+							// 需要花时间计算的方法
+							topicData = Html.fromHtml(topicDataInfo,
+									new Html.ImageGetter() {
+
+										public Drawable getDrawable(String source) {
+											
+											Drawable drawable = null;
+											if ("xian".equals(source)) {
+												drawable = xianDraw;
+												drawable.setBounds(0, 0, sWidth, 2);
+											} else {
+												try {
+													drawable = fetchDrawable(source); 
+												} catch (Exception e) {
+													return null;
+												}
+												int iw = drawable.getIntrinsicWidth();
+												drawable.setBounds(0, 0, iw, drawable
+														.getIntrinsicHeight());
+											}
+											return drawable;
+
+										}
+									}, null);
+							if(this.getName()!=null&&!this.getName().equals("NoUse"))
+							{
+								sendMsg(Const.MSGTOPICREFREASH);
+							}
+
+						}
+					};
+					imageTrd.start();
+					}
+					
+				}
 				sendMsg(datamsg);
 			}
 		}.start();
@@ -1458,7 +1748,7 @@ public class TestAndroidActivity extends Activity {
 
 		Drawable drawable = zoomDrawable(source);
 		drawableRef = new SoftReference<Drawable>(drawable);
-		drawableMap.put(urlString, drawableRef);
+		drawableMap.put(source, drawableRef);
 
 		return drawable;
 
@@ -1583,7 +1873,14 @@ public class TestAndroidActivity extends Activity {
 
 							public void onClick(DialogInterface dialog,
 									int which) {
-								getHtmlContent(loginoutURL);
+								getUrlHtml(loginoutURL,123);
+								
+								try {
+									Thread.sleep(300);
+								} catch (InterruptedException e) {
+	
+									e.printStackTrace();
+								}
 								android.os.Process
 										.killProcess(android.os.Process.myPid());
 							}
@@ -1725,12 +2022,72 @@ public class TestAndroidActivity extends Activity {
 
 		super.onDestroy();
 
-		getHtmlContent(loginoutURL);
+		getUrlHtml(loginoutURL,123);
+		
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
 
 		System.gc();
 
 		System.exit(0);
 
+	}
+
+	public boolean onTouch(View arg0, MotionEvent arg1) {
+		return mGestureDetector.onTouchEvent(arg1);
+	}
+
+	public boolean onDown(MotionEvent arg0) {
+		return false;
+	}
+
+	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
+			float arg3) {
+		if (curStatus == 1) {
+			chaToMain();
+			if (top10TopicList != null) {
+				setTopics();
+			}
+		} else {
+			chaToArea(null);
+		}
+		return false;
+	}
+
+	public void onLongPress(MotionEvent arg0) {
+		getUrlHtml(huifuUrl, Const.MSGPST);
+		
+	}
+
+	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
+			float arg3) {
+		return false;
+	}
+
+	public void onShowPress(MotionEvent arg0) {
+
+		
+	}
+
+	public boolean onSingleTapUp(MotionEvent arg0) {
+		ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
+		float y = arg0.getRawY();
+		//点击上翻和点击下翻
+		if(y>sv.getHeight()-sLength/6)
+		{
+			sv.scrollBy(0, sv.getHeight()-20);
+			//sv.pageScroll(ScrollView.FOCUS_DOWN);
+		}
+		if(y<sLength/3)
+		{
+			sv.scrollBy(0, 20-sv.getHeight());
+			//sv.pageScroll(ScrollView.FOCUS_UP);
+		}
+	return true;
 	}
 
 }

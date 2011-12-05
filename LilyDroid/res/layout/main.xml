@@ -32,10 +32,10 @@
             android:text="@string/like" />
             
            <Button   
-            android:id="@+id/btn_exit"
+            android:id="@+id/btn_set"
             android:layout_width="75dp"
             android:layout_height="50dp"
-            android:text="@string/exitStr" 
+            android:text="@string/setting" 
             />
             
     </LinearLayout>

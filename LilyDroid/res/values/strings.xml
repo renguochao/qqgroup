@@ -9,6 +9,7 @@
     <string name="pre">上一页</string>
     <string name="next">下一页</string>
      <string name="exitStr">退出</string>
+          <string name="setting">设置</string>
      <string name="like">收藏夹</string>
     <string name="allStr">讨论版</string>
      <string name="huifu">回复</string>
@@ -19,5 +20,15 @@
     <string name="login_username_hint">小百合用户名</string>
     <string name="login_register_link">没有帐号？ <a href="#">注册</a></string>
     <string name="getnew">网络故障请重试!</string>
+     <string-array name="pic_value">  
+        <item>1</item>  
+        <item>2</item>  
+        <item>3</item>    
+    </string-array>  
+    <string-array name="pic_text">  
+        <item>只在WIFI环境下显示</item>  
+        <item>一直不显示</item>  
+        <item>手机网络和WIFI环境都显示</item>  
+    </string-array>  
    
 </resources>
