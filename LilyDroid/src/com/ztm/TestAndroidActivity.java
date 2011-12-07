@@ -20,18 +20,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.Cookie;
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.http.client.ClientProtocolException;
+
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,11 +29,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.ztm.R;
-import com.ztm.AsyncImageLoader.ImageCallback;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -52,9 +42,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
@@ -63,13 +50,14 @@ import android.os.Handler;
 import android.os.Message;
 
 import android.text.ClipboardManager;
-import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.method.ScrollingMovementMethod;
-import android.text.style.ImageSpan;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -81,7 +69,6 @@ import android.view.View;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.webkit.WebView;
 import android.widget.Button;
 
 import android.widget.AdapterView;
@@ -89,11 +76,9 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
-import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -102,9 +87,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 OnGestureListener {
 
 	private GestureDetector mGestureDetector;
-	
-	
-
 	// ¿Ø¼þ
 
 	private TextView textView;
@@ -149,8 +131,17 @@ OnGestureListener {
 	String isPic;
 	String isRem = "false";
 	boolean isTouch ;
+	boolean isIP;
+	
 	String loginId = "";
 	String loginPwd = "";
+	
+	String androidmanufacturer;
+	String androidmodel;
+	
+	
+	String backWords = "";//
+	boolean isBackWord = true;
 	
 	int runningTasks = 0;
 
@@ -159,6 +150,8 @@ OnGestureListener {
 	SharedPreferences sharedPreferences;
 
 	List<String> areaNamList;
+	
+	String[] fastReList;
 
 	Drawable drawableFav;
 
@@ -166,7 +159,7 @@ OnGestureListener {
 
 	boolean isLogin = false;
 
-	Cookie[] cookies = null;
+
 
 	Spanned topicData;
 
@@ -178,19 +171,23 @@ OnGestureListener {
 	
 	HashMap<String, Integer> smilyAll;
 	
-	HashMap<String, String> fFolorAll;
-	
 	ArrayAdapter<String> bbsAlladapter;
 
 	String loginURL = "http://bbs.nju.edu.cn/bbslogin?type=2";
 
 	String loginoutURL = "http://bbs.nju.edu.cn/bbslogout";
+	
+	String synUrl = "http://bbs.nju.edu.cn/bbsleft";
+	
+	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
 
 	
 	Drawable xianDraw;
 	int sWidth = 480;
 	int sLength = 800;
-
+	
+	
+	//TODO:¶¨ÒåÈ«¾Ö±äÁ¿
 	/**
 	 * Called when the activity is first created.
 	 * */
@@ -209,19 +206,52 @@ OnGestureListener {
 
 		this.getWindow().setBackgroundDrawable(drawable);
 		bbsAll = BBSAll.getBBSAll();
-		fFolorAll = BBSAll.getFColorAll();
+		
 		smilyAll = BBSAll.getSmilyAll();
-		String[] bbsAllArray = getArray(bbsAll);
+		String[] bbsAllArray = StringUtil.getArray(bbsAll);
 		bbsAlladapter = new ArrayAdapter<String>(TestAndroidActivity.this,
 				android.R.layout.simple_dropdown_item_1line, bbsAllArray);
+		initPhoneState();
 		initAllParams();
+		
+		StringUtil.initAll();
+		
+		
 		chaToLogin();
 	}
 
 	private void InitMain() {
 		chaToMain();
-		getTop10();
+		getUrlHtml(bbsTop10String, Const.MSGWHAT);
 
+	}
+
+	private void initPhoneState()
+	{
+          
+		try {
+			
+			
+
+           Class<android.os.Build> build_class = android.os.Build.class;
+
+           //È¡µÃÅÆ×Ó
+
+           java.lang.reflect.Field manu_field = build_class.getField("MANUFACTURER");
+
+           androidmanufacturer = (String) manu_field.get(new android.os.Build());
+
+           //È¡µÃÐÍÌ–
+
+           java.lang.reflect.Field field2 = build_class.getField("MODEL");
+
+           androidmodel = (String) field2.get(new android.os.Build());
+
+          
+		} catch (Exception e) {
+		
+			e.printStackTrace();
+		} 
 	}
 
 	private void chaToLogin() {
@@ -281,7 +311,7 @@ OnGestureListener {
 
 			public void onClick(View arg0) {
 				// ¿ÉÒÔ´ò¿ªÒ»¸öÐÂÏß³ÌÀ´¶ÁÈ¡£¬¼ÓÈë¹ö¶¯ÌõµÈ
-				getTop10();
+				getUrlHtml(bbsTop10String, Const.MSGWHAT);
 			}
 
 		});
@@ -400,7 +430,7 @@ OnGestureListener {
 
 			public void onClick(View arg0) {
 
-				//exitPro();
+				exitPro();
 			}
 
 		});
@@ -410,6 +440,8 @@ OnGestureListener {
 	
 	// ²Ëµ¥Ïî   
     final private int menuSettings=Menu.FIRST;  
+    final private int menuLogout=Menu.FIRST+2;
+    final private int menuSyn=Menu.FIRST+1;  
     private static final int REQ_SYSTEM_SETTINGS = 0;    
 
     //´´½¨²Ëµ¥   
@@ -424,6 +456,8 @@ OnGestureListener {
     {  
         // ½¨Á¢²Ëµ¥   
         menu.add(Menu.NONE, menuSettings, 2, "ÉèÖÃ");  
+        menu.add(Menu.NONE, menuSyn, 2, "Í¬²½ÊÕ²Ø");  
+        menu.add(Menu.NONE, menuLogout, 2, "×¢Ïú");  
         return super.onCreateOptionsMenu(menu);  
     }  
     //²Ëµ¥Ñ¡ÔñÊÂ¼þ´¦Àí   
@@ -436,6 +470,21 @@ OnGestureListener {
                 //×ªµ½SettingsÉèÖÃ½çÃæ   
                 startActivityForResult(new Intent(this, Settings.class), REQ_SYSTEM_SETTINGS);  
                 break;  
+            case menuLogout:  
+                //×ªµ½µÇÂ¼½çÃæ   
+            	getUrlHtml(loginoutURL,123);
+                chaToLogin();
+                break;
+            case menuSyn:  
+                //×ªµ½µÇÂ¼½çÃæ   
+            	if(isLogin)
+            		getUrlHtml(synUrl,Const.MSGSYN);
+            	else
+            	{
+            		displayMsg("Äã»¹Ã»µÇÂ½ÄÅ~");
+            	}
+                break; 
+                
             default:  
                 break;  
         }  
@@ -474,17 +523,7 @@ OnGestureListener {
 		}
 	}
 
-	private String[] getArray(HashMap<String, String> bbsAll2) {
-		String[] ba = new String[bbsAll2.size() * 2];
-		int i = 0;
-		Set<String> keySet = bbsAll2.keySet();
-		for (String string : keySet) {
-			ba[i] = string;
-			ba[i + 1] = bbsAll2.get(string);
-			i += 2;
-		}
-		return ba;
-	}
+
 
 	private void initAllParams() {
 		sharedPreferences = getSharedPreferences("LilyDroid",
@@ -494,6 +533,7 @@ OnGestureListener {
 		isRem = sharedPreferences.getString("isRem", "false");
 		loginId = sharedPreferences.getString("loginId", "");
 		loginPwd = sharedPreferences.getString("loginPwd", "");
+		
 		 myParams();
 		WifiManager mWiFiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
 		if(mWiFiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED )
@@ -516,10 +556,32 @@ OnGestureListener {
 				Context.MODE_PRIVATE);
 		isPic = sp.getString("picDS", "1");
 		isTouch = sp.getBoolean("isTouch", true);
+		isBackWord =  sp.getBoolean("isBackWord", true);
+		backWords = sp.getString("backWords", "·¢ËÍ×Ô ÎÒµÄÐ¡°ÙºÏAndroid¿Í»§¶Ë by ${model}");
+		isIP = sp.getBoolean("isIP", false);
+		backWords = backWords.replaceAll("\\$\\{model\\}", androidmodel).replaceAll("\\$\\{manufa\\}", androidmanufacturer);
+		String fastRe = sp.getString("fastRe", "É³·¢");
+		if ( fastRe.length() < 1)
+		{
+			fastReList = null;
+			return;
+		}
+		
+		fastReList= fastRe.split("##");
+		
+		
+		
 	}
+	
+	private void displayMsg(String msg)
+	{
+		Toast.makeText(TestAndroidActivity.this, msg,
+				Toast.LENGTH_SHORT).show();
+	}
+	
 
 	/**
-	 * 
+	 * TODO:ÏûÏ¢¿ØÖÆÆ÷
 	 * ÏûÏ¢¿ØÖÆÆ÷£¬ÓÃÀ´¸üÐÂ½çÃæ£¬ÒòÎªÔÚÆÕÍ¨Ïß³ÌÊÇÎÞ·¨ÓÃÀ´¸üÐÂ½çÃæµÄ
 	 */
 	private Handler handler = new Handler() {
@@ -528,9 +590,8 @@ OnGestureListener {
 			
 			runningTasks--;
 			
-			if (data.equals("error")) {
-				Toast.makeText(TestAndroidActivity.this, "ÄãµÄÍøÂçÃ²ËÆÓÐµãÐ¡ÎÊÌâ~",
-						Toast.LENGTH_SHORT).show();
+			if (  msg.what!=Const.MSGPSTNEW && data.equals("error")) {
+				displayMsg("ÄãµÄÍøÂçÃ²ËÆÓÐµãÐ¡ÎÊÌâ~");
 				
 			}
 			else
@@ -539,7 +600,7 @@ OnGestureListener {
 			case Const.MSGWHAT:
 				// ÉèÖÃÏÔÊ¾ÎÄ±¾
 				// ´¦Àí½âÎödataÊý¾Ý
-				top10TopicList = getTop10Topic(data);
+				top10TopicList = StringUtil.getTop10Topic(data);
 				setTopics();
 				break;
 			case Const.MSGTOPIC:
@@ -552,13 +613,14 @@ OnGestureListener {
 				textView = (TextView) findViewById(R.id.label);
 				ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
 				sv.scrollTo(0, 0);
-				textView.setText(topicData);
+				textView.setText( getURLChanged(topicData));
 
 				break;
 			case Const.MSGTOPICREFREASH:
 				textView = (TextView) findViewById(R.id.label);
+				
 				if(textView!=null)
-					textView.setText(topicData);
+					textView.setText(getURLChanged(topicData));
 				break;
 			case Const.MSGAREA:
 				chaToArea(data);
@@ -582,6 +644,16 @@ OnGestureListener {
 				checkRst(data);
 				break;
 
+			case Const.MSGVIEWUSER:
+				getUserData(data);
+				break;
+				
+			case Const.MSGSYN:
+				checkSyn(data);
+				break;
+				
+				
+				
 			default:
 				break;
 
@@ -595,7 +667,96 @@ OnGestureListener {
 			
 		}
 
+		
+
+		
+
 	};
+	
+	//Í¬²½ÊÕ²Ø¼Ð
+	private void checkSyn(String data) {
+		Document doc = Jsoup.parse(data);
+
+		Elements as = doc.getElementsByTag("a");
+		int ll = areaNamList.size();
+		for (Element aTag : as) {
+			String href = aTag.attr("href");
+			if(href.contains("board?board="))
+			{
+				String tempAreaName = aTag.text().trim().toLowerCase();
+			
+				tempAreaName = tempAreaName.replaceFirst(
+						tempAreaName.substring(0, 1),
+						tempAreaName.substring(0, 1)
+									.toUpperCase());
+				
+				if (areaNamList.contains(tempAreaName)) {
+					continue;
+				}
+				areaNamList.add(tempAreaName);
+				
+			}
+		}
+		if(ll<areaNamList.size())
+		{
+			int ii= areaNamList.size()-ll;
+			storeAreaName();
+			displayMsg("Í¬²½WEBÊÕ²Ø¼Ð³É¹¦!¸üÐÂ"+ii+"¸öÒÑÊÕ²Ø°æÃæ");
+		}
+		else
+		{
+			displayMsg("ÄãµÄ±¾µØÊÕ²Ø¼ÐÒÑ¾­ÊÇ×îÐÂµÄÁË£¡");
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * »ñÈ¡ÓÃ»§ÐÅÏ¢
+	 * @param data
+	 */
+	private void getUserData(String data) {
+		//TODO:
+		char s = 10;
+		String backS = s + "";
+		
+		data = data.replaceAll(backS, "<br>");
+		Document doc = Jsoup.parse(data);
+
+		Elements scs = doc.getElementsByTag("textarea");
+		
+		if (scs.size() != 1) {
+			Toast.makeText(TestAndroidActivity.this, "»ñÈ¡ÓÃ»§ÐÅÏ¢Ê§°Ü",
+					Toast.LENGTH_SHORT).show();
+		}
+		else
+		{
+			Element textArea = scs.get(0);
+			String infoView = textArea.text();
+			
+			
+			String withSmile = StringUtil.addSmileySpans(infoView);
+			LayoutInflater factory = LayoutInflater
+			.from(TestAndroidActivity.this);
+			final View info = factory.inflate(R.layout.infodlg, null);
+			AlertDialog dlg = new AlertDialog.Builder(TestAndroidActivity.this)
+			.setTitle("ÓÃ»§ÐÅÏ¢²éÑ¯").setView(info).setNegativeButton("È·¶¨",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+						}
+					}).create();
+			//·¢²ÊÕÕ¹¦ÄÜ
+			textView = (TextView) info.findViewById(R.id.tvInfo);
+			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
+			sv.scrollTo(0, 0);
+			textView.setText(Html.fromHtml(withSmile));
+			
+			dlg.show();
+
+		}
+
+	}
 
 	/**
 	 * ¼ì²é·¢ÎÄ½á¹û
@@ -727,6 +888,10 @@ OnGestureListener {
 	String reid;
 	String cont;
 
+	/**
+	 * »ñÈ¡·¢ÎÄµÄ´°¿Ú
+	 * @param formData
+	 */
 	protected void checkForm(String formData) {
 		Document doc = Jsoup.parse(formData);
 		Elements ins = doc.getElementsByTag("input");
@@ -736,7 +901,7 @@ OnGestureListener {
 			if (formData.contains("´Ò´Ò¹ý¿Í")) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						TestAndroidActivity.this);
-				builder.setMessage("Äã»¹Ã»µÇÂ½ÄØ~È¥µÇÂ¼?").setCancelable(false)
+				builder.setMessage("Äã»¹Ã»µÇÂ½ÄØ~ÖØÐÂµÇÂ¼?").setCancelable(false)
 						.setPositiveButton("µÇÂ¼",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
@@ -776,11 +941,20 @@ OnGestureListener {
 			String title = ins.get(0).attr("value");
 			pid = ins.get(1).attr("value");
 			reid = ins.get(2).attr("value");
-
+			 String recont = "" ;
+			try
+			{
+				recont = formData.substring(formData.indexOf("<textarea name=text rows=20 cols=80 wrap=physicle>")+50,formData.indexOf("</textarea>"));
+			}
+			catch(Exception e)
+			{
+				
+			}
+			final String extraRecont = recont;
 			LayoutInflater factory = LayoutInflater
 					.from(TestAndroidActivity.this);
 			final View acdlgView = factory.inflate(R.layout.acdlg, null);
-			AlertDialog dlg = new AlertDialog.Builder(TestAndroidActivity.this)
+			 Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
 					.setTitle("·¢ÎÄ").setView(acdlgView).setPositiveButton("·¢±í",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
@@ -791,98 +965,135 @@ OnGestureListener {
 											.toString();
 									titleEdit = (EditText) acdlgView
 											.findViewById(R.id.edt_cont);
-									cont = getStrBetter(titleEdit.getText()
+									cont = StringUtil.getStrBetter(titleEdit.getText()
 											.toString());
-
-									try {
-										title = URLEncoder.encode(title,
-												"GB2312"); // new
-															// String((title.replace(" ",
-															// "%20")).getBytes("UTF-8"),"gb2312");
-										String url = "http://bbs.nju.edu.cn/bbssnd?board="
-												+ curAreaName
-												+ "&title="
-												+ title
-												+ "&pid="
-												+ pid
-												+ "&reid="
-												+ reid
-												+ "&signature=1";
-										// +"&text="+;
-
-										NameValuePair[] newVp = { new NameValuePair(
-												"text", cont) };
-
-										nvpCont = newVp;
-
-										getUrlHtml(url, Const.MSGPSTNEW);
-									} catch (UnsupportedEncodingException e) {
-										e.printStackTrace();
-									}
-
+											//ÒýÓÃÔ­ÎÄ
+											CheckBox cb = (CheckBox) acdlgView.findViewById(R.id.cb_recont);
+											if(cb.isChecked()&&extraRecont!=null&&extraRecont.length()>1)
+											{
+												cont+=extraRecont.substring(2);
+											}
+											sendTopic(title,cont);
 								}
 
-							}).setNegativeButton("È¡Ïû",
+							});
+							
+			 if(extraRecont.length()<4)
+				{
+				 altDlg.setNegativeButton("È¡Ïû",
+							new DialogInterface.OnClickListener() {
+						public void onClick(
+								DialogInterface dialoginterface, int i) {
+
+						}
+					});
+				}
+			 else
+			 {
+				 altDlg.setNegativeButton("¿ìËÙ»Ø¸´",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int whichButton) {
-								}
-							}).create();
+										if(fastReList.length<1)
+											return;
+										if(fastReList.length==1)
+										{
+											//TODO
+											EditText titleEdit = (EditText) acdlgView
+											.findViewById(R.id.edt_title);
+											String title = titleEdit.getText().toString();
+											String reText = fastReList[0];
+											sendTopic(title,reText);
+											return;
+										}
+										AlertDialog.Builder builder = new AlertDialog.Builder(
+												TestAndroidActivity.this);
+
+										builder.setTitle("Ñ¡ÔñÒªÊ¹ÓÃµÄ¿ì½Ý»Ø¸´£º");
+										
+										builder.setSingleChoiceItems(fastReList, 0,
+												new DialogInterface.OnClickListener() {
+													public void onClick(
+															DialogInterface dialoginterface, int i) {
+
+														EditText titleEdit = (EditText) acdlgView
+														.findViewById(R.id.edt_title);
+														String title = titleEdit.getText().toString();
+														String reText = fastReList[i]+"\n";
+														dialoginterface.dismiss();
+														sendTopic(title,reText);
+													}
+												});
+
+										builder.setPositiveButton("È¡Ïû",
+												new DialogInterface.OnClickListener() {
+													public void onClick(
+															DialogInterface dialoginterface, int i) {
+
+													}
+												});
+										builder.create().show();
+
+									}
+							});
+			 }
+			 
+							
+				AlertDialog dlg =			altDlg.create();
 			EditText titleEdit = (EditText) acdlgView
 					.findViewById(R.id.edt_title);
-
+			CheckBox cb = (CheckBox) acdlgView.findViewById(R.id.cb_recont);
+			if(extraRecont.length()<4)
+			{
+				
+				cb.setChecked(false);
+				cb.setVisibility(CheckBox.INVISIBLE);
+			}
+			else
+			{
+				cb.setChecked(true);
+			}
 			titleEdit.setText(title);
 			dlg.show();
 
 		}
 	}
 
-	public boolean isEnglish(char c) {
-		if ((c >= 0 && c <= 9) || (c >= 'a' && c <= 'z')
-				|| (c >= 'A' && c <= 'z') || c == ' ') {
-			return true;
-		} else
-			return false;
-	}
-
-	private String getStrBetter(String string) {
-
-		String scon = string;// new
-								// String(string.getBytes("iso-8859-1"),"gb2312");
-
-		String[] split = scon.split("\n");
-		StringBuilder allSb = new StringBuilder();
-		for (String sp : split) {
-			StringBuilder sb = new StringBuilder(sp);
-			int len = sp.length();
-			int tempLen = 0;
-			for (int i = 0; i < len; i++) {
-				char charAt = sb.charAt(i);
-				if (isEnglish(charAt)) {
-					tempLen++;
-				} else {
-					tempLen += 2;
-				}
-				if (tempLen >= 80) {
-					sb.insert(i + 1, '\n');
-					len++;
-					i++;
-					tempLen = 0;
-				}
-			}
-
-			// for(int i=0;i<sp.length()/40;i++)
-			// {
-			// sb.insert((i+1)*40, '\n');
-			// }
-			allSb.append(sb.append('\n'));
+	private void sendTopic(String title,String cont)
+	{
+		//ÊÖ»úÇ©Ãû
+		if(isBackWord&&backWords!=null&&backWords.length()>0)
+		{
+			cont+="\n-\n[1;32m"+backWords+"[m\n";
 		}
+		
+		try {
+			title = URLEncoder.encode(title,
+					"GB2312"); // new
+								// String((title.replace(" ",
+								// "%20")).getBytes("UTF-8"),"gb2312");
+			String url = "http://bbs.nju.edu.cn/bbssnd?board="
+					+ curAreaName
+					+ "&title="
+					+ title
+					+ "&pid="
+					+ pid
+					+ "&reid="
+					+ reid
+					+ "&signature=1";
+			// +"&text="+;
 
-		string = allSb.toString();
+			NameValuePair[] newVp = { new NameValuePair(
+					"text", cont) };
 
-		return string;
+			nvpCont = newVp;
+
+			getUrlHtml(url, Const.MSGPSTNEW);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 	}
-
+	
 	private void setCookies(String cookStr) {
 
 		char[] charArray = cookStr.toCharArray();
@@ -899,75 +1110,20 @@ OnGestureListener {
 			}
 			i++;
 		}
-
 		String NUM = (Integer.parseInt(cookStr.substring(0, sp1)) + 2) + "";
-
 		String id = cookStr.substring(sp1 + 1, sp2);
 		String KEY = (Integer.parseInt(cookStr.substring(sp2 + 1)) - 2) + "";
 		//saveMyCookie( NUM, id , KEY);
-		setMyCookie( NUM, id , KEY);
-		
-		
-
+		NetTraffic.setMyCookie( NUM, id , KEY);
 	}
 
-	private void setMyCookie(String NUM,String id ,String KEY)
-	{
-		cookies = new Cookie[3];
 
-		cookies[0] = new Cookie();
-		cookies[0].setDomain("bbs.nju.edu.cn");
-		cookies[0].setPath("/");
-		cookies[0].setName("_U_NUM");
-		cookies[0].setValue(NUM);
-
-		cookies[1] = new Cookie();
-		cookies[1].setDomain("bbs.nju.edu.cn");
-		cookies[1].setPath("/");
-		cookies[1].setName("_U_UID");
-		cookies[1].setValue(id);
-
-		cookies[2] = new Cookie();
-		cookies[2].setDomain("bbs.nju.edu.cn");
-		cookies[2].setPath("/");
-		cookies[2].setName("_U_KEY");
-		cookies[2].setValue(KEY);
-	}
-	
-	/*
-	private void saveMyCookie(String NUM,String id ,String KEY)
-	{
-		Editor editor = sharedPreferences.edit();// »ñÈ¡±à¼­Æ÷
-		editor.putString("NUM", NUM);
-		editor.putString("id", id);
-		editor.putString("KEY", KEY);
-		editor.commit();
-	}
 	
 	
-	private boolean getMyCookie()
-	{
-
-		String NUM = sharedPreferences.getString("NUM", null);
-		String id  = sharedPreferences.getString("id", null);
-		String KEY = sharedPreferences.getString("KEY", null);
-		
-		if(NUM==null)
-		{
-			return false;
-		}
-		else 
-		{
-			setMyCookie( NUM, id , KEY);
-			return true;
-		}
-		
-	}
-	*/
 	
 
 	/**
-	 * ½«ÓÉHTMLÒ³Ãæ×ª³öµÄÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ ¹©10´óÊ¹ÓÃ
+	 * ½«ÓÉÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ ¹©10´óÊ¹ÓÃ
 	 */
 	private void setTopics() {
 
@@ -981,8 +1137,8 @@ OnGestureListener {
 
 			map.put("topictitle", " " + topicInfo.getTitle());
 
-			map.put("topicau", " ×÷Õß£º" + topicInfo.getAuthor() + "  ÐÅÇø£º"
-					+ topicInfo.getArea() + "  »Ø¸´£º" + topicInfo.getNums());
+			map.put("topicau", " ×÷Õß:" + topicInfo.getAuthor() + "  ÐÅÇø:"
+					+ topicInfo.getArea() + "  »Ø¸´:" + topicInfo.getNums());
 
 			list.add(map);
 
@@ -1029,14 +1185,14 @@ OnGestureListener {
 			map.put("topictitle", " " + topicInfo.getTitle());
 			if (topicInfo.getNums() == null || topicInfo.getNums().equals("")) {
 				map
-						.put("topicau", " ÖÃ¶¥   ×÷Õß£º" + topicInfo.getAuthor()
-								+ " - " + topicInfo.getPubDate() + "  ÈËÆø£º"
+						.put("topicau", " ÖÃ¶¥   ×÷Õß:" + topicInfo.getAuthor()
+								+ " - " + topicInfo.getPubDate() + "  ÈËÆø:"
 								+ topicInfo.getHot());
 			} else {
 				map
-						.put("topicau", " " + topicInfo.getNums() + "   ×÷Õß£º"
-								+ topicInfo.getAuthor() + " - "
-								+ topicInfo.getPubDate() + "  ÈËÆø£º"
+						.put("topicau", " " + topicInfo.getNums() + "   ×÷Õß:"
+								+ topicInfo.getAuthor() + " ÓÚ"
+								+ topicInfo.getPubDate() + "  ÈËÆø:"
 								+ topicInfo.getHot());
 			}
 
@@ -1076,310 +1232,23 @@ OnGestureListener {
 	boolean isNext = true;
 	boolean isPrev = true;
 
-	/**
-	 * ½âÎö»ñÈ¡µÄÒ³Ãæ ´¦ÀíÄ³¸öÌØ¶¨µÄ»°Ìâ
-	 * 
-	 * @param data
-	 * @return
-	 */
-	private String getTopicInfo(String data) {
-		StringBuffer tiList = new StringBuffer("<br>");
-		char s = 10;
-		String backS = s + "";
-		data = data.replaceAll(backS, "<br>");
-		Document doc = Jsoup.parse(data);
-		topicWithImg = false;
-
-		Elements tds = doc.getElementsByTag("textarea");
-		int k = 0;
-		for (Element element : tds) {
-			String text = element.text();
-			String content = "";
-			/**
-			 * ½âÎöTopicµÄ´úÂë ÔÝÊ±²»ÓÃ int auNo = text.indexOf("·¢ÐÅÈË:"); int areaNo =
-			 * text.indexOf("ÐÅÇø:"); int titleNo = text.indexOf("±ê Ìâ:"); int
-			 * mailNo = text.indexOf("·¢ÐÅÕ¾:"); int tailNo = text.indexOf("<br>
-			 * --<br>
-			 * "); //¿ÉÒÔ¿¼ÂÇÌáÉýÐ§ÂÊµÄµØ·½ //StringBuffer sb = new StringBuffer("");
-			 * 
-			 * String au=""; if(auNo==-1||areaNo==-1) { content=text; } else {
-			 * au = text.substring(auNo+5, areaNo-2); if(k==0) { String area =
-			 * text.substring(areaNo+4, titleNo); curAreaName =
-			 * area.replaceAll("<br>
-			 * ", ""); String title = text.substring(titleNo+5, mailNo);
-			 * tiList+="±êÌâ£º"+title+"ÐÅÇø£º"+area+"<br>
-			 * <br>
-			 * ";
-			 * 
-			 * }
-			 * 
-			 * if(tailNo<mailNo+40) { content =text.substring( mailNo+40); }
-			 * else { content = text.substring( mailNo+40, tailNo); }
-			 * if(content.startsWith("br>")) { content = content.substring(3); }
-			 * }
-			 */
-
-			content = text;
-			String nowP = "";
-			{
-				nowP = (nowPos + k) + "";
-				if (k == 0) {
-					nowP = "0";
-				}
-
-			}
-			if (k == tds.size() - 1) {
-				if (k < 30) {
-					isNext = false;
-				} else {
-					isNext = true;
-				}
-
-			}
-			
-			
-			
-			 if(k==0) {
-				 int areaNo = text.indexOf("ÐÅÇø:");
-					int titleNo = text.indexOf("±ê Ìâ:"); 
-				 String area =text.substring(areaNo+4, titleNo); 
-				 curAreaName =  area.replaceAll("<br>", ""); 
-			 }
-			
-
-			k++;
-
-			String nbs = "<br>";// &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-
-			if (k == 1 && nowPos > 1) {
-				content = content.substring(4, content.indexOf("·¢ÐÅÕ¾:"))
-						+ "<br><br>...(ÒÔÏÂÊ¡ÂÔ)<br>";
-			} else {
-				/** * ´¦ÀíÓ²»Ø³µ */
-				String[] split = content.split("<br>");
-
-				int j = 0;
-				int tempBr = 0;
-				StringBuffer sb = new StringBuffer();
-				// TODO:²ÎÊý»¯
-				// int picNo = 0;
-				for (String sconA : split) {
-
-					if (j < 3) {
-						j++;
-						if (j == 1) {
-							sconA = sconA.substring(4);
-							int ind = sconA.indexOf(" (");
-							int inArea = sconA.indexOf(", ÐÅÇø");
-
-							if (k == 1) {
-								// TODO:¿É¼ÓÈëµã»÷²é¿´ÓÃ»§ÐÅÏ¢¹¦ÄÜ
-								sb.append("<font color=#0000EE >").append(
-										sconA.substring(0, ind)).append(
-										"</font>").append(
-										sconA.substring(ind, inArea)).append(
-										nbs)
-										.append(sconA.substring(inArea + 1))
-										.append(nbs);
-								
-							} else {
-								sb.append("<font color=#0000EE >").append(
-										sconA.substring(0, ind)).append(
-										"</font>").append(
-										sconA.substring(ind, inArea)).append(
-										nbs);
-
-							}
-							continue;
-						}
-						if (j == 2 && k != 1)
-							continue;
-						// if(j==3)
-						// {
-						// //.substring(15,sconA.length()-1)
-						// sconA =
-						// "<font size='8dp' color=#669900 >"+sconA+"</font>";
-						// }
-
-						sb.append(sconA).append(nbs);
-						continue;
-					} else if (sconA.length() < 1) {
-						if (tempBr == 0) {
-							tempBr = 1;
-							sb.append(sconA).append(nbs);
-						}
-						continue;
-					}
-
-					if (sconA.contains("À´Ô´:£®") || sconA.contains("ÐÞ¸Ä:£®")
-							|| sconA.equals("--")) {
-						continue;
-					}
-					sconA = sconA.trim();
-					if(isPic.equals(Const.AllPic)||(isWifi &&isPic.equals(Const.WIFIPic)))
-						
-						
-					{
-						if (sconA.toLowerCase().startsWith("http:")
-								&& (sconA.toLowerCase().endsWith(".jpg") || sconA
-										.toLowerCase().endsWith(".png")||sconA.toLowerCase().endsWith(".jpeg"))) {
-							
-	
-							sb.append("<img src='").append(sconA).append("'><br>");
-							topicWithImg = true;
-							continue;
-						}
-					}
-
-					tempBr = 0;
-					String scon = "";
-					try {
-						scon = new String(sconA.getBytes("gb2312"),
-								"iso-8859-1");
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
-					if (scon.length() < 71 || scon.length() > 89) {
-						sb.append(sconA + nbs);
-					} else {
-						sb.append(sconA);
-					}
-
-				}
-				content = sb.toString();
-			}
-
-			if (nowP == "0") {
-				tiList.append("Â¥Ö÷: ").append(content).append(
-						"<img src='xian'><br><br>");// +au+"</font></B>"
-			} else {
-				tiList.append(nowP).append("Â¥£º").append(content).append(
-						"<img src='xian'><br><br>");// +au+"</font></B>"
-				// tiList
-				// +="<B><font color=#0080ff >"+nowP+"Â¥:</font>"+nbs+content+"<br><br>";//+au+"</font></B>"
-			}
-		}
-		return addSmileySpans(tiList.toString());
-	}
-	
-	
-    public String addSmileySpans(String text) {
-        
-    	//Ìæ»»±íÇé
-        Pattern mPattern = Pattern.compile("\\[(;|:).{1,4}\\]");
-        Matcher matcher = mPattern.matcher(text);
-       
-        StringBuffer sb = new StringBuffer();
-
-        while (matcher.find()) {
-        	matcher.appendReplacement(sb, "<img src='"+matcher.group()+"'>");
-        }
-        
-        
-        matcher.appendTail(sb);
-       
-        //String ma = sb.toString();
-        
-        //Ìæ»»×ÖÌåÑÕÉ«
-        StringBuffer sb2= new StringBuffer();
-        mPattern = Pattern.compile("\\[(1;.*?|37;1|32)m");
-        matcher = mPattern.matcher(sb);
-
-        while (matcher.find()) {
-        	matcher.appendReplacement(sb2, fFolorAll.get(matcher.group(0)));
-        }
-        
-        
-        matcher.appendTail(sb2);
-
-        
-        
-        
-        sb2.append("</font>");
- 
-        return sb2.toString().replaceAll("\\[\\+reset\\]|\\[m|\\[(0|[0-9]{1,2})m", "</font>");
-    }
 	
 
-	/**
-	 * ½âÎö»ñÈ¡µÄÒ³Ãæ ´¦ÀíÌÖÂÛÇøµÄ»°ÌâÁÐ±í
-	 * 
-	 * @param data
-	 * @return
-	 */
-	private List<TopicInfo> getAreaTopic(String data) {
-		List<TopicInfo> tiList = new ArrayList<TopicInfo>();
-		Document doc = Jsoup.parse(data);
-		Elements tds = doc.getElementsByTag("td");
-		int curPos = 0;
-		int getTopicNo = 0;
-		while (curPos < tds.size()) {
-			if (curPos != 0) {
-				TopicInfo ti = new TopicInfo();
-				ti.setLink((tds.get(curPos + 4).getElementsByTag("a")).get(0)
-						.attr("href"));// ÉèÖÃtitle
-				ti.setTitle(tds.get(curPos + 4).text());// ÉèÖÃtitle
-				ti.setPubDate(tds.get(curPos + 3).text());
-				ti.setAuthor(tds.get(curPos + 2).text());
-				ti.setHot(tds.get(curPos + 5).text());
-				String notext = tds.get(curPos).text();
-				ti.setNums(notext);
-				tiList.add(ti);
-				if (getTopicNo == 0) {
-
-					if (notext != "" && Character.isDigit(notext.charAt(0))) {
-						areaNowTopic = Integer.parseInt(notext);
-						getTopicNo = 1;
-					}
-				}
-
-			}
-
-			curPos += 6;
-		}
-
-		return tiList;
-	}
-
-	/**
-	 * ½âÎö»ñÈ¡µÄÒ³Ãæ ´¦Àí10´óÁÐ±í
-	 * 
-	 * @param data
-	 * @return
-	 */
-	private List<TopicInfo> getTop10Topic(String data) {
-		List<TopicInfo> tiList = new ArrayList<TopicInfo>();
-		Document doc = Jsoup.parse(data);
-		Elements tds = doc.getElementsByTag("td");
-		if (tds.size() != 55) {
-			TopicInfo ti = new TopicInfo();
-			ti.setTitle(getResources().getString(R.string.getnew));
-			tiList.add(ti);
-			return tiList;
-		}
-
-		for (int i = 1; i < 11; i++) {
-			int pos = i * 5;
-			TopicInfo ti = new TopicInfo();
-			ti.setRank(i + "");
-			ti.setLink((tds.get(pos + 2).getElementsByTag("a")).get(0).attr(
-					"href"));// ÉèÖÃtitle
-			ti.setTitle(tds.get(pos + 2).text());// ÉèÖÃtitle
-			ti.setArea(tds.get(pos + 1).text());
-			ti.setNums(tds.get(pos + 4).text());
-			ti.setAuthor(tds.get(pos + 3).text());
-			tiList.add(ti);
-		}
-
-		return tiList;
-	}
-
+	
 	/**
 	 * Ìø×ªµ½ÌÖÂÛÇø½çÃæ
 	 * 
 	 * @param AreaData
 	 */
 	private void chaToArea(String AreaData) {
+		
+		if(AreaData!=null&&AreaData.contains("´íÎó! ´íÎóµÄÌÖÂÛÇø"))
+				{
+			Toast.makeText(TestAndroidActivity.this, "¸ÃÌÖÂÛÇø²»´æÔÚ£¡",
+					Toast.LENGTH_SHORT).show();
+			return;
+				}
+		
 		setContentView(R.layout.area);
 		curStatus = 1;
 		Button btnBack = (Button) findViewById(R.id.btn_back);
@@ -1493,11 +1362,111 @@ OnGestureListener {
 		setAreaTopics();
 		listView.setSelection(areaTopic.size() - 1);
 	}
+	
+	 /**
+	 * ½âÎö»ñÈ¡µÄÒ³Ãæ ´¦ÀíÌÖÂÛÇøµÄ»°ÌâÁÐ±í
+	 * 
+	 * @param data
+	 * @return
+	 */
+	private List<TopicInfo> getAreaTopic(String data) {
+		List<TopicInfo> tiList = new ArrayList<TopicInfo>();
+		Document doc = Jsoup.parse(data);
+		Elements tds = doc.getElementsByTag("td");
+		int curPos = 0;
+		int getTopicNo = 0;
+		while (curPos < tds.size()) {
+			if (curPos != 0) {
+				TopicInfo ti = new TopicInfo();
+				ti.setLink((tds.get(curPos + 4).getElementsByTag("a")).get(0)
+						.attr("href"));// ÉèÖÃtitle
+				ti.setTitle(tds.get(curPos + 4).text());// ÉèÖÃtitle
+				
+				String date = DateUtil.formatDateToStrNoWeek(DateUtil.getDatefromStrNoWeek(tds.get(curPos + 3).text()));
+				if(date == null||date.equals("null"))
+					
+					ti.setPubDate(tds.get(curPos + 3).text());
+				else
+					ti.setPubDate(date);
+				ti.setAuthor(tds.get(curPos + 2).text());
+				ti.setHot(tds.get(curPos + 5).text());
+				String notext = tds.get(curPos).text();
+				ti.setNums(notext);
+				tiList.add(ti);
+				if (getTopicNo == 0) {
 
-	int textViewY = 0;
-	
-	
-	
+					if (notext != "" && Character.isDigit(notext.charAt(0))) {
+						areaNowTopic = Integer.parseInt(notext);
+						getTopicNo = 1;
+					}
+				}
+
+			}
+
+			curPos += 6;
+		}
+
+		return tiList;
+	}
+	class MyURLSpan extends ClickableSpan {
+		
+		  private String mUrl;
+		   private boolean underline = false;
+		     MyURLSpan(String url) {
+		      mUrl = url;
+		     }
+
+
+		     
+		     @Override
+		  public void updateDrawState(TextPaint ds) {
+		   super.updateDrawState(ds);
+		    ds.setUnderlineText(underline);//Ò»°ãÁ´ÏÂÃæ¶¼ÓÐÒ»ÌõÏß£¬Í¦¶ñÐÄ£¬ ¸Ã·½·¨¿ÉÒÔÈ¥µôÄÇÌõÏß
+		   // ds.setColor(Color.rgb(0, 0, 237));// ¸Ä±äÁ´½ÓµÄÑÕÉ«ÉèÖÃ
+		  }
+
+		  @Override
+		     public void onClick(View widget) {
+		            //´Ë´¦Ð´ÄãµÄ´¦ÀíÂß¼­
+			  //System.out.println("123123");
+			  // processHyperLinkClick(text); //µã»÷³¬Á´½ÓÊ±µ÷ÓÃ
+			  if(mUrl.contains("bbsqry?userid"))
+			  {
+				  //²é¿´ÓÃ»§
+				  getUrlHtml(mUrl, Const.MSGVIEWUSER);
+			  }
+			  else if(mUrl.toLowerCase().startsWith("http:")
+						&& (mUrl.toLowerCase().endsWith(".jpg") 
+								|| mUrl.toLowerCase().endsWith(".png")
+								||mUrl.toLowerCase().endsWith(".jpeg")
+								||mUrl.toLowerCase().endsWith(".gif")
+								))
+			  {
+				  Intent intent = new Intent(TestAndroidActivity.this, ImageActivity.class);
+				  intent.putExtra("mUrl", mUrl); 
+				 
+				  startActivity(intent);
+			  }
+			  else if(mUrl.toLowerCase().startsWith("http:"))
+			  {
+				  //super.
+			  }
+
+		   }
+		 }
+
+	 public  SpannableStringBuilder getURLChanged(Spanned topicData)
+	 {
+		 URLSpan[] spans = topicData.getSpans(0, topicData.length(), URLSpan.class);  
+			SpannableStringBuilder style = new SpannableStringBuilder(topicData);
+			for (URLSpan url : spans) {
+				 style.removeSpan(url);
+			     MyURLSpan myURLSpan = new MyURLSpan(url.getURL());
+			     style.setSpan(myURLSpan, topicData.getSpanStart(url), topicData
+			       .getSpanEnd(url), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+			    }
+			return style;
+	 }
 
 	/**
 	 * Ìø×ªµ½Ä³¸ö»°Ìâ½çÃæ
@@ -1507,20 +1476,21 @@ OnGestureListener {
 	private void chaToTopic(Spanned topicData) {
 
 		setContentView(R.layout.topic);
-		textView = (TextView) findViewById(R.id.label);
-		textView.setText(topicData);
-
 		
-		//textView.
+		//topicData.getSpans(arg0, arg1, arg2);
+		SpannableStringBuilder urlChanged = getURLChanged(topicData);
+
+		textView = (TextView) findViewById(R.id.label);
+		textView.setText(urlChanged);
+		textView.setMovementMethod(LinkMovementMethod.getInstance());
+
+//		
+//		//textView.
 		if(isTouch)
 		{
 			textView.setOnTouchListener(this);
 			textView.setFocusable(true);
-
-			textView.setClickable(true);
-
 			textView.setLongClickable(true);
-
 		}
 		
 		// WebView mWebView = (WebView) findViewById(R.id.label);
@@ -1570,14 +1540,7 @@ OnGestureListener {
 		btnNext.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// if(!isNext)
-				// {
-				// Toast.makeText(TestAndroidActivity.this, "µ±Ç°Îª×îºóÒ»Ò³£¡",
-				// Toast.LENGTH_SHORT)
-				// .show();
-				// return;
-				//					
-				// }
+				
 				if (isNext) {
 					nowPos = nowPos + 30;
 					getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICNEXT);
@@ -1608,12 +1571,6 @@ OnGestureListener {
 
 	}
 
-	AsyncImageLoader asyncImageLoader = new AsyncImageLoader();
-
-	private void getTop10() {
-		String urlString = getResources().getString(R.string.bbstop10);
-		getUrlHtml(urlString, Const.MSGWHAT);
-	}
 
 	private String dataUrl = "";
 	private int datamsg = -1;
@@ -1636,9 +1593,9 @@ OnGestureListener {
 				// ÐèÒª»¨Ê±¼ä¼ÆËãµÄ·½·¨
 				try {
 					if (nvpCont == null) {
-						data = getHtmlContent(dataUrl);
+						data = NetTraffic.getHtmlContent(dataUrl);
 					} else {
-						data = postHtmlContent(dataUrl, nvpCont);
+						data = NetTraffic.postHtmlContent(dataUrl, nvpCont);
 						nvpCont = null;
 					}
 					// Thread.sleep(5000);
@@ -1654,8 +1611,14 @@ OnGestureListener {
 					{
 						imageTrd.setName("NoUse");
 					}
-					final  String topicDataInfo = getTopicInfo(data);
+					topicWithImg = false;
+					final  String topicDataInfo = StringUtil.getTopicInfo(data,nowPos,isIP,isWifi,isPic);
 
+					isNext = StringUtil.isNext;
+					if(StringUtil.curAreaName!=null&&!StringUtil.curAreaName.equals("byztm"))
+						curAreaName =  StringUtil.curAreaName;
+					topicWithImg = StringUtil.topicWithImg;
+					
 					topicData = Html.fromHtml(topicDataInfo,
 							new Html.ImageGetter() {
 								public Drawable getDrawable(String source) {
@@ -1667,16 +1630,15 @@ OnGestureListener {
 									}
 									else if (source.startsWith("[")) 
 									{
-										Resources res = getResources();
-										Integer i = smilyAll.get(source);
-										if(i!=null)
-										{
-										drawable = res.getDrawable( i);
+										try {
+											drawable = fetchDrawable(source); 
+										} catch (Exception e) {
+											return null;
+										}
+										if (drawable==null) return null;
 										int iw = drawable.getIntrinsicWidth();
 										drawable.setBounds(0, 0, iw, drawable
 												.getIntrinsicHeight());
-										}
-										//String faceNo = source.substring(5)
 									}
 									return drawable;
 
@@ -1684,7 +1646,8 @@ OnGestureListener {
 							}, null);
 					if(topicWithImg)
 					{
-					imageTrd = new Thread(topicDataInfo) {
+						
+						imageTrd = new Thread(topicDataInfo) {
 
 						@Override
 						public void interrupt() {
@@ -1703,12 +1666,15 @@ OnGestureListener {
 											if ("xian".equals(source)) {
 												drawable = xianDraw;
 												drawable.setBounds(0, 0, sWidth, 2);
-											} else {
+											} 
+											
+											else if (source.startsWith("http")||source.startsWith("[")) {
 												try {
 													drawable = fetchDrawable(source); 
 												} catch (Exception e) {
 													return null;
 												}
+												if (drawable==null) return null;
 												int iw = drawable.getIntrinsicWidth();
 												drawable.setBounds(0, 0, iw, drawable
 														.getIntrinsicHeight());
@@ -1745,8 +1711,27 @@ OnGestureListener {
 
 			drawableMap.remove(source);
 		}
+		Drawable drawable =null;
+		if(source.startsWith("["))
+		{
+			Resources res = getResources();
+			Integer i = smilyAll.get(source);
+			if(i!=null)
+			{
+				drawable = res.getDrawable( i);
+			}
+			else
+				return null;
+		}
+		else if(source.startsWith("http"))
+		{
+			 drawable = zoomDrawable(source);
+		}
+		else
+		{
+			return null;
+		}
 
-		Drawable drawable = zoomDrawable(source);
 		drawableRef = new SoftReference<Drawable>(drawable);
 		drawableMap.put(source, drawableRef);
 
@@ -1876,7 +1861,7 @@ OnGestureListener {
 								getUrlHtml(loginoutURL,123);
 								
 								try {
-									Thread.sleep(300);
+									Thread.sleep(500);
 								} catch (InterruptedException e) {
 	
 									e.printStackTrace();
@@ -1901,121 +1886,7 @@ OnGestureListener {
 		handler.sendMessage(msg);
 	}
 
-	private HttpClient getClient() {
-		// ¹¹ÔìHttpClientµÄÊµÀý
-		HttpClient httpClient = new HttpClient();
-
-		if (cookies != null) {
-			for (Cookie cc : cookies) {
-				httpClient.getState().addCookie(cc);
-			}
-		}
-
-		httpClient.getParams().setCookiePolicy(
-				CookiePolicy.BROWSER_COMPATIBILITY);
-		httpClient.getParams().setParameter(
-				"http.protocol.single-cookie-header", true);
-		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
-				5000);
-		httpClient.getHttpConnectionManager().getParams().setSoTimeout(10000);
-
-		return httpClient;
-	}
-
-	HttpClient httpClient = null;
-
-	/**
-	 * ¸ù¾ÝurlÈ¡µÃÆä¶ÔÓ¦µÄresponse
-	 */
-	private String getHtmlContent(String url) {
-		if (!url.startsWith("http"))
-			url = "http:////" + url;
-		String result = "";// ·µ»ØµÄ½á¹û
-		StringBuffer resultBuffer = new StringBuffer();
-
-		httpClient = getClient();
-		// ´´½¨GET·½·¨µÄÊµÀý
-		GetMethod getMethod = new GetMethod(url);
-		// getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-		// new DefaultHttpMethodRetryHandler());
-		getMethod.getParams().setContentCharset("GB2312");
-		try {
-			// Ö´ÐÐgetMethod
-			int statusCode = httpClient.executeMethod(getMethod);
-			if (statusCode != HttpStatus.SC_OK) {
-				System.err.println("Method failed: "
-						+ getMethod.getStatusLine());
-			}
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					getMethod.getResponseBodyAsStream(), getMethod
-							.getResponseCharSet()));
-			String inputLine = null;
-			while ((inputLine = in.readLine()) != null) {
-				resultBuffer.append(inputLine);
-				resultBuffer.append("\n");
-			}
-			result = new String(resultBuffer);
-			return result;
-		} catch (HttpException e) {
-			// ·¢ÉúÖÂÃüµÄÒì³££¬¿ÉÄÜÊÇÐ­Òé²»¶Ô»òÕß·µ»ØµÄÄÚÈÝÓÐÎÊÌâ
-			result = "error";
-			e.printStackTrace();
-		} catch (IOException e) {
-			// ·¢ÉúÍøÂçÒì³£
-			result = "error";
-			e.printStackTrace();
-		} finally {
-			// ÊÍ·ÅÁ¬½Ó
-			getMethod.releaseConnection();
-		}
-		return result;
-	}
-
-	/**
-	 * POST Êý¾Ýµ½·þÎñÆ÷ÉÏ
-	 */
-	private String postHtmlContent(String url, NameValuePair[] nvp) {
-		if (!url.startsWith("http"))
-			url = "http:////" + url;
-		String result = "";// ·µ»ØµÄ½á¹û
-		StringBuffer resultBuffer = new StringBuffer();
-
-		httpClient = getClient();
-		// ´´½¨GET·½·¨µÄÊµÀý
-		PostMethod post = new PostMethod(url);
-		// getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-		// new DefaultHttpMethodRetryHandler());
-		post.getParams().setContentCharset("GB2312");
-		post.setRequestBody(nvp);
-		try {
-			// Ö´ÐÐgetMethod
-			int statusCode = httpClient.executeMethod(post);
-			if (statusCode != HttpStatus.SC_OK) {
-				System.err.println("Method failed: " + post.getStatusLine());
-			}
-			BufferedReader in = new BufferedReader(new InputStreamReader(post
-					.getResponseBodyAsStream(), post.getResponseCharSet()));
-			String inputLine = null;
-			while ((inputLine = in.readLine()) != null) {
-				resultBuffer.append(inputLine);
-				resultBuffer.append("\n");
-			}
-			result = new String(resultBuffer);
-			return result;
-		} catch (HttpException e) {
-			// ·¢ÉúÖÂÃüµÄÒì³££¬¿ÉÄÜÊÇÐ­Òé²»¶Ô»òÕß·µ»ØµÄÄÚÈÝÓÐÎÊÌâ
-			result = "error";
-			e.printStackTrace();
-		} catch (IOException e) {
-			// ·¢ÉúÍøÂçÒì³£
-			result = "error";
-			e.printStackTrace();
-		} finally {
-			// ÊÍ·ÅÁ¬½Ó
-			post.releaseConnection();
-		}
-		return result;
-	}
+	
 
 	@Override
 	protected void onDestroy() {
@@ -2025,7 +1896,7 @@ OnGestureListener {
 		getUrlHtml(loginoutURL,123);
 		
 		try {
-			Thread.sleep(300);
+			Thread.sleep(500);
 		} catch (InterruptedException e) {
 			
 			e.printStackTrace();
@@ -2044,22 +1915,37 @@ OnGestureListener {
 	public boolean onDown(MotionEvent arg0) {
 		return false;
 	}
+	
+	
+	private static final int SWIPE_MIN_DISTANCE = 120;   
+	private static final int SWIPE_THRESHOLD_VELOCITY = 200; 
+	
 
-	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
-			float arg3) {
-		if (curStatus == 1) {
-			chaToMain();
-			if (top10TopicList != null) {
-				setTopics();
-			}
-		} else {
-			chaToArea(null);
-		}
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		
+		if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE ) { 
+			
+			getUrlHtml(huifuUrl, Const.MSGPST);
+			
+			} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE ) {   
+				
+				if (curStatus == 1) {
+					chaToMain();
+					if (top10TopicList != null) {
+						setTopics();
+					}
+				} else {
+					chaToArea(null);
+				}
+			}  
+
+		
+		
 		return false;
 	}
 
 	public void onLongPress(MotionEvent arg0) {
-		getUrlHtml(huifuUrl, Const.MSGPST);
 		
 	}
 
@@ -2075,19 +1961,18 @@ OnGestureListener {
 
 	public boolean onSingleTapUp(MotionEvent arg0) {
 		ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
+		float x = arg0.getRawX();
 		float y = arg0.getRawY();
 		//µã»÷ÉÏ·­ºÍµã»÷ÏÂ·­
-		if(y>sv.getHeight()-sLength/6)
+		if(y>sv.getHeight()-sLength/6&&x>(sWidth*3/4))
 		{
 			sv.scrollBy(0, sv.getHeight()-20);
-			//sv.pageScroll(ScrollView.FOCUS_DOWN);
 		}
-		if(y<sLength/3)
+		if(y<sLength/3&&x>(sWidth*3/4))
 		{
 			sv.scrollBy(0, 20-sv.getHeight());
-			//sv.pageScroll(ScrollView.FOCUS_UP);
 		}
-	return true;
+	return false;
 	}
 
 }

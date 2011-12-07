@@ -11,45 +11,46 @@ public class BBSAll {
 	 */
 	public static HashMap<String,Integer> getSmilyAll() {
 		HashMap<String,Integer> hm = new HashMap<String,Integer>();
-		hm.put("[:s]",  R.drawable.face9);
-		hm.put("[:O]",  R.drawable.face9);
-		hm.put("[:|]",  R.drawable.face9);
-		hm.put("[:]", R.drawable.face9);
-		hm.put("[:X]",  R.drawable.face9);
+		hm.put("[:s]",  R.drawable.face2);
+		hm.put("[:O]",  R.drawable.face0);
+		hm.put("[:|]",  R.drawable.face3);
+		hm.put("[:]", R.drawable.face6);
+		hm.put("[:X]",  R.drawable.face7);
 		
 		hm.put("[:'(]", R.drawable.face9);
-		hm.put("[:-|]", R.drawable.face9);
-		hm.put("[:@]", R.drawable.face9);
-		hm.put("[:P]", R.drawable.face9);
-		hm.put("[:D]", R.drawable.face9);
-		hm.put("[:)]", R.drawable.face9);
-		hm.put("[:(]", R.drawable.face9);
-		hm.put("[:Q]", R.drawable.face9);
-		hm.put("[:T]", R.drawable.face9);
+		hm.put("[:-|]", R.drawable.face10);
+		hm.put("[:@]", R.drawable.face11);
+		hm.put("[:P]", R.drawable.face12);
+		hm.put("[:D]", R.drawable.face13);
+		hm.put("[:)]", R.drawable.face14);
+		hm.put("[:(]", R.drawable.face15);
+		hm.put("[:Q]", R.drawable.face18);
+		hm.put("[:T]", R.drawable.face19);
 		
-		hm.put("[;P]", R.drawable.face9);
-		hm.put("[;-D]", R.drawable.face9);
-		hm.put("[:!]", R.drawable.face9);
-		hm.put("[:L]", R.drawable.face9);
-		hm.put("[:?]", R.drawable.face9);
-		hm.put("[:U]", R.drawable.face9);
-		hm.put("[:K]", R.drawable.face9);
-		hm.put("[;X]", R.drawable.face9);
-		hm.put("[:H]", R.drawable.face9);
+		hm.put("[;P]", R.drawable.face20);
+		hm.put("[;-D]", R.drawable.face21);
+		hm.put("[:!]", R.drawable.face26);
+		hm.put("[:L]", R.drawable.face27);
+		hm.put("[:?]", R.drawable.face32);
+		hm.put("[:U]", R.drawable.face16);
+		hm.put("[:K]", R.drawable.face25);
+		hm.put("[;X]", R.drawable.face34);
+		hm.put("[:H]", R.drawable.face36);
 		
-		hm.put("[;bye]", R.drawable.face9);
-		hm.put("[;cool]", R.drawable.face9);
-		hm.put("[:-b]", R.drawable.face9);
-		hm.put("[:-8]", R.drawable.face9);
-		hm.put("[;PT]", R.drawable.face9);
-		hm.put("[:hx]", R.drawable.face9);
-		hm.put("[;K]", R.drawable.face9);
-		hm.put("[:E]", R.drawable.face9);
-		hm.put("[:-(]", R.drawable.face9);
+		hm.put("[;bye]", R.drawable.face39);
+		hm.put("[;cool]", R.drawable.face4);
+		hm.put("[:-b]", R.drawable.face40);
+		hm.put("[:-8]", R.drawable.face41);
+		hm.put("[;PT]", R.drawable.face42);
+		hm.put("[:hx]", R.drawable.face44);
+		hm.put("[;K]", R.drawable.face47);
+		hm.put("[:E]", R.drawable.face49);
+		hm.put("[:-(]", R.drawable.face50);
+		hm.put("[:C-]", R.drawable.face29);
 		
-		hm.put("[;hx]", R.drawable.face9);
-		hm.put("[:-v]", R.drawable.face9);
-		hm.put("[;xx]", R.drawable.face9);
+		hm.put("[;hx]", R.drawable.face51);
+		hm.put("[:-v]", R.drawable.face53);
+		hm.put("[;xx]", R.drawable.face54);
 		return hm;
 	}
 	
@@ -67,6 +68,7 @@ public class BBSAll {
 		hm.put("[1;35m", "</font><font color=#D000D0 >");
 		hm.put("[1;36m", "</font><font color=#33A0A0 >");
 		hm.put("[32m", "</font><font color=#808000 >");
+		hm.put("[33m", "</font><font color=green >");
 		hm.put("[37;1m", "");
 		
 		
