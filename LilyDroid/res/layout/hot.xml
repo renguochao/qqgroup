@@ -11,7 +11,7 @@
 		android:scrollingCache="false" 
 		android:divider="#D3D3D3"  
 		android:fastScrollEnabled="true"
-        android:dividerHeight="2px"
+        android:dividerHeight="1dp"
         >
     </ListView>
 </RelativeLayout>

@@ -10,8 +10,8 @@
     <string name="next">下一页</string>
      <string name="exitStr">退出</string>
           <string name="setting">设置</string>
-     <string name="like">收藏夹</string>
-    <string name="allStr">讨论版</string>
+     <string name="like">邮箱</string>
+    <string name="allStr">版面</string>
      <string name="huifu">回复</string>
     <string name="login_label_username">帐号</string>
     <string name="bbshot">热门</string>

@@ -32,6 +32,7 @@ import com.ztm.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -81,12 +82,14 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ExpandableListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+
 
 public class TestAndroidActivity extends Activity implements OnTouchListener,
 OnGestureListener {
@@ -191,10 +194,14 @@ OnGestureListener {
 	
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
 	
+	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
+	
 	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
 	String bbsHotString = "http://bbs.nju.edu.cn/bbstopall";
-
+	 List<Map<String, Object>> parentList = null;
+     List<List<Map<String, Object>>> allChildList =  null;
 	ImageSpan hotTopicSpan;
+	ImageSpan mailSpan;
 	Drawable xianDraw;
 	int sWidth = 480;
 	int sLength = 800;
@@ -222,7 +229,12 @@ OnGestureListener {
 	    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight()); 
 		
 		hotTopicSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);  
-
+		
+		
+		d = getResources().getDrawable(R.drawable.unread); 
+	    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight()); 
+		
+		mailSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);  
 		//TMStr = "©I";
 		
 		xianDraw = res.getDrawable(R.drawable.xian);
@@ -253,7 +265,6 @@ OnGestureListener {
 	private void InitMain() {
 		chaToMain();
 		getUrlHtml(bbsTop10String, Const.MSGWHAT);
-
 	}
 	
 	
@@ -342,6 +353,49 @@ OnGestureListener {
 			cb.setChecked(true);
 		}
 	}
+	
+	private void getLikeDialog()
+	{
+		AlertDialog.Builder builder = new AlertDialog.Builder(
+				TestAndroidActivity.this);
+
+		builder.setTitle("—°‘Òƒ„œÎ»•µƒÃ÷¬€«¯£∫");
+		if (areaNamList == null || areaNamList.size() < 1) {
+
+			return;
+		}
+		String[] a = new String[areaNamList.size()];
+		int i = 0;
+		for (String areName : areaNamList) {
+			a[i] = areName;
+			i++;
+		}
+
+		builder.setSingleChoiceItems(a, 0,
+				new DialogInterface.OnClickListener() {
+					public void onClick(
+							DialogInterface dialoginterface, int i) {
+
+						String areaText = areaNamList.get(i);
+						urlString = getResources().getString(
+								R.string.areaStr)
+								+ areaText;
+						curAreaName = "" + areaText;
+						dialoginterface.dismiss();
+						getUrlHtml(urlString, Const.MSGAREA);
+
+					}
+				});
+
+		builder.setPositiveButton("»°œ˚",
+				new DialogInterface.OnClickListener() {
+					public void onClick(
+							DialogInterface dialoginterface, int i) {
+
+					}
+				});
+		builder.create().show();
+	}
 
 	/**
 	 * Ã¯◊™µΩ÷˜ΩÁ√Ê
@@ -370,54 +424,13 @@ OnGestureListener {
 
 			public void onClick(View arg0) {
 				// ø…“‘¥Úø™“ª∏ˆ–¬œﬂ≥Ã¿¥∂¡»°£¨º”»Îπˆ∂ØÃıµ»
-
-				LayoutInflater factory = LayoutInflater
-						.from(TestAndroidActivity.this);
-				final View textEntryView = factory.inflate(R.layout.dialog,
-						null);
-				AlertDialog dlg = new AlertDialog.Builder(
-						TestAndroidActivity.this)
-
-				.setTitle("Ã÷¬€«¯√˚ªÚ÷–Œƒ√Ë ˆ").setView(textEntryView)
-						.setPositiveButton("≥ˆ∑¢",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int whichButton) {
-										EditText secondPwd = (EditText) textEntryView
-												.findViewById(R.id.username_edit);
-										String inputPwd = secondPwd.getText()
-												.toString();
-										String areaText = bbsAll.get(inputPwd);
-										areaText = areaText == null ? inputPwd
-												: areaText;
-										areaText = areaText.toLowerCase();
-										areaText = areaText.replaceFirst(
-												areaText.substring(0, 1),
-												areaText.substring(0, 1)
-														.toUpperCase());
-										urlString = getResources().getString(
-												R.string.areaStr)
-												+ areaText;
-										curAreaName = "" + areaText;
-
-										getUrlHtml(urlString, Const.MSGAREA);
-
-									}
-								}).setNegativeButton("»°œ˚",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int whichButton) {
-									}
-								}).create();
-
-				dlg.show();
-
-				AutoCompleteTextView secondPwd = (AutoCompleteTextView) textEntryView
-						.findViewById(R.id.username_edit);
-				if (secondPwd.getAdapter() == null) {
-					secondPwd.setAdapter(bbsAlladapter);
-					secondPwd.setThreshold(1);
+				if(parentList==null)
+				{
+					String url="http://bbs.nju.edu.cn/bbstopb10";
+					getUrlHtml(url, Const.TOP20BOARD);
 				}
+				else
+					chaToAreaToGo();
 
 			}
 
@@ -428,46 +441,13 @@ OnGestureListener {
 		btnLike.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View arg0) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						TestAndroidActivity.this);
-
-				builder.setTitle("—°‘Òƒ„œÎ»•µƒÃ÷¬€«¯£∫");
-				if (areaNamList == null || areaNamList.size() < 1) {
-
-					return;
-				}
-				String[] a = new String[areaNamList.size()];
-				int i = 0;
-				for (String areName : areaNamList) {
-					a[i] = areName;
-					i++;
-				}
-
-				builder.setSingleChoiceItems(a, 0,
-						new DialogInterface.OnClickListener() {
-							public void onClick(
-									DialogInterface dialoginterface, int i) {
-
-								String areaText = areaNamList.get(i);
-								urlString = getResources().getString(
-										R.string.areaStr)
-										+ areaText;
-								curAreaName = "" + areaText;
-								dialoginterface.dismiss();
-								getUrlHtml(urlString, Const.MSGAREA);
-
-							}
-						});
-
-				builder.setPositiveButton("»°œ˚",
-						new DialogInterface.OnClickListener() {
-							public void onClick(
-									DialogInterface dialoginterface, int i) {
-
-							}
-						});
-				builder.create().show();
-
+				if(isLogin)
+					getUrlHtml(mailURL, Const.MSGMAIL);
+            	else
+            	{
+            		displayMsg("ƒ„ªπ√ªµ«¬Ωƒ≈~");
+            	}
+				
 			}
 
 		});
@@ -490,6 +470,7 @@ OnGestureListener {
     final private int menuSettings=Menu.FIRST;  
     final private int menuLogout=Menu.FIRST+2;
     final private int menuSyn=Menu.FIRST+1;  
+    final private int menuReport=Menu.FIRST+3;  
     private static final int REQ_SYSTEM_SETTINGS = 0;    
 
     //¥¥Ω®≤Àµ•   
@@ -505,6 +486,7 @@ OnGestureListener {
         // Ω®¡¢≤Àµ•   
         menu.add(Menu.NONE, menuSettings, 2, "…Ë÷√");  
         menu.add(Menu.NONE, menuSyn, 2, "Õ¨≤Ω ’≤ÿ");  
+        menu.add(Menu.NONE, menuReport, 2, "“‚º˚∑¥¿°");  
         menu.add(Menu.NONE, menuLogout, 2, "◊¢œ˙");  
         return super.onCreateOptionsMenu(menu);  
     }  
@@ -532,7 +514,17 @@ OnGestureListener {
             		displayMsg("ƒ„ªπ√ªµ«¬Ωƒ≈~");
             	}
                 break; 
-                
+            case menuReport:
+            	
+            	if(isLogin)
+            	{
+            		beginMail("tiztm","Android∞Ê–°∞Ÿ∫œ“‚º˚∑¥¿°",null);
+            	}
+            	else
+            	{
+            		displayMsg("ƒ„ªπ√ªµ«¬Ωƒ≈~");
+            	}
+            	break; 
             default:  
                 break;  
         }  
@@ -543,7 +535,70 @@ OnGestureListener {
     	myParams();
     }  
     
-    
+    private void beginMail(String to,String title,String cont)
+    {
+    	LayoutInflater factory = LayoutInflater
+		.from(TestAndroidActivity.this);
+		final View acdlgView = factory.inflate(R.layout.maildlg, null);
+			Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
+			.setTitle("∑¢ÀÕ–≈º˛").setView(acdlgView).setPositiveButton("»∑∂®",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,
+							int whichButton) {
+						
+						EditText titleEdit = (EditText) acdlgView
+								.findViewById(R.id.edt_cont);
+						String cont = StringUtil.getStrBetter(titleEdit.getText()
+								.toString());
+						
+						titleEdit = (EditText) acdlgView
+						.findViewById(R.id.edt_to);
+						String to = titleEdit.getText()
+								.toString();
+						
+						titleEdit = (EditText) acdlgView
+						.findViewById(R.id.edt_title);
+						String title =titleEdit.getText()
+								.toString();
+								
+								sendMail(to,title,cont);
+					}
+				});
+				
+
+				altDlg.setNegativeButton("»°œ˚",
+				new DialogInterface.OnClickListener() {
+						public void onClick(
+								DialogInterface dialoginterface, int i) {
+
+			}
+		});
+
+				
+				
+	 	AlertDialog dlg =altDlg.create();
+	 	EditText titleEdit;
+	 	if(to!=null)
+	 	{
+	 	titleEdit= (EditText) acdlgView
+		.findViewById(R.id.edt_to);
+	 	titleEdit.setText(to);
+	 	}
+	 	if(title!=null)
+	 	{
+		titleEdit = (EditText) acdlgView
+		.findViewById(R.id.edt_title);
+		titleEdit.setText(title);
+	 	}
+	 	if(cont!=null)
+	 	{
+	 		titleEdit = (EditText) acdlgView
+			.findViewById(R.id.edt_cont);
+			titleEdit.setText(cont);
+	 	}
+		
+	 	dlg.show();
+    }
 
 
 	/**
@@ -562,7 +617,13 @@ OnGestureListener {
 			} 
 			 else if (curStatus == 3) {
 					chaToHot(null);
+			} else if (curStatus == 4) {
+					chaToAreaToGo();
 			} 
+			else if (curStatus == 5) {
+				chaToMailBox(null);
+			} 
+			
 			else if (curStatus == 0) {
 				exitPro();
 			}
@@ -729,6 +790,20 @@ OnGestureListener {
 				bbsHot();
 				chaToHot("New");
 				break;
+				
+			case Const.TOP20BOARD:
+				initAllAreas();
+				chaToAreaToGo();
+				break;
+				
+			case Const.MSGMAIL:
+				getMailCont();
+				chaToMailBox("");
+				break;
+				
+			case  Const.MSGMAILTOPIC:
+				chaToMailTopic();
+				break;
 			default:
 				break;
 
@@ -744,11 +819,245 @@ OnGestureListener {
 
 		
 
-		
-
-		
-
 	};
+	
+	/**
+	 * Ã÷¬€«¯ΩÁ√Ê∑≠“≥
+	 * 
+	 * @param AreaData
+	 */
+	private void goToMailPage(int pageNo) {
+		int startPage = areaNowTopic + pageNo;
+		if (startPage < 0) {
+			startPage = 0;
+		}
+
+		getUrlHtml(mailURL + "?start=" + startPage, Const.MSGMAIL);
+
+	}
+	
+	
+	private void chaToMailTopic() {
+		// TODO Auto-generated method stub
+		char s = 10;
+		String backS = s + "";
+		
+		data =data.replaceAll(backS, "<br>");
+		Document doc = Jsoup.parse(data);
+		Elements scs = doc.getElementsByTag("textarea");
+		
+		if (scs.size() != 1) {
+			Toast.makeText(TestAndroidActivity.this, "ªÒ»°” º˛ ß∞‹",
+					Toast.LENGTH_SHORT).show();
+		}
+		else
+		{
+			Element textArea = scs.get(0);
+			String infoView =  "<br>"+textArea.text();
+			
+			
+			String withSmile = StringUtil.addSmileySpans(infoView);
+			setContentView(R.layout.mailtopic);
+			
+			//SpannableStringBuilder urlChanged = getURLChanged(topicData);
+
+			textView = (TextView) findViewById(R.id.label);
+			textView.setText(Html.fromHtml(withSmile));
+			textView.setTextSize(txtFonts);
+			textView.setMovementMethod(LinkMovementMethod.getInstance());
+
+			textView.getBackground().setAlpha(backAlpha);
+			if(isTouch)
+			{
+				textView.setOnTouchListener(this);
+				textView.setFocusable(true);
+				textView.setLongClickable(true);
+			}
+			
+
+		}
+		
+		
+		
+		
+	}
+	
+	private void chaToMailBox(String place) {
+		
+		setTitle("Œ“µƒ” œ‰");
+		setContentView(R.layout.mailbox);
+		curStatus = 1;
+		LinkAdr = new ArrayList<String>();
+		
+		listView = (ListView) findViewById(R.id.topicList);
+
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+
+		for (TopicInfo topicInfo : mailList) {
+
+			Map<String, Object> map = new HashMap<String, Object>();
+
+			String title = topicInfo.getTitle();
+			SpannableString ss = null;
+			
+			
+			if(topicInfo.getMark().length()>0)
+			{
+				
+				if(topicInfo.getMark().equals("unread"))
+				{
+					
+					ss = new SpannableString(title+"[sm]");
+					ss.setSpan(mailSpan,title.length(),title.length()+4,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					
+					map.put("topicau",topicInfo.getNums()+" ◊˜’ﬂ:" + topicInfo.getAuthor());
+				}
+				else
+				{
+					
+					map.put("topicau","["+topicInfo.getMark()+"] "+topicInfo.getNums()+" ◊˜’ﬂ:" + topicInfo.getAuthor() );
+				}
+			}
+			else
+			{
+				map.put("topicau",topicInfo.getNums()+" ◊˜’ﬂ:" + topicInfo.getAuthor());
+			
+			
+			}
+			if(ss==null)
+				ss = new SpannableString(title);
+			map.put("topictitle", ss);
+			map.put("topicother", topicInfo.getPubDate());
+			list.add(map);
+			LinkAdr.add("http://bbs.nju.edu.cn/" + topicInfo.getLink());
+
+		}
+		if (list.size() > 0) {
+
+			MyListAdapter adapter = new MyListAdapter(this, list,
+					R.layout.vlist, new String[] { "topictitle", "topicau","topicother" },
+					new int[] { R.id.topictitle, R.id.topicau ,R.id.topicother});
+			listView.setAdapter(adapter);
+			// ÃÌº”µ„ª˜
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+
+					topicUrl = LinkAdr.get(arg2);
+
+					if (topicUrl == null)
+						return;
+
+					//huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
+					curStatus = 5;
+					
+					scrollY = listView.getFirstVisiblePosition()+1;
+
+					getUrlHtml(topicUrl, Const.MSGMAILTOPIC);
+
+				}
+			});
+		}
+		
+		Button btnPre = (Button) findViewById(R.id.btn_pre);
+		btnPre.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				goToMailPage(-20);
+			}
+		});
+
+		Button btnNext = (Button) findViewById(R.id.btn_next);
+		btnNext.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				goToMailPage(20);
+			}
+		});
+		
+		Button btnMail = (Button) findViewById(R.id.btn_mail);
+		btnMail.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				beginMail(null,null,null);
+			}
+		});
+		
+	
+		
+		
+		if(place!=null)
+		{
+			listView.setSelection(mailList.size()-1);
+		}
+		else
+		{
+			listView.setSelection(scrollY);
+		}
+		
+	}
+	
+	
+	List<TopicInfo> mailList = null; 
+	private void getMailCont() {
+		Document doc = Jsoup.parse(data);
+		Elements tds = doc.getElementsByTag("td");
+		int getTopicNo =0;
+		mailList = new ArrayList<TopicInfo>();
+		if (tds.size() <7) {
+			Toast.makeText(TestAndroidActivity.this, "ƒ„µƒ” œ‰ «ø’µƒ",
+					Toast.LENGTH_SHORT).show();
+		}else
+		{
+			int i=6;
+			while(i<tds.size())
+			{
+				
+				String no = tds.get(i).text();
+				int thisPos = 0;
+				try {
+					thisPos =Integer.parseInt(no);
+				} catch (Exception e) {
+					// TODO: handle exception
+					return;
+				}
+				
+				if (getTopicNo == 0) {
+					areaNowTopic = thisPos;
+					getTopicNo=1;
+				}
+				
+				TopicInfo ti = new TopicInfo();
+				ti.setNums(no);
+				// …Ë÷√title
+				ti.setTitle(tds.get(i+5).text());	
+				ti.setLink((tds.get(i + 5).getElementsByTag("a")).get(0).attr("href"));
+				
+				String date = DateUtil.formatDateToStrNoWeek(DateUtil.getDatefromStrNoWeek(tds.get(i + 4).text()));
+				if(date == null||date.equals("null"))
+					ti.setPubDate(tds.get(i + 4).text());
+				else
+					ti.setPubDate(date);
+				
+				ti.setAuthor(tds.get(i + 3).text());
+				ti.setMark(tds.get(i + 2).text());
+				Elements element = (tds.get(i + 2).getElementsByTag("img"));
+				if(element!=null&&element.size()>0)
+				{
+					ti.setMark("unread");
+				}
+				mailList.add(ti);
+				i+=6;
+			}
+		}
+		//return tiList;
+		
+		
+	}
+
+	
+	
+	
 	List<TopicInfo> hotList;
 	private void bbsHot() {
 		Document doc = Jsoup.parse(data);
@@ -825,6 +1134,35 @@ OnGestureListener {
 		
 	}
 	
+	
+	
+	private List<TopicInfo> convtTOP20Area(String areaData) {
+		Document doc = Jsoup.parse(data);
+
+		Elements tds = doc.getElementsByTag("td");
+		
+		List<TopicInfo> tiList = new ArrayList<TopicInfo>();
+		if (tds.size() <12) {
+			Toast.makeText(TestAndroidActivity.this, "ªÒ»°»»√≈Ã÷¬€«¯ ß∞‹",
+					Toast.LENGTH_SHORT).show();
+		}else
+		{
+			int i=6;
+			while(i<tds.size())
+			{
+				TopicInfo ti = new TopicInfo();
+				ti.setTitle(tds.get(i+1).text()+" ("+tds.get(i+2).text()+")");	
+				//ti.setNums(tds.get(i+4).text());
+				tiList.add(ti);
+				i+=6;
+			}
+		}
+		return tiList;
+		
+	}
+
+	
+	
 	/**
 	 * 
 	 * ªÒ»°”√ªß–≈œ¢
@@ -877,7 +1215,15 @@ OnGestureListener {
 	 */
 	private void checkRst(String data) {
 
-		if (data.contains("http-equiv='Refresh'")) {
+		if(data.contains("–≈º˛“—ºƒ∏¯"))
+		{
+			displayMsg("∑¢ÀÕ–≈º˛≥…π¶£°");
+		}
+		else if(data.contains("¥ÌŒÛµƒ ’–≈»À’ ∫≈"))
+		{
+			displayMsg("¥ÌŒÛµƒ ’–≈»À’ ∫≈! ");
+		}
+		else if (data.contains("http-equiv='Refresh'")) {
 			
 			if(reid.equals("0"))
 			{
@@ -890,9 +1236,6 @@ OnGestureListener {
 				getUrlHtml(topicUrl + "&start="
 						+ nowPos, Const.MSGTOPICREFREASH);
 			}
-			
-			
-			
 			displayMsg("∑¢Œƒ≥…π¶£°");
 		}
 		else if (data.contains("–ﬁ∏ƒŒƒ’¬≥…π¶")) 
@@ -924,7 +1267,7 @@ OnGestureListener {
 			}
 			else
 			{
-				displayMsg("∑¢ÀÕ ß∞‹¡Àƒ≈~∑¢Œƒƒ⁄»›±£¥Ê‘⁄ºÙÃ˘∞Â…œ");
+				displayMsg("∑¢ÀÕ ß∞‹~∑¢Œƒƒ⁄»›±£¥Ê‘⁄ºÙÃ˘∞Â…œ");
 			}
 			
 			ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -1292,7 +1635,40 @@ OnGestureListener {
 	}
 	
 	
-	
+	private void sendMail(String to, String title,
+			String cont) {
+		// ÷ª˙«©√˚
+		if(isBackWord&&backWords!=null&&backWords.length()>0)
+		{
+			cont+="\n-\n"+signColor+backWords+"[m\n";
+		}
+		
+		try {
+			title = URLEncoder.encode(title,
+					"GB2312"); 
+			String url = "http://bbs.nju.edu.cn/bbssndmail?pid=0"
+					+ "&title="
+					+ title
+					+ "&userid="
+					+ to
+					+ "&signature=1";
+					
+					
+			// +"&text="+;
+
+			NameValuePair[] newVp = { new NameValuePair(
+					"text", cont) };
+
+			nvpCont = newVp;
+
+			getUrlHtml(url, Const.MSGPSTNEW);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
 	
 	
 
@@ -1502,7 +1878,7 @@ OnGestureListener {
 					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
 					curStatus = 2;
 					nowPos = 0;
-					scrollY = listView.getFirstVisiblePosition();
+					scrollY = listView.getFirstVisiblePosition()+1;
 
 					getUrlHtml(topicUrl, Const.MSGTOPIC);
 
@@ -1534,12 +1910,7 @@ OnGestureListener {
 			{
 				
 				String title = topicInfo.getTitle();
-//				int begin = title.length();
-//				title+="   "+topicInfo.getArea()+"";
-//				SpannableString sp = new SpannableString(title);
-//				sp.setSpan(listColorSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
-//				sp.setSpan(absoluteSizeSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
-				
+			
 				
 				map.put("topictitle", title);
 			
@@ -1577,6 +1948,129 @@ OnGestureListener {
 			});
 		}
 	}
+	
+	
+
+	private void chaToAreaToGo() {
+		
+		setTitle("Ã¯◊™Ã÷¬€«¯");
+
+		curStatus = 1;
+		setContentView(R.layout.gotoarea);
+	
+		AutoCompleteTextView secondPwd = (AutoCompleteTextView) findViewById(R.id.area_edit);
+		if (secondPwd.getAdapter() == null) {
+			secondPwd.setAdapter(bbsAlladapter);
+			secondPwd.setThreshold(1);
+		}
+		Button btnBack = (Button) findViewById(R.id.btn_go);
+		btnBack.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				EditText secondPwd = (EditText) findViewById(R.id.area_edit);
+				String inputPwd = secondPwd.getText()
+						.toString();
+				getToAreaWithName(inputPwd);
+			}
+		});
+		if(parentList==null)
+			initAllAreas();
+
+        android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
+                this,
+                parentList,
+                R.layout.explistparent,
+                new String []{"TITLE"},
+                new int []{android.R.id.text1},
+                allChildList,
+                R.layout.explistchild,
+                new String []{"TITLE"},
+                new int []{android.R.id.text1}
+        );
+        // create child's OnChildClickListener
+        android.widget.ExpandableListView listView = (android.widget.ExpandableListView) findViewById(R.id.area_view);
+        
+        // Adapter set
+        listView.setAdapter(adapter);
+        listView.setOnChildClickListener(new android.widget.ExpandableListView.OnChildClickListener(){
+
+			public boolean onChildClick(android.widget.ExpandableListView parent,
+					 View v,
+	                    int groupPosition,
+	                    int childPosition,
+	                    long id) {
+					Map<String, Object> childMap = allChildList.get(groupPosition).get(childPosition);
+					String name =	(String)childMap.get("TITLE");
+					if(name==null||name.length()<1) return false;
+					int indexOf = name.indexOf('(');
+					if(indexOf>0)
+					{
+						name = name.substring(0,indexOf);
+					}
+					getToAreaWithName(name);
+	                return false;
+	            }
+        });
+		
+				
+	}
+	
+	private void getToAreaWithName(String name)
+	{
+		if(name==null||name.length()<1) return;
+		String areaText = bbsAll.get(name);
+		areaText = areaText == null ? name
+				: areaText;
+		areaText = areaText.toLowerCase();
+		areaText = areaText.replaceFirst(
+				areaText.substring(0, 1),
+				areaText.substring(0, 1)
+						.toUpperCase());
+		urlString = getResources().getString(
+				R.string.areaStr)
+				+ areaText;
+		curAreaName = "" + areaText;
+		getUrlHtml(urlString, Const.MSGAREA);
+	}
+	
+	
+	
+
+	private void initAllAreas() {
+		 parentList = new ArrayList<Map<String,Object>>();
+	     allChildList = new ArrayList<List<Map<String,Object>>>();
+
+	     Map<String, Object> parentData = new HashMap<String, Object>();
+	     parentData.put("TITLE", "Œ“µƒ ’≤ÿ");
+	     parentList.add(parentData);
+	     
+	     List<Map<String, Object>> childList = new ArrayList<Map<String,Object>>();
+	     
+	     for (String s : areaNamList) {
+	    	 Map<String, Object> childData = new HashMap<String, Object>();
+             childData.put("TITLE", s);
+             childList.add(childData);
+		}
+         allChildList.add(childList);
+         
+         
+         parentData = new HashMap<String, Object>();
+	     parentData.put("TITLE", "ΩÒ»’»»√≈");
+	     parentList.add(parentData);
+	     
+	     List<TopicInfo> tiList = convtTOP20Area(data);
+	     childList = new ArrayList<Map<String,Object>>();
+	     for (TopicInfo topicInfo : tiList) {
+	    	 Map<String, Object> childData = new HashMap<String, Object>();
+             childData.put("TITLE", topicInfo.getTitle());
+             childList.add(childData);
+		}
+	     allChildList.add(childList);
+         
+	}
+
+
+	
 
 	boolean isNext = true;
 	boolean isPrev = true;
@@ -1616,7 +2110,7 @@ OnGestureListener {
 				}
 		
 		setContentView(R.layout.area);
-		curStatus = 1;
+		curStatus = 4;
 		Button btnBack = (Button) findViewById(R.id.btn_back);
 		btnBack.setOnClickListener(new OnClickListener() {
 
@@ -1701,6 +2195,8 @@ OnGestureListener {
 		editor.commit();
 	}
 
+	
+	
 	/**
 	 * Ã÷¬€«¯ΩÁ√Ê∑≠“≥
 	 * 

@@ -330,7 +330,14 @@ public class StringUtil {
 			
 			
 		}
-		return addSmileySpans(tiList.toString());
+		
+		String ss = tiList.toString()
+//		+"<a href='curArea'>[<font color=#0000EE >本讨论区</font>]</a>&nbsp;&nbsp;"
+//		+"<a href='prev'>[<font color=#0000EE >上一页</font>]</a>&nbsp;&nbsp;"
+//		+"<a href='next'>[<font color=#0000EE >下一页</font>]</a>&nbsp;&nbsp;"
+//		+"<a href='huifu'>[<font color=#0000EE >回复</font>]</a>"
+		;
+		return addSmileySpans(ss);
 	}
 
 	
@@ -391,7 +398,7 @@ public class StringUtil {
 			ti.setRank(i + "");
 			ti.setLink((tds.get(pos + 2).getElementsByTag("a")).get(0).attr(
 					"href"));// 设置title
-			ti.setTitle("○ "+tds.get(pos + 2).text());// 设置title
+			ti.setTitle("□ "+tds.get(pos + 2).text());// 设置title
 			ti.setArea(tds.get(pos + 1).text());
 			ti.setNums(tds.get(pos + 4).text());
 			ti.setAuthor(tds.get(pos + 3).text());

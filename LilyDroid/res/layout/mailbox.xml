@@ -9,11 +9,7 @@
         android:layout_alignParentBottom="true"
              android:layout_height="50sp" >
 
-       <Button
-            android:id="@+id/btn_like"
-              android:layout_width="77dp"
-             android:layout_height="45dp"
-             />
+
      <Button
             android:id="@+id/btn_pre"
              android:layout_width="77dp"
@@ -26,10 +22,10 @@
             android:text="@string/next" />
 
              <Button
-            android:id="@+id/btn_back"
+            android:id="@+id/btn_mail"
              android:layout_width="77dp"
             android:layout_height="45dp"
-            android:text="发文" />
+            android:text="发信" />
             
     </LinearLayout>
   
@@ -45,8 +41,4 @@
         android:layout_above="@id/linearLayout1">
 
     </ListView>
-    
-  
-    
-
 </RelativeLayout>
