@@ -2,6 +2,7 @@ package com.ztm;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -10,9 +11,9 @@ public class DateUtil {
 
 	public static void main(String[] args) {
 		
-		System.out.println(formatDateToStr(getDatefromStr("Mon Dec 5 20:30:55 2011")));
+		Calendar ca = Calendar.getInstance();
+		System.out.println(ca.getTime().toLocaleString());
 		
-		System.out.println(formatDateToStrNoWeek(getDatefromStrNoWeek("Dec 5 20:30")));
 
 	}
 	static SimpleDateFormat ddf = new SimpleDateFormat( 
@@ -30,7 +31,7 @@ public class DateUtil {
 		return sdate;
 	}
 	static SimpleDateFormat cdf = new SimpleDateFormat( 
-	"M-d HH:mm"); 
+	"MM-dd HH:mm"); 
 	public static String formatDateToStrNoWeek(Date newtime)
 	{
 		

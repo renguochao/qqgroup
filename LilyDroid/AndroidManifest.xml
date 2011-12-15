@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ztm"
-    android:versionCode="20"
-    android:versionName="0.952" >
+    android:versionCode="22"
+    android:versionName="0.96b" >
 
     <uses-sdk android:minSdkVersion="7" />
     

@@ -7,35 +7,35 @@
         android:id="@+id/linearLayout1"
         style="@android:style/ButtonBar"  
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" 
+        android:layout_height="50sp" 
         android:layout_centerHorizontal = "true"
         android:layout_alignParentBottom="true">
 
         <Button   
             android:id="@+id/btn_link"
-            android:layout_width="75dp"
-            android:layout_height="50dp"
+            android:layout_width="77dp"
+            android:layout_height="45dp"
             android:text="@string/top10Str" 
             />
             
 
         <Button
             android:id="@+id/btn_all"
-            android:layout_width="75dp"
-          android:layout_height="50dp"
+            android:layout_width="77dp"
+          android:layout_height="45dp"
             android:text="@string/allStr" />
             
         <Button
             android:id="@+id/btn_like"
-            android:layout_width="75dp"
-         android:layout_height="50dp"
+            android:layout_width="77dp"
+         android:layout_height="45dp"
             android:text="@string/like" />
             
            <Button   
             android:id="@+id/btn_set"
-            android:layout_width="75dp"
-            android:layout_height="50dp"
-            android:text="@string/exitStr" 
+            android:layout_width="77dp"
+            android:layout_height="45dp"
+            android:text="@string/bbshot" 
             />
             
     </LinearLayout>
@@ -43,17 +43,14 @@
     
     <ListView
         android:id="@+id/topicList"
-        
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:cacheColorHint="@android:color/transparent"
         android:textColor="#000000" 
+        android:divider="#D3D3D3"  
+        android:dividerHeight="2px"
 		android:scrollingCache="false" 
         android:layout_above="@id/linearLayout1">
-
     </ListView>
     
-  
-    
-
 </RelativeLayout>

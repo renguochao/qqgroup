@@ -25,6 +25,8 @@ public class TopicInfo {
 	
 	private String status;
 	
+	private String mark;
+	
 	private String hot;
 
 	public String getTitle() {
@@ -89,6 +91,14 @@ public class TopicInfo {
 
 	public void setHot(String hot) {
 		this.hot = hot;
+	}
+
+	public String getMark() {
+		return mark;
+	}
+
+	public void setMark(String mark) {
+		this.mark = mark;
 	}
 
 }

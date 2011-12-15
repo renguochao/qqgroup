@@ -26,8 +26,15 @@ public class StringUtil {
 	static boolean isNext;
 	static String curAreaName;
 	static boolean topicWithImg = false;
+	
+	
 
-	private static HashMap<String, String> fFolorAll = null;
+	static Pattern mPattern = Pattern.compile("\\[(;|:).{1,4}\\]");
+	static Pattern colorPat = Pattern.compile("\\[(1;.*?|37;1|32|33)m");
+	//static Pattern rePat = Pattern.compile("\\[(1;.*?|37;1|32|33)m");
+   
+
+	public static HashMap<String, String> fFolorAll = null;
 	public static void initAll()
 	{
 		fFolorAll = BBSAll.getFColorAll();
@@ -61,6 +68,7 @@ public class StringUtil {
 		String[] split = scon.split("\n");
 		StringBuilder allSb = new StringBuilder();
 		for (String sp : split) {
+			if(sp.startsWith(":")||sp.contains("※")) continue;
 			StringBuilder sb = new StringBuilder(sp);
 			int len = sp.length();
 			int tempLen = 0;
@@ -93,20 +101,37 @@ public class StringUtil {
 	 * @param data
 	 * @return
 	 */
-	public static String getTopicInfo(String data,int nowPos,boolean isIP,boolean isWifi,String isPic) {
+	public static String getTopicInfo(String data,int nowPos,boolean isIP,boolean isWifi,String isPic,String nowLoginId) {
 		StringBuffer tiList = new StringBuffer("<br>");
 		char s = 10;
 		String backS = s + "";
-		data = data.replaceAll(backS, "<br>");
-		Document doc = Jsoup.parse(data);
 		
+		data = data.replaceAll(backS, "<br>");
+		
+		//分析回复本文   功能<a href='bbspst?board=Pictures&file=M.1323243608.A'>回复本文</a>
+		
+		Pattern rePat = Pattern.compile("bbspst\\?.*?\\.A"); 
+		        Matcher matcher = rePat.matcher(data);
+		       List<String> reList = new ArrayList<String>();
+		      
+		        while (matcher.find()) {
+		        	reList.add(matcher.group());
+		        	
+		        }
 
+		
+		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("textarea");
+		if(tds.size()>reList.size())
+			return null;
+		
+		String lz = "";
 		int k = 0;
 		for (Element element : tds) {
+			
 			String text = element.text();
 			String content = "";
-			
+			String userId ="";
 			content = text;
 			String nowP = "";
 			{
@@ -167,23 +192,38 @@ public class StringUtil {
 							int ind = sconA.indexOf(" (");
 							int inArea = sconA.indexOf(", 信区");
 							if(ind<0||inArea<0) break;
+							
+							userId = sconA.substring(1, ind);
+							String DisId = " "+userId;
+							if(userId.equals(nowLoginId)) DisId = " 我";
+								
 							if (k == 1) {
-								sb.append("<a href='http://bbs.nju.edu.cn/bbsqry?userid="+sconA.substring(1, ind)+"'><font color=#0000EE >").append(
-										sconA.substring(0, ind)).append(
+								lz = DisId;
+								
+								sb.append("<a href='http://bbs.nju.edu.cn/bbsqry?userid="+userId+"'><font color=#0000EE >").append(
+										DisId).append(
 										"</font></a>").append(
 										sconA.substring(ind, inArea)).append(
 										nbs)
-										.append(sconA.substring(inArea + 1))
-										.append(nbs);
+										.append(sconA.substring(inArea + 1)).append(
+												nbs);
+										;
 								
 							} else {
-								sb.append("<a href='http://bbs.nju.edu.cn/bbsqry?userid="+sconA.substring(1, ind)+"'><font color=#0000EE >").append(
-										sconA.substring(0, ind)).append(
+								
+								if(lz.equals(DisId))
+								{
+									DisId=" 楼主";
+								}
+								
+								sb.append("<a href='http://bbs.nju.edu.cn/bbsqry?userid="+userId+"'><font color=#0000EE >").append(
+										DisId).append(
 										"</font></a>").append(
 										sconA.substring(ind, inArea)).append(
-										nbs);
+												nbs);
 
 							}
+							
 							continue;
 						}
 						if (j == 2 && k != 1)
@@ -238,9 +278,7 @@ public class StringUtil {
 										||sconA.toLowerCase().endsWith(".jpeg")
 										||sconA.toLowerCase().endsWith(".gif")
 										))
-							{
-							
-	
+						{
 							sb.append("<a href='"+sconA+"'><img src='").append(sconA).append("'></a><br>");
 							topicWithImg = true;
 							continue;
@@ -265,23 +303,42 @@ public class StringUtil {
 				if(sb.length()>0)
 					content = sb.toString();
 			}
-
+			String sFL;
 			if (nowP == "0") {
-				tiList.append("楼主: ").append(content).append(
-						"</font><img src='xian'><br><br>");// +au+"</font></B>"
+				sFL = "楼主:";
 			} else {
-				tiList.append(nowP).append("楼：").append(content).append(
-						"</font><img src='xian'><br><br>");// +au+"</font></B>"
-			
+				sFL = nowP+"楼:";
 			}
+			if(userId.equals(nowLoginId))
+			{
+				tiList.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1)+"'>[<font color=#0000EE >回复</font>]</a>&nbsp;&nbsp;")
+				.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1).replace("bbspst?", "bbsedit?")+"'>[<font color=#0000EE>修改</font>]</a>&nbsp;&nbsp;")
+				.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1).replace("bbspst?", "bbsdel?")+"'>[<font color=#0000EE>删除</font>]</a><br>")
+				
+				.append(sFL)
+				.append(content)
+				
+				.append("</font>")
+				
+				.append("<img src='xian'><br><br>");
+			}
+			else
+			{
+				tiList.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1)+"'>[<font color=#0000EE >回复</font>]</a>").append(sFL).append(content).append(
+				"</font><img src='xian'><br><br>");
+			}
+			
+			
 		}
 		return addSmileySpans(tiList.toString());
 	}
 
+	
+	
     public static String addSmileySpans(String text) {
         
     	//替换表情
-        Pattern mPattern = Pattern.compile("\\[(;|:).{1,4}\\]");
+    
         Matcher matcher = mPattern.matcher(text);
        
         StringBuffer sb = new StringBuffer();
@@ -294,8 +351,8 @@ public class StringUtil {
         
         //替换字体颜色
         StringBuffer sb2= new StringBuffer();
-        mPattern = Pattern.compile("\\[(1;.*?|37;1|32|33)m");
-        matcher = mPattern.matcher(sb);
+       
+        matcher = colorPat.matcher(sb);
 
         while (matcher.find()) {
         	String ss = fFolorAll.get(matcher.group(0));
@@ -334,7 +391,7 @@ public class StringUtil {
 			ti.setRank(i + "");
 			ti.setLink((tds.get(pos + 2).getElementsByTag("a")).get(0).attr(
 					"href"));// 设置title
-			ti.setTitle(tds.get(pos + 2).text());// 设置title
+			ti.setTitle("○ "+tds.get(pos + 2).text());// 设置title
 			ti.setArea(tds.get(pos + 1).text());
 			ti.setNums(tds.get(pos + 4).text());
 			ti.setAuthor(tds.get(pos + 3).text());

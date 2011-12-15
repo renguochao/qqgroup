@@ -10,6 +10,8 @@ import java.lang.ref.SoftReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import com.sonyericsson.zoom.ImageZoomView;
@@ -108,9 +110,49 @@ public class ImageActivity extends Activity {
 		});
 
 	}
+	
+	
+	// 菜单项   
+    final private int menuSettings=Menu.FIRST;  
+    private static final int REQ_SYSTEM_SETTINGS = 0;    
 
-	// HashMap<String, SoftReference<Drawable>> drawableMap = new
-	// HashMap<String, SoftReference<Drawable>>();
+    //创建菜单   
+    @Override    
+    public boolean onPrepareOptionsMenu(Menu menu) 
+    {        
+    	return true;
+    }
+
+    @Override  
+    public boolean onCreateOptionsMenu(Menu menu)  
+    {  
+        // 建立菜单   
+        menu.add(Menu.NONE, menuSettings, 2, "保存");  
+    
+        return super.onCreateOptionsMenu(menu);  
+    }  
+    //菜单选择事件处理   
+    @Override  
+    public boolean onMenuItemSelected(int featureId, MenuItem item)  
+    {  
+        switch (item.getItemId())  
+        {  
+            case menuSettings:  
+                //保存图片
+            	try {
+					saveMyBitmap(url.substring(url.lastIndexOf('/'),url.lastIndexOf('.')));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                break;  
+            default:  
+                break;  
+        }  
+        return super.onMenuItemSelected(featureId, item);  
+    }  
+
+	
 
 	public Drawable fetchDrawable(String source) {
 

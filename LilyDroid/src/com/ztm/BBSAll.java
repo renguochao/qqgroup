@@ -70,6 +70,7 @@ public class BBSAll {
 		hm.put("[32m", "</font><font color=#808000 >");
 		hm.put("[33m", "</font><font color=green >");
 		hm.put("[37;1m", "");
+		hm.put("[m", "");
 		
 		
 		

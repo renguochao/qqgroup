@@ -42,6 +42,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.wifi.WifiManager;
@@ -52,11 +53,15 @@ import android.os.Message;
 import android.text.ClipboardManager;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
@@ -129,10 +134,11 @@ OnGestureListener {
 	String curTopicId = "";
 	
 	String isPic;
+	String signColor;
 	String isRem = "false";
 	boolean isTouch ;
 	boolean isIP;
-	
+	boolean isMoreFast;
 	String loginId = "";
 	String loginPwd = "";
 	
@@ -158,8 +164,12 @@ OnGestureListener {
 	Drawable drawableDis;
 
 	boolean isLogin = false;
+	
+	String nowLoginId = "";
+	
+	int txtFonts;
 
-
+	int backAlpha;
 
 	Spanned topicData;
 
@@ -180,13 +190,17 @@ OnGestureListener {
 	String synUrl = "http://bbs.nju.edu.cn/bbsleft";
 	
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
-
 	
+	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
+	String bbsHotString = "http://bbs.nju.edu.cn/bbstopall";
+
+	ImageSpan hotTopicSpan;
 	Drawable xianDraw;
 	int sWidth = 480;
 	int sLength = 800;
-	
-	
+	ForegroundColorSpan listColorSpan ;
+	AbsoluteSizeSpan absoluteSizeSpan;
+	//String TMStr;
 	//TODO:¶¨ÒåÈ«¾Ö±äÁ¿
 	/**
 	 * Called when the activity is first created.
@@ -195,9 +209,22 @@ OnGestureListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mGestureDetector = new GestureDetector(this);
-
+		
 		Resources res = getResources();
+		String color = res.getString(R.string.listColor);
+		listColorSpan = new ForegroundColorSpan(Color.parseColor(color));
+		absoluteSizeSpan = new AbsoluteSizeSpan(13,true);
+		
 		Drawable drawable = res.getDrawable(R.drawable.bkcolor);
+		
+		
+		Drawable d = getResources().getDrawable(R.drawable.hottopcic); 
+	    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight()); 
+		
+		hotTopicSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);  
+
+		//TMStr = "©I";
+		
 		xianDraw = res.getDrawable(R.drawable.xian);
 		DisplayMetrics metric = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
@@ -213,17 +240,38 @@ OnGestureListener {
 				android.R.layout.simple_dropdown_item_1line, bbsAllArray);
 		initPhoneState();
 		initAllParams();
-		
+		initfbAll();
 		StringUtil.initAll();
 		
 		
 		chaToLogin();
 	}
 
+	
+	
+	
 	private void InitMain() {
 		chaToMain();
 		getUrlHtml(bbsTop10String, Const.MSGWHAT);
 
+	}
+	
+	
+	private void initfbAll()
+	{
+		fbAll.put("fb1", R.drawable.fb1);
+		fbAll.put("fb2", R.drawable.fb2);
+		fbAll.put("fb3", R.drawable.fb3);
+		fbAll.put("fb4", R.drawable.fb4);
+		fbAll.put("fb5", R.drawable.fb5);
+		fbAll.put("fb6", R.drawable.fb6);
+		fbAll.put("fb7", R.drawable.fb7);
+		fbAll.put("fb8", R.drawable.fb8);
+		fbAll.put("fb9", R.drawable.fb9);
+		fbAll.put("fb10", R.drawable.fb10);
+		fbAll.put("fb11", R.drawable.fb11);
+		fbAll.put("fb12", R.drawable.fb12);
+		
 	}
 
 	private void initPhoneState()
@@ -430,7 +478,7 @@ OnGestureListener {
 
 			public void onClick(View arg0) {
 
-				exitPro();
+				getUrlHtml(bbsHotString, Const.MSGHOT);
 			}
 
 		});
@@ -507,11 +555,15 @@ OnGestureListener {
 			if (curStatus == 1) {
 				chaToMain();
 				if (top10TopicList != null) {
-					setTopics();
+					convtTopics();
 				}
 			} else if (curStatus == 2) {
 				chaToArea(null);
-			} else if (curStatus == 0) {
+			} 
+			 else if (curStatus == 3) {
+					chaToHot(null);
+			} 
+			else if (curStatus == 0) {
 				exitPro();
 			}
 			return true;
@@ -550,6 +602,9 @@ OnGestureListener {
 		}
 	}
 	
+	
+	
+	
 	private void myParams()
 	{
 		SharedPreferences sp = getSharedPreferences("com.ztm_preferences",
@@ -559,7 +614,21 @@ OnGestureListener {
 		isBackWord =  sp.getBoolean("isBackWord", true);
 		backWords = sp.getString("backWords", "·¢ËÍ×Ô ÎÒµÄÐ¡°ÙºÏAndroid¿Í»§¶Ë by ${model}");
 		isIP = sp.getBoolean("isIP", false);
+		signColor =  sp.getString("signColor", "[1;32m");
+		
+		backAlpha = sp.getInt("backAlpha", 20);
+		
+	
+		backAlpha = (int) ((int)(100-backAlpha)*2.55);
+		//backWords = backWords.replaceAll(TMStr, "");
 		backWords = backWords.replaceAll("\\$\\{model\\}", androidmodel).replaceAll("\\$\\{manufa\\}", androidmanufacturer);
+		isMoreFast = sp.getBoolean("isMoreFast", false);
+		txtFonts = sp.getInt("txtFonts", 18);
+		
+		
+		
+		
+		
 		String fastRe = sp.getString("fastRe", "É³·¢");
 		if ( fastRe.length() < 1)
 		{
@@ -601,7 +670,7 @@ OnGestureListener {
 				// ÉèÖÃÏÔÊ¾ÎÄ±¾
 				// ´¦Àí½âÎödataÊý¾Ý
 				top10TopicList = StringUtil.getTop10Topic(data);
-				setTopics();
+				convtTopics();
 				break;
 			case Const.MSGTOPIC:
 				// ÉèÖÃÏÔÊ¾ÎÄ±¾
@@ -651,9 +720,15 @@ OnGestureListener {
 			case Const.MSGSYN:
 				checkSyn(data);
 				break;
+			case Const.MSGSYNFIRST:
+				checkSyn(data);
+				InitMain();
+				break;
 				
-				
-				
+			case Const.MSGHOT:
+				bbsHot();
+				chaToHot("New");
+				break;
 			default:
 				break;
 
@@ -671,7 +746,47 @@ OnGestureListener {
 
 		
 
+		
+
 	};
+	List<TopicInfo> hotList;
+	private void bbsHot() {
+		Document doc = Jsoup.parse(data);
+		Elements tds = doc.getElementsByTag("td");
+		int curPos = 0;
+		if(!tds.get(0).text().equals(""))
+		{
+			displayMsg("¸÷ÇøÈÈµã¸ñÊ½ÓÐ±ä»¯£¬ÎÞ·¨½âÎö£¡");
+			return;
+		}
+		hotList =  new ArrayList<TopicInfo> (); ;
+		for (int i = 0; i < tds.size(); i++) {
+			Element element= tds.get(i);
+			String text = element.text();
+			if(text.equals(""))
+			{
+				//img
+				Elements elementsByTag = element.getElementsByTag("img");
+				if(elementsByTag.size()<1) continue;
+				curPos++;
+				TopicInfo ti = new TopicInfo();
+				ti.setTitle("fb"+curPos);
+				hotList.add(ti);
+				
+				
+				continue;
+			}
+			TopicInfo ti = new TopicInfo();
+			hotList.add(ti);
+			ti.setLink((element.getElementsByTag("a")).get(0).attr("href"));// ÉèÖÃtitle
+			int lastIndexOf = text.lastIndexOf('[');
+			ti.setTitle("¡ð "+text.substring(1,lastIndexOf-1));// ÉèÖÃtitle
+			ti.setArea(text.substring(lastIndexOf,text.length()));
+		}
+		hotList.size();
+	}
+	
+	
 	
 	//Í¬²½ÊÕ²Ø¼Ð
 	private void checkSyn(String data) {
@@ -716,7 +831,6 @@ OnGestureListener {
 	 * @param data
 	 */
 	private void getUserData(String data) {
-		//TODO:
 		char s = 10;
 		String backS = s + "";
 		
@@ -778,14 +892,41 @@ OnGestureListener {
 			}
 			
 			
-			Toast.makeText(TestAndroidActivity.this, "·¢ÎÄ³É¹¦£¡",
-					Toast.LENGTH_SHORT).show();
+			
+			displayMsg("·¢ÎÄ³É¹¦£¡");
+		}
+		else if (data.contains("ÐÞ¸ÄÎÄÕÂ³É¹¦")) 
+		{
+			
+			//ÐÞ¸ÄÍê³É
+			getUrlHtml(topicUrl + "&start="
+					+ nowPos, Const.MSGTOPICREFREASH);
+			
+			displayMsg("ÐÞ¸Ä³É¹¦£¡");
+			
+		}
+		else if (data.contains("·µ»Ø±¾ÌÖÂÛÇø")) 
+		{
+			
+			//»Ø¸´Íê³É
+			getUrlHtml(topicUrl + "&start="
+					+ nowPos, Const.MSGTOPICREFREASH);
+			
+			displayMsg("É¾³ý³É¹¦£¡");
+			
 		}
 
-		else // if(data.contains("javascript:history.go(-1)"))
+		else 
 		{
-			Toast.makeText(TestAndroidActivity.this, "·¢ËÍÊ§°ÜÁËÄÅ~·¢ÎÄÄÚÈÝ±£´æÔÚ¼ôÌù°åÉÏ",
-					Toast.LENGTH_SHORT).show();
+			if(data.contains("Á½´Î·¢ÎÄ¼ä¸ô¹ýÃÜ"))
+			{
+				displayMsg("Á½´Î·¢ÎÄ¼ä¸ô¹ýÃÜ, ÇëÐÝÏ¢¼¸ÃëºóÔÙÊÔ! ");
+			}
+			else
+			{
+				displayMsg("·¢ËÍÊ§°ÜÁËÄÅ~·¢ÎÄÄÚÈÝ±£´æÔÚ¼ôÌù°åÉÏ");
+			}
+			
 			ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
 			clipboard.setText(cont);
@@ -812,6 +953,7 @@ OnGestureListener {
 			Toast.makeText(TestAndroidActivity.this, "µÇÂ¼³É¹¦£¡",
 					Toast.LENGTH_SHORT).show();
 			isLogin = true;
+			nowLoginId = loginId;
 
 			Editor editor = sharedPreferences.edit();// »ñÈ¡±à¼­Æ÷
 			editor.putString("isRem", isRem);
@@ -823,8 +965,18 @@ OnGestureListener {
 				editor.putString("loginPwd", "");
 			}
 			editor.commit();
+			
+			//Èç¹ûÊÕ²Ø¼ÐÎª¿Õ£¬ÔòÈ¥·þÎñÆ÷¶ËÈ¡µÃ
+			if(areaNamList.size()<1)
+			{
+				getUrlHtml(synUrl,Const.MSGSYNFIRST);
+			}
+			else
+			{
+				InitMain();
+			}
 			// progressDialog.dismiss();
-			InitMain();
+			
 
 		} else if (scs.size() == 1) {
 			if (data.contains("ÃÜÂë´íÎó") || data.contains("´íÎóµÄÊ¹ÓÃÕßÕÊºÅ")) {
@@ -863,6 +1015,7 @@ OnGestureListener {
 			Toast.makeText(TestAndroidActivity.this, "µÇÂ¼³É¹¦£¡",
 					Toast.LENGTH_SHORT).show();
 			isLogin = true;
+			nowLoginId = loginId;
 		} else if (scs.size() == 1) {
 			if (data.contains("ÃÜÂë´íÎó") || data.contains("´íÎóµÄÊ¹ÓÃÕßÕÊºÅ")) {
 				Toast.makeText(TestAndroidActivity.this, "ÓÃ»§Ãû»òÃÜÂë´í£¡",
@@ -897,6 +1050,10 @@ OnGestureListener {
 		Elements ins = doc.getElementsByTag("input");
 		// progressDialog.dismiss();
 		if (ins.size() != 12) {
+			
+			
+			
+			if (ins.size() != 5) {
 			// µÇÂ¼Ê§°Ü£¬ÒªÇóÖØÐÂµÇÂ¼
 			if (formData.contains("´Ò´Ò¹ý¿Í")) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -935,6 +1092,54 @@ OnGestureListener {
 				Toast.makeText(TestAndroidActivity.this, "ÓÉÓÚÎ´Öª´íÎó·¢ÎÄÊ§°Ü",
 						Toast.LENGTH_SHORT).show();
 			}
+			}
+			else
+			{
+				final String type=ins.get(0).attr("value");
+				final String board=ins.get(1).attr("value");
+				final String file=ins.get(2).attr("value");
+				String recont = formData.substring(formData.indexOf("<textarea name=text rows=20 cols=80 wrap=physicle>")+50,formData.indexOf("</textarea>"));
+			
+				LayoutInflater factory = LayoutInflater
+				.from(TestAndroidActivity.this);
+				final View acdlgView = factory.inflate(R.layout.editdlg, null);
+					Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
+					.setTitle("ÐÞ¸ÄÎÄÕÂ").setView(acdlgView).setPositiveButton("È·¶¨",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								
+								EditText titleEdit = (EditText) acdlgView
+										.findViewById(R.id.edt_cont);
+								String cont = StringUtil.getStrBetter(titleEdit.getText()
+										.toString());
+										
+										sendEdit(cont,type,board,file);
+							}
+
+						});
+						
+
+			 altDlg.setNegativeButton("È¡Ïû",
+						new DialogInterface.OnClickListener() {
+					public void onClick(
+							DialogInterface dialoginterface, int i) {
+
+					}
+				});
+		
+						
+			AlertDialog dlg =altDlg.create();
+//			EditText titleEdit = (EditText) acdlgView
+//				.findViewById(R.id.edt_title);
+			
+			EditText titleEdit = (EditText) acdlgView
+			.findViewById(R.id.edt_cont);
+			titleEdit.setText(recont);
+
+			dlg.show();
+				
+			}
 
 		} else {
 
@@ -971,7 +1176,7 @@ OnGestureListener {
 											CheckBox cb = (CheckBox) acdlgView.findViewById(R.id.cb_recont);
 											if(cb.isChecked()&&extraRecont!=null&&extraRecont.length()>1)
 											{
-												cont+=extraRecont.substring(2);
+												cont+=" "+extraRecont.substring(2);
 											}
 											sendTopic(title,cont);
 								}
@@ -996,9 +1201,8 @@ OnGestureListener {
 										int whichButton) {
 										if(fastReList.length<1)
 											return;
-										if(fastReList.length==1)
+										if(isMoreFast)
 										{
-											//TODO
 											EditText titleEdit = (EditText) acdlgView
 											.findViewById(R.id.edt_title);
 											String title = titleEdit.getText().toString();
@@ -1058,13 +1262,46 @@ OnGestureListener {
 
 		}
 	}
+	
+	private void sendEdit(String cont,String type,String board,String file)
+	{
+//		//ÊÖ»úÇ©Ãû
+//		if(isBackWord&&backWords!=null&&backWords.length()>0)
+//		{
+//			cont+="\n-\n[1;32m"+backWords+"[m\n";
+//		}
+		
+		
+			
+			String url = "http://bbs.nju.edu.cn/bbsedit?board="
+					+ board
+					+ "&file="
+					+ file
+					+ "&type="
+					+type;
+					
+			// +"&text="+;
+
+			NameValuePair[] newVp = { new NameValuePair(
+					"text", cont) };
+
+			nvpCont = newVp;
+
+			getUrlHtml(url, Const.MSGPSTNEW);
+		
+	}
+	
+	
+	
+	
+	
 
 	private void sendTopic(String title,String cont)
 	{
 		//ÊÖ»úÇ©Ãû
 		if(isBackWord&&backWords!=null&&backWords.length()>0)
 		{
-			cont+="\n-\n[1;32m"+backWords+"[m\n";
+			cont+="\n-\n"+signColor+backWords+"[m\n";
 		}
 		
 		try {
@@ -1125,7 +1362,7 @@ OnGestureListener {
 	/**
 	 * ½«ÓÉÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ ¹©10´óÊ¹ÓÃ
 	 */
-	private void setTopics() {
+	private void convtTopics() {
 
 		LinkAdr = new ArrayList<String>();
 
@@ -1135,10 +1372,21 @@ OnGestureListener {
 
 			Map<String, Object> map = new HashMap<String, Object>();
 
-			map.put("topictitle", " " + topicInfo.getTitle());
-
-			map.put("topicau", " ×÷Õß:" + topicInfo.getAuthor() + "  ÐÅÇø:"
-					+ topicInfo.getArea() + "  »Ø¸´:" + topicInfo.getNums());
+			String title = topicInfo.getTitle();
+//			int begin = title.length();
+//			title+=" (HOT:"+topicInfo.getNums()+")";
+//			
+//			
+//			SpannableString sp = new SpannableString(title);    
+//			sp.setSpan(listColorSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
+//			sp.setSpan(absoluteSizeSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
+			
+			
+			map.put("topictitle", title);
+			
+			map.put("topicau", "×÷Õß:" + topicInfo.getAuthor());
+			
+			map.put("topicother", "ÐÅÇø:"+ topicInfo.getArea());
 
 			list.add(map);
 
@@ -1148,8 +1396,8 @@ OnGestureListener {
 		if (list.size() > 0) {
 
 			SimpleAdapter adapter = new SimpleAdapter(this, list,
-					R.layout.vlist, new String[] { "topictitle", "topicau" },
-					new int[] { R.id.topictitle, R.id.topicau });
+					R.layout.vlist, new String[] { "topictitle", "topicau","topicother" },
+					new int[] { R.id.topictitle, R.id.topicau ,R.id.topicother});
 			listView.setAdapter(adapter);
 			// Ìí¼Óµã»÷
 			listView.setOnItemClickListener(new OnItemClickListener() {
@@ -1172,7 +1420,7 @@ OnGestureListener {
 	/**
 	 * ½«ÓÉHTMLÒ³Ãæ×ª³öµÄÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ ¹©ÌÖÂÛÇøÊ¹ÓÃ
 	 */
-	private void setAreaTopics() {
+	private void convtAreaTopics() {
 
 		LinkAdr = new ArrayList<String>();
 
@@ -1182,20 +1430,54 @@ OnGestureListener {
 
 			Map<String, Object> map = new HashMap<String, Object>();
 
-			map.put("topictitle", " " + topicInfo.getTitle());
-			if (topicInfo.getNums() == null || topicInfo.getNums().equals("")) {
-				map
-						.put("topicau", " ÖÃ¶¥   ×÷Õß:" + topicInfo.getAuthor()
-								+ " - " + topicInfo.getPubDate() + "  ÈËÆø:"
-								+ topicInfo.getHot());
-			} else {
-				map
-						.put("topicau", " " + topicInfo.getNums() + "   ×÷Õß:"
-								+ topicInfo.getAuthor() + " ÓÚ"
-								+ topicInfo.getPubDate() + "  ÈËÆø:"
-								+ topicInfo.getHot());
+			String title = topicInfo.getTitle();
+			int begin = title.length();
+			title+="  ("+topicInfo.getHot()+")";
+			String[] split = topicInfo.getHot().split("/");
+			SpannableString sp = null;
+			
+			
+			if(split.length==2)
+			{
+				int re = Integer.parseInt(split[0]);
+				int watch = Integer.parseInt(split[1]);
+				if(re>9||watch>500)
+				{
+					sp = new SpannableString(title+"[sm]");
+					sp.setSpan(hotTopicSpan,title.length(),title.length()+4,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				}
 			}
-
+			if(sp ==null)
+			{
+				sp = new SpannableString(title);
+			}
+			sp.setSpan(listColorSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
+			sp.setSpan(absoluteSizeSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
+			
+			
+			
+			map.put("topictitle", sp);
+			String place ="";
+			if (topicInfo.getNums() == null || topicInfo.getNums().equals("")) {
+				place = "";
+			} else {
+				place =  topicInfo.getNums();
+			}
+			
+			if(topicInfo.getMark().length()>0)
+			{
+				
+				map.put("topicau","["+topicInfo.getMark()+"] "+place+" ×÷Õß:" + topicInfo.getAuthor() );
+			}
+			else
+			{
+				map.put("topicau",place+" ×÷Õß:" + topicInfo.getAuthor());
+			
+			
+			}
+			map.put("topicother", topicInfo.getPubDate());
+			
+			
 			list.add(map);
 
 			LinkAdr.add("http://bbs.nju.edu.cn/" + topicInfo.getLink());
@@ -1203,9 +1485,9 @@ OnGestureListener {
 		}
 		if (list.size() > 0) {
 
-			SimpleAdapter adapter = new SimpleAdapter(this, list,
-					R.layout.vlist, new String[] { "topictitle", "topicau" },
-					new int[] { R.id.topictitle, R.id.topicau });
+			MyListAdapter adapter = new MyListAdapter(this, list,
+					R.layout.vlist, new String[] { "topictitle", "topicau","topicother" },
+					new int[] { R.id.topictitle, R.id.topicau ,R.id.topicother});
 			listView.setAdapter(adapter);
 			// Ìí¼Óµã»÷
 			listView.setOnItemClickListener(new OnItemClickListener() {
@@ -1228,12 +1510,96 @@ OnGestureListener {
 			});
 		}
 	}
+	
+	
+	
+	
+	/**
+	 * ½«ÓÉHTMLÒ³Ãæ×ª³öµÄÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ 
+	 * ¹©¸÷ÇøÈÈµãÊ¹ÓÃ
+	 */
+	private void convtHotTopics() {
+
+		LinkAdr = new ArrayList<String>();
+
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		
+		for (TopicInfo topicInfo : hotList) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			if(topicInfo.getArea()==null||topicInfo.getArea().length()<1)
+			{
+				map.put("img",fbAll.get(topicInfo.getTitle()));
+			}
+			else
+			{
+				
+				String title = topicInfo.getTitle();
+//				int begin = title.length();
+//				title+="   "+topicInfo.getArea()+"";
+//				SpannableString sp = new SpannableString(title);
+//				sp.setSpan(listColorSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
+//				sp.setSpan(absoluteSizeSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
+				
+				
+				map.put("topictitle", title);
+			
+				map.put("topicau", topicInfo.getArea());
+				
+			}
+			list.add(map);
+			
+			LinkAdr.add("http://bbs.nju.edu.cn/" +topicInfo.getLink());
+
+		}
+		if (list.size() > 0) {
+
+			MyImageListAdapter adapter = new MyImageListAdapter(this, list,
+					R.layout.hotlist, new String[] { "topictitle","img","topicau" },
+					new int[] { R.id.topictitle, R.id.itemImage,R.id.topicau});
+			listView.setAdapter(adapter);
+			// Ìí¼Óµã»÷
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+
+					topicUrl = LinkAdr.get(arg2);
+
+					if (topicUrl == null||topicUrl.length()<27)
+						return;
+
+					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
+					curStatus = 3;
+					nowPos = 0;
+					scrollY = listView.getFirstVisiblePosition();
+					getUrlHtml(topicUrl, Const.MSGTOPIC);
+
+				}
+			});
+		}
+	}
 
 	boolean isNext = true;
 	boolean isPrev = true;
 
 	
 
+	
+	private void chaToHot(String HotData) {
+		
+
+		setTitle("¸÷ÇøÈÈµã");
+
+		curStatus = 1;
+		setContentView(R.layout.hot);
+	
+		listView = (ListView) findViewById(R.id.topicList);
+		convtHotTopics();
+		if (HotData == null) {
+			listView.setSelection(scrollY);
+		} 
+				
+	}
+	
 	
 	/**
 	 * Ìø×ªµ½ÌÖÂÛÇø½çÃæ
@@ -1255,12 +1621,6 @@ OnGestureListener {
 		btnBack.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				/**
-				 * ¸Ä³É·¢±íÐÂ»°Ìâ
-				 * 
-				 * chaToMain(); if(top10TopicList!=null) { setTopics(); }
-				 * 
-				 */
 				getUrlHtml(newUrl, Const.MSGPST);
 
 			}
@@ -1318,7 +1678,7 @@ OnGestureListener {
 		}
 		listView = (ListView) findViewById(R.id.topicList);
 
-		setAreaTopics();
+		convtAreaTopics();
 		if (AreaData == null) {
 			listView.setSelection(scrollY);
 		} else {
@@ -1359,7 +1719,7 @@ OnGestureListener {
 	private void areaPages(String AreaData) {
 		areaTopic = getAreaTopic(AreaData);
 		listView = (ListView) findViewById(R.id.topicList);
-		setAreaTopics();
+		convtAreaTopics();
 		listView.setSelection(areaTopic.size() - 1);
 	}
 	
@@ -1389,6 +1749,7 @@ OnGestureListener {
 				else
 					ti.setPubDate(date);
 				ti.setAuthor(tds.get(curPos + 2).text());
+				ti.setMark(tds.get(curPos + 1).text());
 				ti.setHot(tds.get(curPos + 5).text());
 				String notext = tds.get(curPos).text();
 				ti.setNums(notext);
@@ -1430,12 +1791,7 @@ OnGestureListener {
 		            //´Ë´¦Ð´ÄãµÄ´¦ÀíÂß¼­
 			  //System.out.println("123123");
 			  // processHyperLinkClick(text); //µã»÷³¬Á´½ÓÊ±µ÷ÓÃ
-			  if(mUrl.contains("bbsqry?userid"))
-			  {
-				  //²é¿´ÓÃ»§
-				  getUrlHtml(mUrl, Const.MSGVIEWUSER);
-			  }
-			  else if(mUrl.toLowerCase().startsWith("http:")
+			   if(mUrl.toLowerCase().startsWith("http:")
 						&& (mUrl.toLowerCase().endsWith(".jpg") 
 								|| mUrl.toLowerCase().endsWith(".png")
 								||mUrl.toLowerCase().endsWith(".jpeg")
@@ -1447,10 +1803,51 @@ OnGestureListener {
 				 
 				  startActivity(intent);
 			  }
-			  else if(mUrl.toLowerCase().startsWith("http:"))
+			  else if(mUrl.contains("bbsqry?userid"))
 			  {
-				  //super.
+				  //²é¿´ÓÃ»§
+				  getUrlHtml(mUrl, Const.MSGVIEWUSER);
 			  }
+			  else if(mUrl.contains("bbspst?board"))
+			  {
+				  // »Ø¸´
+				  getUrlHtml(mUrl, Const.MSGPST);
+			  } 
+			   
+			  else if(mUrl.contains("bbsedit?board"))
+			  {
+				  // ÐÞ¸Ä
+				  getUrlHtml(mUrl, Const.MSGPST);
+			  } 
+			   
+			  else if(mUrl.contains("bbsdel?board"))
+			  {
+				  // É¾³ý
+				  AlertDialog.Builder builder = new AlertDialog.Builder(
+							TestAndroidActivity.this);
+				  
+				  
+				  builder.setTitle("ÌáÊ¾")
+					.setMessage("È·¶¨É¾³ý±¾ÎÄ£¿").setPositiveButton("È·¶¨",
+							new DialogInterface.OnClickListener() {
+
+								public void onClick(DialogInterface dialog,
+										int which) {
+									 getUrlHtml(mUrl, Const.MSGPSTNEW);
+								}
+
+							}).setNegativeButton("È¡Ïû",
+							new DialogInterface.OnClickListener() {
+
+								public void onClick(DialogInterface dialog,
+										int which) {
+
+								}
+							}).show();
+				 
+			  } 
+				  
+				  
 
 		   }
 		 }
@@ -1477,15 +1874,14 @@ OnGestureListener {
 
 		setContentView(R.layout.topic);
 		
-		//topicData.getSpans(arg0, arg1, arg2);
 		SpannableStringBuilder urlChanged = getURLChanged(topicData);
 
 		textView = (TextView) findViewById(R.id.label);
 		textView.setText(urlChanged);
+		textView.setTextSize(txtFonts);
 		textView.setMovementMethod(LinkMovementMethod.getInstance());
 
-//		
-//		//textView.
+		textView.getBackground().setAlpha(backAlpha);
 		if(isTouch)
 		{
 			textView.setOnTouchListener(this);
@@ -1493,22 +1889,28 @@ OnGestureListener {
 			textView.setLongClickable(true);
 		}
 		
-		// WebView mWebView = (WebView) findViewById(R.id.label);
-		// mWebView.loadData(getTopicInfo(data), "text/html", "iso-8859-1");
-
 		Button btnBack = (Button) findViewById(R.id.btn_back);
 		btnBack.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-
-				if (curStatus == 1) {
-					chaToMain();
-					if (top10TopicList != null) {
-						setTopics();
-					}
-				} else {
-					chaToArea(null);
-				}
+//
+//				if (curStatus == 1) {
+//					chaToMain();
+//					if (top10TopicList != null) {
+//						convtTopics();
+//					}
+//				} else if (curStatus == 2) {
+//					chaToArea(null);
+//				} 
+//				 else if (curStatus == 3) {
+//						chaToHot(null);
+//				} 
+				
+				urlString = "http://bbs.nju.edu.cn/bbstdoc?board=" + curAreaName;
+				getUrlHtml(urlString, Const.MSGAREA);
+				
+				
+				
 			}
 		});
 
@@ -1612,8 +2014,9 @@ OnGestureListener {
 						imageTrd.setName("NoUse");
 					}
 					topicWithImg = false;
-					final  String topicDataInfo = StringUtil.getTopicInfo(data,nowPos,isIP,isWifi,isPic);
-
+					final  String topicDataInfo = StringUtil.getTopicInfo(data,nowPos,isIP,isWifi,isPic,nowLoginId);
+					if(topicDataInfo!=null)
+					{
 					isNext = StringUtil.isNext;
 					if(StringUtil.curAreaName!=null&&!StringUtil.curAreaName.equals("byztm"))
 						curAreaName =  StringUtil.curAreaName;
@@ -1691,6 +2094,7 @@ OnGestureListener {
 						}
 					};
 					imageTrd.start();
+					}
 					}
 					
 				}
@@ -1841,6 +2245,8 @@ OnGestureListener {
 				options.inSampleSize = heightRatio;
 			}
 		}
+		if(sWidth<260)
+			options.inSampleSize = options.inSampleSize*2;
 
 
 		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
@@ -1933,7 +2339,7 @@ OnGestureListener {
 				if (curStatus == 1) {
 					chaToMain();
 					if (top10TopicList != null) {
-						setTopics();
+						convtTopics();
 					}
 				} else {
 					chaToArea(null);
@@ -1967,10 +2373,12 @@ OnGestureListener {
 		if(y>sv.getHeight()-sLength/6&&x>(sWidth*3/4))
 		{
 			sv.scrollBy(0, sv.getHeight()-20);
+			return true;
 		}
 		if(y<sLength/3&&x>(sWidth*3/4))
 		{
 			sv.scrollBy(0, 20-sv.getHeight());
+			return true;
 		}
 	return false;
 	}

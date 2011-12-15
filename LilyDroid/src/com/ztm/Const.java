@@ -32,6 +32,9 @@ public class Const {
 	public static final int MSGVIEWUSER = 0x000009;
 	
 	public static final int MSGSYN = 0x000010;
+	public static final int MSGSYNFIRST = 0x000110;
+	
+	public static final int MSGHOT = 0x000011;
 	
 
 }
