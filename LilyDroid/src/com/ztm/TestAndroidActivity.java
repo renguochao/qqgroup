@@ -910,17 +910,17 @@ OnGestureListener {
 					ss = new SpannableString(title+"[sm]");
 					ss.setSpan(mailSpan,title.length(),title.length()+4,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					
-					map.put("topicau",topicInfo.getNums()+" 作者:" + topicInfo.getAuthor());
+					map.put("topicau",topicInfo.getNums()+" 寄信人:" + topicInfo.getAuthor());
 				}
 				else
 				{
 					
-					map.put("topicau","["+topicInfo.getMark()+"] "+topicInfo.getNums()+" 作者:" + topicInfo.getAuthor() );
+					map.put("topicau","["+topicInfo.getMark()+"] "+topicInfo.getNums()+" 寄信人:" + topicInfo.getAuthor() );
 				}
 			}
 			else
 			{
-				map.put("topicau",topicInfo.getNums()+" 作者:" + topicInfo.getAuthor());
+				map.put("topicau",topicInfo.getNums()+" 寄信人:" + topicInfo.getAuthor());
 			
 			
 			}
@@ -1973,8 +1973,8 @@ OnGestureListener {
 				getToAreaWithName(inputPwd);
 			}
 		});
-		if(parentList==null)
-			initAllAreas();
+//		if(parentList==null)
+//			initAllAreas();
 
         android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
                 this,
