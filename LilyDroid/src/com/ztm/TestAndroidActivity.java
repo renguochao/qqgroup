@@ -186,6 +186,8 @@ OnGestureListener {
 	
 	ArrayAdapter<String> bbsAlladapter;
 
+	String bbsURL = "http://bbs.nju.edu.cn/";
+	
 	String loginURL = "http://bbs.nju.edu.cn/bbslogin?type=2";
 
 	String loginoutURL = "http://bbs.nju.edu.cn/bbslogout";
@@ -206,7 +208,9 @@ OnGestureListener {
 	int sWidth = 480;
 	int sLength = 800;
 	ForegroundColorSpan listColorSpan ;
+	List<TopicInfo> hotList;
 	AbsoluteSizeSpan absoluteSizeSpan;
+	List<TopicInfo> mailList = null; 
 	//String TMStr;
 	//TODO:∂®“Â»´æ÷±‰¡ø
 	/**
@@ -424,7 +428,7 @@ OnGestureListener {
 
 			public void onClick(View arg0) {
 				// ø…“‘¥Úø™“ª∏ˆ–¬œﬂ≥Ã¿¥∂¡»°£¨º”»Îπˆ∂ØÃıµ»
-				if(parentList==null)
+				if(parentList==null||parentList.size()<2)
 				{
 					String url="http://bbs.nju.edu.cn/bbstopb10";
 					getUrlHtml(url, Const.TOP20BOARD);
@@ -503,6 +507,8 @@ OnGestureListener {
             case menuLogout:  
                 //◊™µΩµ«¬ºΩÁ√Ê   
             	getUrlHtml(loginoutURL,123);
+            	isLogin = false;
+            	nowLoginId = null;
                 chaToLogin();
                 break;
             case menuSyn:  
@@ -518,7 +524,7 @@ OnGestureListener {
             	
             	if(isLogin)
             	{
-            		beginMail("tiztm","Android∞Ê–°∞Ÿ∫œ“‚º˚∑¥¿°",null);
+            		beginMail("tiztm","Android∞Ê–°∞Ÿ∫œ“‚º˚∑¥¿°",null,null);
             	}
             	else
             	{
@@ -535,8 +541,9 @@ OnGestureListener {
     	myParams();
     }  
     
-    private void beginMail(String to,String title,String cont)
+    private void beginMail(String to,String title,String cont,String action)
     {
+    	final String thisAction=action;
     	LayoutInflater factory = LayoutInflater
 		.from(TestAndroidActivity.this);
 		final View acdlgView = factory.inflate(R.layout.maildlg, null);
@@ -561,7 +568,7 @@ OnGestureListener {
 						String title =titleEdit.getText()
 								.toString();
 								
-								sendMail(to,title,cont);
+								sendMail(to,title,cont,thisAction);
 					}
 				});
 				
@@ -792,6 +799,7 @@ OnGestureListener {
 				break;
 				
 			case Const.TOP20BOARD:
+				convtTOP20Area(data);
 				initAllAreas();
 				chaToAreaToGo();
 				break;
@@ -803,6 +811,9 @@ OnGestureListener {
 				
 			case  Const.MSGMAILTOPIC:
 				chaToMailTopic();
+				break;
+			case Const.MSGREMAIL:
+				checkMailForm(data);
 				break;
 			default:
 				break;
@@ -822,9 +833,9 @@ OnGestureListener {
 	};
 	
 	/**
-	 * Ã÷¬€«¯ΩÁ√Ê∑≠“≥
+	 * ” º˛ΩÁ√Ê∑≠“≥
 	 * 
-	 * @param AreaData
+	 * 
 	 */
 	private void goToMailPage(int pageNo) {
 		int startPage = areaNowTopic + pageNo;
@@ -838,7 +849,6 @@ OnGestureListener {
 	
 	
 	private void chaToMailTopic() {
-		// TODO Auto-generated method stub
 		char s = 10;
 		String backS = s + "";
 		
@@ -859,22 +869,48 @@ OnGestureListener {
 			String withSmile = StringUtil.addSmileySpans(infoView);
 			setContentView(R.layout.mailtopic);
 			
-			//SpannableStringBuilder urlChanged = getURLChanged(topicData);
-
+			
 			textView = (TextView) findViewById(R.id.label);
 			textView.setText(Html.fromHtml(withSmile));
 			textView.setTextSize(txtFonts);
-			textView.setMovementMethod(LinkMovementMethod.getInstance());
-
 			textView.getBackground().setAlpha(backAlpha);
-			if(isTouch)
-			{
-				textView.setOnTouchListener(this);
-				textView.setFocusable(true);
-				textView.setLongClickable(true);
+			
+			Elements as = doc.getElementsByTag("a");
+			for (Element element : as) {
+				if(element.text().equals("ªÿ–≈"))
+				{
+					String ss = (element.getElementsByTag("a")).get(0).attr("href");
+					int lastIndexOf = ss.lastIndexOf("Re:");
+					
+					String sFir = ss.substring(0,lastIndexOf);
+					String sSec = ss.substring(lastIndexOf);
+					
+					
+					try {
+						sSec = URLEncoder.encode(sSec,
+						"GB2312");
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+					final String attr =bbsURL+sFir+sSec ;
+
+					Button btnPre = (Button) findViewById(R.id.btn_huifu);
+					btnPre.setOnClickListener(new OnClickListener() {
+
+						public void onClick(View v) {
+							getUrlHtml(attr, Const.MSGREMAIL);
+						}
+					});
+					
+				}
+//				else if(element.text().equals("…æ≥˝"))
+//				{
+//					
+//				}
 			}
 			
-
+			
 		}
 		
 		
@@ -979,7 +1015,7 @@ OnGestureListener {
 		btnMail.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				beginMail(null,null,null);
+				beginMail(null,null,null,null);
 			}
 		});
 		
@@ -998,7 +1034,7 @@ OnGestureListener {
 	}
 	
 	
-	List<TopicInfo> mailList = null; 
+
 	private void getMailCont() {
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("td");
@@ -1018,7 +1054,6 @@ OnGestureListener {
 				try {
 					thisPos =Integer.parseInt(no);
 				} catch (Exception e) {
-					// TODO: handle exception
 					return;
 				}
 				
@@ -1058,7 +1093,7 @@ OnGestureListener {
 	
 	
 	
-	List<TopicInfo> hotList;
+
 	private void bbsHot() {
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("td");
@@ -1125,6 +1160,7 @@ OnGestureListener {
 		{
 			int ii= areaNamList.size()-ll;
 			storeAreaName();
+			//initAllAreas();
 			displayMsg("Õ¨≤ΩWEB ’≤ÿº–≥…π¶!∏¸–¬"+ii+"∏ˆ“— ’≤ÿ∞Ê√Ê");
 		}
 		else
@@ -1136,12 +1172,12 @@ OnGestureListener {
 	
 	
 	
-	private List<TopicInfo> convtTOP20Area(String areaData) {
+	private void convtTOP20Area(String areaData) {
 		Document doc = Jsoup.parse(data);
 
 		Elements tds = doc.getElementsByTag("td");
 		
-		List<TopicInfo> tiList = new ArrayList<TopicInfo>();
+		top20List = new ArrayList<TopicInfo>();
 		if (tds.size() <12) {
 			Toast.makeText(TestAndroidActivity.this, "ªÒ»°»»√≈Ã÷¬€«¯ ß∞‹",
 					Toast.LENGTH_SHORT).show();
@@ -1153,11 +1189,11 @@ OnGestureListener {
 				TopicInfo ti = new TopicInfo();
 				ti.setTitle(tds.get(i+1).text()+" ("+tds.get(i+2).text()+")");	
 				//ti.setNums(tds.get(i+4).text());
-				tiList.add(ti);
+				top20List.add(ti);
 				i+=6;
 			}
 		}
-		return tiList;
+		//return null;
 		
 	}
 
@@ -1184,20 +1220,36 @@ OnGestureListener {
 		else
 		{
 			Element textArea = scs.get(0);
-			String infoView = textArea.text();
+			final String infoView = textArea.text();
 			
 			
 			String withSmile = StringUtil.addSmileySpans(infoView);
 			LayoutInflater factory = LayoutInflater
 			.from(TestAndroidActivity.this);
 			final View info = factory.inflate(R.layout.infodlg, null);
-			AlertDialog dlg = new AlertDialog.Builder(TestAndroidActivity.this)
+			Builder dlg = new AlertDialog.Builder(TestAndroidActivity.this)
 			.setTitle("”√ªß–≈œ¢≤È—Ø").setView(info).setNegativeButton("»∑∂®",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
 								int whichButton) {
 						}
-					}).create();
+					});
+					
+					
+			if(isLogin)
+			{
+				dlg.setPositiveButton("–¥–≈", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,
+							int whichButton) {
+						String to = infoView.substring(0,infoView.indexOf(" ("));
+						beginMail(to, null, null, null);
+						
+					}
+				});
+				
+			}
+			
+					AlertDialog ad = dlg.create();
 			//∑¢≤ ’’π¶ƒ‹
 			textView = (TextView) info.findViewById(R.id.tvInfo);
 			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
@@ -1378,6 +1430,66 @@ OnGestureListener {
 	}
 	
 	
+	
+	protected void checkMailForm(String formData) {
+		Document doc = Jsoup.parse(formData);
+		Elements ins = doc.getElementsByTag("input");
+		// progressDialog.dismiss();
+		if (ins.size() != 12) {
+			
+			// µ«¬º ß∞‹£¨“™«Û÷ÿ–¬µ«¬º
+			if (formData.contains("¥“¥“π˝øÕ")) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						TestAndroidActivity.this);
+				builder.setMessage("¥“¥“π˝øÕ≤ªƒ‹–¥–≈~÷ÿ–¬µ«¬º?").setCancelable(false)
+						.setPositiveButton("µ«¬º",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										if(isRem.equals("true"))
+										{
+											//◊‘∂Øµ«¬ºµƒª∞£¨◊‘∂Øµ«¬º
+											String url = loginURL + "&id=" + loginId + "&pw=" + loginPwd;
+											getUrlHtml(url, Const.MSGAUTOLOGIN);
+										}
+										else
+										{
+											chaToLogin();
+										}
+									}
+								}).setNegativeButton("À„¡À",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										dialog.cancel();
+									}
+								});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}  else {
+				Toast.makeText(TestAndroidActivity.this, "”…”⁄Œ¥÷™¥ÌŒÛ∑¢Œƒ ß∞‹",
+						Toast.LENGTH_SHORT).show();
+			}
+			
+
+		} else {
+			String action =  ins.get(0).attr("value");
+			String title = ins.get(1).attr("value");
+			String userId = ins.get(2).attr("value");
+			 String recont = "" ;
+			try
+			{												   
+				recont = formData.substring(formData.indexOf("<textarea name=text id=text rows=20 cols=80 wrap=physicle>")+58,formData.indexOf("</textarea>"));
+			}
+			catch(Exception e)
+			{
+				
+			}
+			beginMail(userId, title, recont,action);
+			
+
+		}
+	}
 	
 
 	String pid;
@@ -1608,13 +1720,7 @@ OnGestureListener {
 	
 	private void sendEdit(String cont,String type,String board,String file)
 	{
-//		// ÷ª˙«©√˚
-//		if(isBackWord&&backWords!=null&&backWords.length()>0)
-//		{
-//			cont+="\n-\n[1;32m"+backWords+"[m\n";
-//		}
-		
-		
+
 			
 			String url = "http://bbs.nju.edu.cn/bbsedit?board="
 					+ board
@@ -1636,7 +1742,8 @@ OnGestureListener {
 	
 	
 	private void sendMail(String to, String title,
-			String cont) {
+			String cont,String action) {
+		cont = StringUtil.getStrBetter(cont);
 		// ÷ª˙«©√˚
 		if(isBackWord&&backWords!=null&&backWords.length()>0)
 		{
@@ -1652,7 +1759,11 @@ OnGestureListener {
 					+ "&userid="
 					+ to
 					+ "&signature=1";
-					
+			if(action!=null)
+			{
+				//
+				url+="&action="+action;
+			}
 					
 			// +"&text="+;
 
@@ -1973,8 +2084,8 @@ OnGestureListener {
 				getToAreaWithName(inputPwd);
 			}
 		});
-//		if(parentList==null)
-//			initAllAreas();
+		if(parentList==null||parentList.size()<2)
+			initAllAreas();
 
         android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
                 this,
@@ -2035,7 +2146,7 @@ OnGestureListener {
 	
 	
 	
-
+	List<TopicInfo> top20List;
 	private void initAllAreas() {
 		 parentList = new ArrayList<Map<String,Object>>();
 	     allChildList = new ArrayList<List<Map<String,Object>>>();
@@ -2053,19 +2164,21 @@ OnGestureListener {
 		}
          allChildList.add(childList);
          
-         
+         if(top20List!=null)
+	     {
          parentData = new HashMap<String, Object>();
 	     parentData.put("TITLE", "ΩÒ»’»»√≈");
 	     parentList.add(parentData);
 	     
-	     List<TopicInfo> tiList = convtTOP20Area(data);
+	    // convtTOP20Area(data);
+	    
 	     childList = new ArrayList<Map<String,Object>>();
-	     for (TopicInfo topicInfo : tiList) {
+	     for (TopicInfo topicInfo : top20List) {
 	    	 Map<String, Object> childData = new HashMap<String, Object>();
              childData.put("TITLE", topicInfo.getTitle());
              childList.add(childData);
 		}
-	     allChildList.add(childList);
+	     allChildList.add(childList);}
          
 	}
 
@@ -2193,6 +2306,8 @@ OnGestureListener {
 		Editor editor = sharedPreferences.edit();// ªÒ»°±‡º≠∆˜
 		editor.putString("areaName", areaName);
 		editor.commit();
+		
+		initAllAreas();
 	}
 
 	
@@ -2731,9 +2846,10 @@ OnGestureListener {
 		options.inJustDecodeBounds = false;
 		options.inPurgeable = true;
 		options.inInputShareable = true;
-
-		int widthRatio = (int) Math.ceil(options.outWidth / sWidth);
-		int heightRatio = (int) Math.ceil(options.outHeight / sLength);
+		
+		
+		int widthRatio = (int) Math.ceil(options.outWidth*1.0 / sWidth);
+		int heightRatio = (int) Math.ceil(options.outHeight*1.0 / sLength);
 		if (widthRatio > 1 || heightRatio > 1) {
 			if (widthRatio > heightRatio) {
 				options.inSampleSize = widthRatio;

@@ -13,17 +13,20 @@
      <Button
             android:id="@+id/btn_pre"
              android:layout_width="77dp"
+              android:layout_gravity="center_horizontal"
            android:layout_height="45dp"
             android:text="@string/pre" />
       <Button
             android:id="@+id/btn_next"
              android:layout_width="77dp"
+              android:layout_gravity="center_horizontal"
            android:layout_height="45dp"
             android:text="@string/next" />
 
              <Button
             android:id="@+id/btn_mail"
              android:layout_width="77dp"
+              android:layout_gravity="center_horizontal"
             android:layout_height="45dp"
             android:text="发信" />
             

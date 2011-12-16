@@ -195,7 +195,7 @@ public class StringUtil {
 							
 							userId = sconA.substring(1, ind);
 							String DisId = " "+userId;
-							if(userId.equals(nowLoginId)) DisId = " 我";
+							if(userId.equalsIgnoreCase(nowLoginId)) DisId = " 我";
 								
 							if (k == 1) {
 								lz = DisId;
@@ -309,7 +309,7 @@ public class StringUtil {
 			} else {
 				sFL = nowP+"楼:";
 			}
-			if(userId.equals(nowLoginId))
+			if(userId.equalsIgnoreCase(nowLoginId))
 			{
 				tiList.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1)+"'>[<font color=#0000EE >回复</font>]</a>&nbsp;&nbsp;")
 				.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1).replace("bbspst?", "bbsedit?")+"'>[<font color=#0000EE>修改</font>]</a>&nbsp;&nbsp;")

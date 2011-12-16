@@ -38,6 +38,7 @@ public class Const {
 	public static final int TOP20BOARD =0x000012;
 	public static final int MSGMAIL = 0x000013;
 	public static final int MSGMAILTOPIC = 0x000014;
+	public static final int MSGREMAIL = 0x000015;
 	
 
 }
