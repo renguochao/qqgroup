@@ -475,6 +475,7 @@ OnGestureListener {
     final private int menuLogout=Menu.FIRST+2;
     final private int menuSyn=Menu.FIRST+1;  
     final private int menuReport=Menu.FIRST+3;  
+    final private int menuJump=Menu.FIRST+4;  
     private static final int REQ_SYSTEM_SETTINGS = 0;    
 
     //创建菜单   
@@ -490,6 +491,7 @@ OnGestureListener {
         // 建立菜单   
         menu.add(Menu.NONE, menuSettings, 2, "设置");  
         menu.add(Menu.NONE, menuSyn, 2, "同步收藏");  
+        menu.add(Menu.NONE, menuJump, 2, "快速跳转");  
         menu.add(Menu.NONE, menuReport, 2, "意见反馈");  
         menu.add(Menu.NONE, menuLogout, 2, "注销");  
         return super.onCreateOptionsMenu(menu);  
@@ -511,6 +513,10 @@ OnGestureListener {
             	nowLoginId = null;
                 chaToLogin();
                 break;
+                
+            case menuJump:   
+            	getLikeDialog();
+            	 break;
             case menuSyn:  
                 //转到登录界面   
             	if(isLogin)
