@@ -68,7 +68,11 @@ public class StringUtil {
 		String[] split = scon.split("\n");
 		StringBuilder allSb = new StringBuilder();
 		for (String sp : split) {
-			if(sp.startsWith(":")||sp.contains("¡ù")) continue;
+			if(sp.startsWith(":")||sp.contains("¡ù")) 
+			{
+				allSb.append(sp+'\n');
+				continue;
+			}
 			StringBuilder sb = new StringBuilder(sp);
 			int len = sp.length();
 			int tempLen = 0;

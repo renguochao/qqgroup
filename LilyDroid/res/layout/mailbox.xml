@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content" >
+
     <LinearLayout
         android:id="@+id/linearLayout1"
-        style="@android:style/ButtonBar"  
+        style="@android:style/ButtonBar"
         android:layout_width="fill_parent"
-        android:layout_alignParentBottom="true"
-             android:layout_height="50sp" >
+        android:layout_height="50sp"
+         android:layout_gravity="right"
+        android:layout_alignParentBottom="true" >
 
-
-     <Button
+        <Button
             android:id="@+id/btn_pre"
-             android:layout_width="77dp"
-              android:layout_gravity="center_horizontal"
-           android:layout_height="45dp"
+            android:layout_width="77dp"
+            android:layout_height="45dp"
+           android:layout_gravity = "right"
             android:text="@string/pre" />
-      <Button
+
+        <Button
             android:id="@+id/btn_next"
-             android:layout_width="77dp"
-              android:layout_gravity="center_horizontal"
-           android:layout_height="45dp"
+            android:layout_width="77dp"
+            android:layout_height="45dp"
+
             android:text="@string/next" />
 
-             <Button
+        <Button
             android:id="@+id/btn_mail"
-             android:layout_width="77dp"
-              android:layout_gravity="center_horizontal"
+            android:layout_width="77dp"
             android:layout_height="45dp"
             android:text="发信" />
-            
     </LinearLayout>
-  
+
     <ListView
         android:id="@+id/topicList"
-        android:cacheColorHint="#00000000"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:divider="#D3D3D3"  
+        android:layout_above="@id/linearLayout1"
+        android:cacheColorHint="#00000000"
+        android:divider="#D3D3D3"
         android:dividerHeight="1dp"
-        android:textColor="#000000" 
-		android:scrollingCache="false" 
-        android:layout_above="@id/linearLayout1">
-
+        android:scrollingCache="false"
+        android:textColor="#000000" >
     </ListView>
+
 </RelativeLayout>

@@ -524,7 +524,10 @@ OnGestureListener {
             	
             	if(isLogin)
             	{
-            		beginMail("tiztm","Android版小百合意见反馈",null,null);
+            		
+            		String cont = "\n\n\n我的机型："+androidmodel+"\n屏幕宽高比："+(sWidth+30)+"x"+(sLength+40);
+            		
+            		beginMail("tiztm","Android版小百合意见反馈",cont,null);
             	}
             	else
             	{
@@ -842,7 +845,6 @@ OnGestureListener {
 		if (startPage < 0) {
 			startPage = 0;
 		}
-
 		getUrlHtml(mailURL + "?start=" + startPage, Const.MSGMAIL);
 
 	}
@@ -904,10 +906,6 @@ OnGestureListener {
 					});
 					
 				}
-//				else if(element.text().equals("删除"))
-//				{
-//					
-//				}
 			}
 			
 			
@@ -943,8 +941,8 @@ OnGestureListener {
 				if(topicInfo.getMark().equals("unread"))
 				{
 					
-					ss = new SpannableString(title+"[sm]");
-					ss.setSpan(mailSpan,title.length(),title.length()+4,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					ss = new SpannableString("[sm]"+title);
+					ss.setSpan(mailSpan,0,4,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					
 					map.put("topicau",topicInfo.getNums()+" 寄信人:" + topicInfo.getAuthor());
 				}
@@ -969,7 +967,6 @@ OnGestureListener {
 
 		}
 		if (list.size() > 0) {
-
 			MyListAdapter adapter = new MyListAdapter(this, list,
 					R.layout.vlist, new String[] { "topictitle", "topicau","topicother" },
 					new int[] { R.id.topictitle, R.id.topicau ,R.id.topicother});
@@ -1743,7 +1740,7 @@ OnGestureListener {
 	
 	private void sendMail(String to, String title,
 			String cont,String action) {
-		cont = StringUtil.getStrBetter(cont);
+		//cont = StringUtil.getStrBetter(cont);
 		//手机签名
 		if(isBackWord&&backWords!=null&&backWords.length()>0)
 		{
