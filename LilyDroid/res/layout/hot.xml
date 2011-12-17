@@ -2,10 +2,47 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
+    
+     <LinearLayout
+        android:id="@+id/linearLayout1"
+        style="@style/normalTab" >
+
+       <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn_link"
+            style="@style/normalBtn"
+            android:icon="@drawable/top"
+            android:text="@string/top10Str" >
+        </com.sonyericsson.zoom.ImageTextButton>
+
+        <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn_all"
+            style="@style/normalBtn"
+            android:icon="@drawable/board"
+            android:text="@string/allStr" >
+        </com.sonyericsson.zoom.ImageTextButton>
+
+        <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn_like"
+            style="@style/normalBtn"
+            android:icon="@drawable/mailbox"
+            android:text="@string/like" >
+        </com.sonyericsson.zoom.ImageTextButton>
+
+        <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn_set"
+            style="@style/normalBtn"
+            android:icon="@drawable/hot"
+            android:text="@string/bbshot" >
+        </com.sonyericsson.zoom.ImageTextButton>
+    </LinearLayout>
+    
+    
+    
     <ListView
         android:id="@+id/topicList"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+         android:layout_above="@id/linearLayout1"
 		android:cacheColorHint="@android:color/transparent"
         android:textColor="#000000" 
 		android:scrollingCache="false" 

@@ -101,8 +101,8 @@
 	/>
       
        <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="isMoreFast"
+        android:defaultValue="false"
+        android:key="isMoreMoreFast"
         android:summaryOff="回复发送前选择快捷回复内容"
         android:summaryOn="直接使用第一条快捷回复来回复"
         android:title="更加快捷回复！" >

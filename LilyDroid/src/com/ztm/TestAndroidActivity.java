@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.httpclient.NameValuePair;
 
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -83,16 +82,17 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
-
+import android.widget.LinearLayout.LayoutParams;
 
 public class TestAndroidActivity extends Activity implements OnTouchListener,
-OnGestureListener {
+		OnGestureListener {
 
 	private GestureDetector mGestureDetector;
 	// ¿Ø¼þ
@@ -101,7 +101,6 @@ OnGestureListener {
 
 	private ListView listView;
 
-	
 	private Button btnLink;
 
 	// È«¾Ö±äÁ¿
@@ -118,14 +117,13 @@ OnGestureListener {
 
 	private String huifuUrl;
 
-	
 	// 1 ±íÊ¾´Ó10´óÌø×ª¹ýÈ¥µÄ£¬2±íÊ¾´ÓÌÖÂÛÇøÌø×ª¹ýÈ¥µÄ£¬3±íÊ¾´Ó¸÷ÇøÈÈµãÌø¹ýÈ¥
 	int curStatus = 0;
 
 	List<TopicInfo> areaTopic;
 
 	int areaNowTopic = 0;
-	
+
 	boolean isWifi = false;
 
 	private int nowPos;
@@ -135,23 +133,22 @@ OnGestureListener {
 	String curAreaName = "";
 
 	String curTopicId = "";
-	
+
 	String isPic;
 	String signColor;
 	String isRem = "false";
-	boolean isTouch ;
+	boolean isTouch;
 	boolean isIP;
 	boolean isMoreFast;
 	String loginId = "";
 	String loginPwd = "";
-	
+
 	String androidmanufacturer;
 	String androidmodel;
-	
-	
+
 	String backWords = "";//
 	boolean isBackWord = true;
-	
+
 	int runningTasks = 0;
 
 	private ProgressDialog progressDialog = null;
@@ -159,7 +156,7 @@ OnGestureListener {
 	SharedPreferences sharedPreferences;
 
 	List<String> areaNamList;
-	
+
 	String[] fastReList;
 
 	Drawable drawableFav;
@@ -167,9 +164,9 @@ OnGestureListener {
 	Drawable drawableDis;
 
 	boolean isLogin = false;
-	
+
 	String nowLoginId = "";
-	
+
 	int txtFonts;
 
 	int backAlpha;
@@ -177,70 +174,69 @@ OnGestureListener {
 	Spanned topicData;
 
 	int scrollY = 0;
-	
+
 	boolean topicWithImg = false;
-	
+
 	HashMap<String, String> bbsAll;
-	
+
 	HashMap<String, Integer> smilyAll;
-	
+
 	ArrayAdapter<String> bbsAlladapter;
 
 	String bbsURL = "http://bbs.nju.edu.cn/";
-	
+
 	String loginURL = "http://bbs.nju.edu.cn/bbslogin?type=2";
 
 	String loginoutURL = "http://bbs.nju.edu.cn/bbslogout";
-	
+
 	String synUrl = "http://bbs.nju.edu.cn/bbsleft";
-	
+
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
-	
+
 	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
-	
+
 	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
 	String bbsHotString = "http://bbs.nju.edu.cn/bbstopall";
-	 List<Map<String, Object>> parentList = null;
-     List<List<Map<String, Object>>> allChildList =  null;
+	List<Map<String, Object>> parentList = null;
+	List<List<Map<String, Object>>> allChildList = null;
 	ImageSpan hotTopicSpan;
 	ImageSpan mailSpan;
 	Drawable xianDraw;
 	int sWidth = 480;
 	int sLength = 800;
-	ForegroundColorSpan listColorSpan ;
+	ForegroundColorSpan listColorSpan;
 	List<TopicInfo> hotList;
 	AbsoluteSizeSpan absoluteSizeSpan;
-	List<TopicInfo> mailList = null; 
-	//String TMStr;
-	//TODO:¶¨ÒåÈ«¾Ö±äÁ¿
+	List<TopicInfo> mailList = null;
+
+	// String TMStr;
+	// TODO:¶¨ÒåÈ«¾Ö±äÁ¿
 	/**
 	 * Called when the activity is first created.
-	 * */
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mGestureDetector = new GestureDetector(this);
-		
+
 		Resources res = getResources();
 		String color = res.getString(R.string.listColor);
 		listColorSpan = new ForegroundColorSpan(Color.parseColor(color));
-		absoluteSizeSpan = new AbsoluteSizeSpan(13,true);
-		
+		absoluteSizeSpan = new AbsoluteSizeSpan(13, true);
+
 		Drawable drawable = res.getDrawable(R.drawable.bkcolor);
-		
-		
-		Drawable d = getResources().getDrawable(R.drawable.hottopcic); 
-	    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight()); 
-		
-		hotTopicSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);  
-		
-		
-		d = getResources().getDrawable(R.drawable.unread); 
-	    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight()); 
-		
-		mailSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);  
-		//TMStr = "©I";
-		
+
+		Drawable d = getResources().getDrawable(R.drawable.hottopcic);
+		d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+
+		hotTopicSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
+
+		d = getResources().getDrawable(R.drawable.unread);
+		d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+
+		mailSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
+		// TMStr = "©I";
+
 		xianDraw = res.getDrawable(R.drawable.xian);
 		DisplayMetrics metric = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
@@ -249,7 +245,7 @@ OnGestureListener {
 
 		this.getWindow().setBackgroundDrawable(drawable);
 		bbsAll = BBSAll.getBBSAll();
-		
+
 		smilyAll = BBSAll.getSmilyAll();
 		String[] bbsAllArray = StringUtil.getArray(bbsAll);
 		bbsAlladapter = new ArrayAdapter<String>(TestAndroidActivity.this,
@@ -258,22 +254,16 @@ OnGestureListener {
 		initAllParams();
 		initfbAll();
 		StringUtil.initAll();
-		
-		
+
 		chaToLogin();
 	}
 
-	
-	
-	
 	private void InitMain() {
 		chaToMain();
 		getUrlHtml(bbsTop10String, Const.MSGWHAT);
 	}
-	
-	
-	private void initfbAll()
-	{
+
+	private void initfbAll() {
 		fbAll.put("fb1", R.drawable.fb1);
 		fbAll.put("fb2", R.drawable.fb2);
 		fbAll.put("fb3", R.drawable.fb3);
@@ -286,39 +276,38 @@ OnGestureListener {
 		fbAll.put("fb10", R.drawable.fb10);
 		fbAll.put("fb11", R.drawable.fb11);
 		fbAll.put("fb12", R.drawable.fb12);
-		
+
 	}
 
-	private void initPhoneState()
-	{
-          
+	private void initPhoneState() {
+
 		try {
-			
-			
 
-           Class<android.os.Build> build_class = android.os.Build.class;
+			Class<android.os.Build> build_class = android.os.Build.class;
 
-           //È¡µÃÅÆ×Ó
+			// È¡µÃÅÆ×Ó
 
-           java.lang.reflect.Field manu_field = build_class.getField("MANUFACTURER");
+			java.lang.reflect.Field manu_field = build_class
+					.getField("MANUFACTURER");
 
-           androidmanufacturer = (String) manu_field.get(new android.os.Build());
+			androidmanufacturer = (String) manu_field
+					.get(new android.os.Build());
 
-           //È¡µÃÐÍÌ–
+			// È¡µÃÐÍÌ–
 
-           java.lang.reflect.Field field2 = build_class.getField("MODEL");
+			java.lang.reflect.Field field2 = build_class.getField("MODEL");
 
-           androidmodel = (String) field2.get(new android.os.Build());
+			androidmodel = (String) field2.get(new android.os.Build());
 
-          
 		} catch (Exception e) {
-		
+
 			e.printStackTrace();
-		} 
+		}
 	}
 
 	private void chaToLogin() {
 		setContentView(R.layout.login);
+		setTitle("Ð¡°ÙºÏ");
 		Button btnlog = (Button) findViewById(R.id.btn_login);
 		btnlog.setOnClickListener(new OnClickListener() {
 
@@ -357,13 +346,12 @@ OnGestureListener {
 			cb.setChecked(true);
 		}
 	}
-	
-	private void getLikeDialog()
-	{
+
+	private void getLikeDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(
 				TestAndroidActivity.this);
 
-		builder.setTitle("Ñ¡ÔñÄãÏëÈ¥µÄÌÖÂÛÇø£º");
+		builder.setTitle("Ñ¡Ôñ°æÃæ£º");
 		if (areaNamList == null || areaNamList.size() < 1) {
 
 			return;
@@ -377,12 +365,10 @@ OnGestureListener {
 
 		builder.setSingleChoiceItems(a, 0,
 				new DialogInterface.OnClickListener() {
-					public void onClick(
-							DialogInterface dialoginterface, int i) {
+					public void onClick(DialogInterface dialoginterface, int i) {
 
 						String areaText = areaNamList.get(i);
-						urlString = getResources().getString(
-								R.string.areaStr)
+						urlString = getResources().getString(R.string.areaStr)
 								+ areaText;
 						curAreaName = "" + areaText;
 						dialoginterface.dismiss();
@@ -391,13 +377,11 @@ OnGestureListener {
 					}
 				});
 
-		builder.setPositiveButton("È¡Ïû",
-				new DialogInterface.OnClickListener() {
-					public void onClick(
-							DialogInterface dialoginterface, int i) {
+		builder.setPositiveButton("È¡Ïû", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialoginterface, int i) {
 
-					}
-				});
+			}
+		});
 		builder.create().show();
 	}
 
@@ -411,211 +395,208 @@ OnGestureListener {
 		setTitle("È«Õ¾Ê®´ó");
 		// ×¢Òâ½çÃæ¿Ø¼þµÄ³õÊ¼»¯µÄÎ»ÖÃ,²»Òª·ÅÔÚsetContentView()Ç°Ãæ
 		listView = (ListView) findViewById(R.id.topicList);
+		setIndexBtns(1);
+
+	}
+
+	private void setIndexBtns(int i) {
 		btnLink = (Button) findViewById(R.id.btn_link);
 
 		btnLink.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View arg0) {
 				// ¿ÉÒÔ´ò¿ªÒ»¸öÐÂÏß³ÌÀ´¶ÁÈ¡£¬¼ÓÈë¹ö¶¯ÌõµÈ
+				chaToMain();
 				getUrlHtml(bbsTop10String, Const.MSGWHAT);
 			}
 
 		});
 
-		Button btnArea = (Button) findViewById(R.id.btn_all);
+		if (i != 2) {
+			Button btnArea = (Button) findViewById(R.id.btn_all);
 
-		btnArea.setOnClickListener(new OnClickListener() {
+			btnArea.setOnClickListener(new OnClickListener() {
 
-			public void onClick(View arg0) {
-				// ¿ÉÒÔ´ò¿ªÒ»¸öÐÂÏß³ÌÀ´¶ÁÈ¡£¬¼ÓÈë¹ö¶¯ÌõµÈ
-				if(parentList==null||parentList.size()<2)
-				{
-					String url="http://bbs.nju.edu.cn/bbstopb10";
-					getUrlHtml(url, Const.TOP20BOARD);
+				public void onClick(View arg0) {
+					// ¿ÉÒÔ´ò¿ªÒ»¸öÐÂÏß³ÌÀ´¶ÁÈ¡£¬¼ÓÈë¹ö¶¯ÌõµÈ
+					if (parentList == null || parentList.size() < 2) {
+						String url = "http://bbs.nju.edu.cn/bbstopb10";
+						getUrlHtml(url, Const.TOP20BOARD);
+					} else
+						chaToAreaToGo();
+
 				}
-				else
-					chaToAreaToGo();
 
-			}
+			});
+		}
 
-		});
+		if (i != 3) {
+			Button btnLike = (Button) findViewById(R.id.btn_like);
 
-		Button btnLike = (Button) findViewById(R.id.btn_like);
+			btnLike.setOnClickListener(new OnClickListener() {
 
-		btnLike.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View arg0) {
-				if(isLogin)
-					getUrlHtml(mailURL, Const.MSGMAIL);
-            	else
-            	{
-            		displayMsg("Äã»¹Ã»µÇÂ½ÄÅ~");
-            	}
-				
-			}
-
-		});
-
-		Button btnSet = (Button) findViewById(R.id.btn_set);
-
-		btnSet.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View arg0) {
-
-				getUrlHtml(bbsHotString, Const.MSGHOT);
-			}
-
-		});
-
-	}
-	
-	
-	// ²Ëµ¥Ïî   
-    final private int menuSettings=Menu.FIRST;  
-    final private int menuLogout=Menu.FIRST+2;
-    final private int menuSyn=Menu.FIRST+1;  
-    final private int menuReport=Menu.FIRST+3;  
-    final private int menuJump=Menu.FIRST+4;  
-    private static final int REQ_SYSTEM_SETTINGS = 0;    
-
-    //´´½¨²Ëµ¥   
-    @Override    
-    public boolean onPrepareOptionsMenu(Menu menu) 
-    {        
-    	return true;
-    }
-
-    @Override  
-    public boolean onCreateOptionsMenu(Menu menu)  
-    {  
-        // ½¨Á¢²Ëµ¥   
-        menu.add(Menu.NONE, menuSettings, 2, "ÉèÖÃ");  
-        menu.add(Menu.NONE, menuSyn, 2, "Í¬²½ÊÕ²Ø");  
-        menu.add(Menu.NONE, menuJump, 2, "¿ìËÙÌø×ª");  
-        menu.add(Menu.NONE, menuReport, 2, "Òâ¼û·´À¡");  
-        menu.add(Menu.NONE, menuLogout, 2, "×¢Ïú");  
-        return super.onCreateOptionsMenu(menu);  
-    }  
-    //²Ëµ¥Ñ¡ÔñÊÂ¼þ´¦Àí   
-    @Override  
-    public boolean onMenuItemSelected(int featureId, MenuItem item)  
-    {  
-        switch (item.getItemId())  
-        {  
-            case menuSettings:  
-                //×ªµ½SettingsÉèÖÃ½çÃæ   
-                startActivityForResult(new Intent(this, Settings.class), REQ_SYSTEM_SETTINGS);  
-                break;  
-            case menuLogout:  
-                //×ªµ½µÇÂ¼½çÃæ   
-            	getUrlHtml(loginoutURL,123);
-            	isLogin = false;
-            	nowLoginId = null;
-                chaToLogin();
-                break;
-                
-            case menuJump:   
-            	getLikeDialog();
-            	 break;
-            case menuSyn:  
-                //×ªµ½µÇÂ¼½çÃæ   
-            	if(isLogin)
-            		getUrlHtml(synUrl,Const.MSGSYN);
-            	else
-            	{
-            		displayMsg("Äã»¹Ã»µÇÂ½ÄÅ~");
-            	}
-                break; 
-            case menuReport:
-            	
-            	if(isLogin)
-            	{
-            		
-            		String cont = "\n\n\nÎÒµÄ»úÐÍ£º"+androidmodel+"\nÆÁÄ»¿í¸ß±È£º"+(sWidth+30)+"x"+(sLength+40);
-            		
-            		beginMail("tiztm","Android°æÐ¡°ÙºÏÒâ¼û·´À¡",cont,null);
-            	}
-            	else
-            	{
-            		displayMsg("Äã»¹Ã»µÇÂ½ÄÅ~");
-            	}
-            	break; 
-            default:  
-                break;  
-        }  
-        return super.onMenuItemSelected(featureId, item);  
-    }  
-    //SettingsÉèÖÃ½çÃæ·µ»ØµÄ½á¹û   
-    protected  void onActivityResult(int requestCode, int resultCode, Intent data) {  
-    	myParams();
-    }  
-    
-    private void beginMail(String to,String title,String cont,String action)
-    {
-    	final String thisAction=action;
-    	LayoutInflater factory = LayoutInflater
-		.from(TestAndroidActivity.this);
-		final View acdlgView = factory.inflate(R.layout.maildlg, null);
-			Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
-			.setTitle("·¢ËÍÐÅ¼þ").setView(acdlgView).setPositiveButton("È·¶¨",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,
-							int whichButton) {
-						
-						EditText titleEdit = (EditText) acdlgView
-								.findViewById(R.id.edt_cont);
-						String cont = StringUtil.getStrBetter(titleEdit.getText()
-								.toString());
-						
-						titleEdit = (EditText) acdlgView
-						.findViewById(R.id.edt_to);
-						String to = titleEdit.getText()
-								.toString();
-						
-						titleEdit = (EditText) acdlgView
-						.findViewById(R.id.edt_title);
-						String title =titleEdit.getText()
-								.toString();
-								
-								sendMail(to,title,cont,thisAction);
+				public void onClick(View arg0) {
+					if (isLogin)
+						getUrlHtml(mailURL, Const.MSGMAIL);
+					else {
+						displayMsg("Äã»¹Ã»µÇÂ½ÄÅ~");
 					}
-				});
-				
 
-				altDlg.setNegativeButton("È¡Ïû",
-				new DialogInterface.OnClickListener() {
-						public void onClick(
-								DialogInterface dialoginterface, int i) {
+				}
+
+			});
+		}
+
+		if (i != 4) {
+			Button btnSet = (Button) findViewById(R.id.btn_set);
+
+			btnSet.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View arg0) {
+
+					getUrlHtml(bbsHotString, Const.MSGHOT);
+				}
+
+			});
+		}
+	}
+
+	// ²Ëµ¥Ïî
+	final private int menuSettings = Menu.FIRST;
+	final private int menuLogout = Menu.FIRST + 2;
+	final private int menuSyn = Menu.FIRST + 1;
+	final private int menuReport = Menu.FIRST + 3;
+	final private int menuJump = Menu.FIRST + 4;
+	private static final int REQ_SYSTEM_SETTINGS = 0;
+
+	// ´´½¨²Ëµ¥
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		return true;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// ½¨Á¢²Ëµ¥
+		menu.add(Menu.NONE, menuSettings, 2, "ÉèÖÃ");
+		menu.add(Menu.NONE, menuSyn, 2, "Í¬²½ÊÕ²Ø");
+		menu.add(Menu.NONE, menuJump, 2, "¿ìËÙÌø×ª");
+		menu.add(Menu.NONE, menuReport, 2, "Òâ¼û·´À¡");
+		menu.add(Menu.NONE, menuLogout, 2, "×¢Ïú");
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	// ²Ëµ¥Ñ¡ÔñÊÂ¼þ´¦Àí
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+		case menuSettings:
+			// ×ªµ½SettingsÉèÖÃ½çÃæ
+			startActivityForResult(new Intent(this, Settings.class),
+					REQ_SYSTEM_SETTINGS);
+			break;
+		case menuLogout:
+			// ×ªµ½µÇÂ¼½çÃæ
+			getUrlHtml(loginoutURL, 123);
+			isLogin = false;
+			nowLoginId = null;
+			chaToLogin();
+			break;
+
+		case menuJump:
+			getLikeDialog();
+			break;
+		case menuSyn:
+			// ×ªµ½µÇÂ¼½çÃæ
+			if (isLogin)
+				getUrlHtml(synUrl, Const.MSGSYN);
+			else {
+				displayMsg("Äã»¹Ã»µÇÂ½ÄÅ~");
+			}
+			break;
+		case menuReport:
+
+			if (isLogin) {
+
+				String cont = "\n\n\nÎÒµÄ»úÐÍ£º" + androidmodel + "\nÆÁÄ»¿í¸ß±È£º"
+						+ (sWidth + 30) + "x" + (sLength + 40);
+
+				beginMail("tiztm", "Android°æÐ¡°ÙºÏÒâ¼û·´À¡", cont, null);
+			} else {
+				displayMsg("Äã»¹Ã»µÇÂ½ÄÅ~");
+			}
+			break;
+		default:
+			break;
+		}
+		return super.onMenuItemSelected(featureId, item);
+	}
+
+	// SettingsÉèÖÃ½çÃæ·µ»ØµÄ½á¹û
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		myParams();
+	}
+
+	private void beginMail(String to, String title, String cont, String action) {
+		final String thisAction = action;
+		LayoutInflater factory = LayoutInflater.from(TestAndroidActivity.this);
+		final View acdlgView = factory.inflate(R.layout.maildlg, null);
+		Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
+				.setTitle("·¢ËÍÐÅ¼þ").setView(acdlgView).setPositiveButton("È·¶¨",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+
+								EditText titleEdit = (EditText) acdlgView
+										.findViewById(R.id.edt_cont);
+								String cont = StringUtil.getStrBetter(titleEdit
+										.getText().toString());
+
+								titleEdit = (EditText) acdlgView
+										.findViewById(R.id.edt_to);
+								String to = titleEdit.getText().toString();
+
+								titleEdit = (EditText) acdlgView
+										.findViewById(R.id.edt_title);
+								String title = titleEdit.getText().toString();
+
+								sendMail(to, title, cont, thisAction);
+							}
+						});
+
+		altDlg.setNegativeButton("È¡Ïû", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialoginterface, int i) {
 
 			}
 		});
 
-				
-				
-	 	AlertDialog dlg =altDlg.create();
-	 	EditText titleEdit;
-	 	if(to!=null)
-	 	{
-	 	titleEdit= (EditText) acdlgView
-		.findViewById(R.id.edt_to);
-	 	titleEdit.setText(to);
-	 	}
-	 	if(title!=null)
-	 	{
-		titleEdit = (EditText) acdlgView
-		.findViewById(R.id.edt_title);
-		titleEdit.setText(title);
-	 	}
-	 	if(cont!=null)
-	 	{
-	 		titleEdit = (EditText) acdlgView
-			.findViewById(R.id.edt_cont);
+		AlertDialog dlg = altDlg.create();
+		EditText titleEdit;
+		if (to != null) {
+			titleEdit = (EditText) acdlgView.findViewById(R.id.edt_to);
+			titleEdit.setText(to);
+		}
+		if (title != null) {
+			titleEdit = (EditText) acdlgView.findViewById(R.id.edt_title);
+			titleEdit.setText(title);
+		}
+		if (cont != null) {
+			titleEdit = (EditText) acdlgView.findViewById(R.id.edt_cont);
 			titleEdit.setText(cont);
-	 	}
-		
-	 	dlg.show();
-    }
+		}
+		if (sLength < 300) {
+			titleEdit = (EditText) acdlgView.findViewById(R.id.edt_cont);
 
+			LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) titleEdit
+					.getLayoutParams(); // È¡¿Ø¼þmGridµ±Ç°µÄ²¼¾Ö²ÎÊý
+			linearParams.height = 70;// µ±¿Ø¼þµÄ¸ßÇ¿ÖÆÉè³É75ÏóËØ
+
+			titleEdit.setLayoutParams(linearParams);
+
+		}
+
+		dlg.show();
+	}
 
 	/**
 	 * ²¶»ñ°´¼üÊÂ¼þ
@@ -623,37 +604,36 @@ OnGestureListener {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// Èç¹ûÊÇ·µ»Ø¼ü,Ö±½Ó·µ»Øµ½×ÀÃæ
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (curStatus == 1) {
-				chaToMain();
-				if (top10TopicList != null) {
-					convtTopics();
-				}
-			} else if (curStatus == 2) {
-				chaToArea(null);
-			} 
-			 else if (curStatus == 3) {
-					chaToHot(null);
-			} else if (curStatus == 4) {
-					chaToAreaToGo();
-			} 
-			else if (curStatus == 5) {
-				chaToMailBox(null);
-			} 
-			
-			else if (curStatus == 0) {
-				exitPro();
-			}
+			retBtn();
 			return true;
 
-		}
-		else
-		{
-		return  super.onKeyDown(keyCode, event);
+		} else {
+			return super.onKeyDown(keyCode, event);
 		}
 	}
 
+	
+	private void retBtn()
+	{
+		if (curStatus == 1) {
+			chaToMain();
+			if (top10TopicList != null) {
+				convtTopics();
+			}
+		} else if (curStatus == 2) {
+			chaToArea(null);
+		} else if (curStatus == 3) {
+			chaToHot(null);
+		} else if (curStatus == 4) {
+			chaToAreaToGo();
+		} else if (curStatus == 5) {
+			chaToMailBox(null);
+		}
 
-
+		else if (curStatus == 0) {
+			exitPro();
+		}
+	}
 	private void initAllParams() {
 		sharedPreferences = getSharedPreferences("LilyDroid",
 				Context.MODE_PRIVATE);
@@ -662,14 +642,14 @@ OnGestureListener {
 		isRem = sharedPreferences.getString("isRem", "false");
 		loginId = sharedPreferences.getString("loginId", "");
 		loginPwd = sharedPreferences.getString("loginPwd", "");
-		
-		 myParams();
-		WifiManager mWiFiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-		if(mWiFiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED )
-		{
+
+		myParams();
+		WifiManager mWiFiManager = (WifiManager) this
+				.getSystemService(Context.WIFI_SERVICE);
+		if (mWiFiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
 			isWifi = true;
 		}
-		
+
 		if (name == null || name.length() < 1)
 			return;
 
@@ -678,173 +658,153 @@ OnGestureListener {
 			areaNamList.add(string);
 		}
 	}
-	
-	
-	
-	
-	private void myParams()
-	{
+
+	private void myParams() {
 		SharedPreferences sp = getSharedPreferences("com.ztm_preferences",
 				Context.MODE_PRIVATE);
 		isPic = sp.getString("picDS", "1");
 		isTouch = sp.getBoolean("isTouch", true);
-		isBackWord =  sp.getBoolean("isBackWord", true);
-		backWords = sp.getString("backWords", "·¢ËÍ×Ô ÎÒµÄÐ¡°ÙºÏAndroid¿Í»§¶Ë by ${model}");
+		isBackWord = sp.getBoolean("isBackWord", true);
+		backWords = sp
+				.getString("backWords", "·¢ËÍ×Ô ÎÒµÄÐ¡°ÙºÏAndroid¿Í»§¶Ë by ${model}");
 		isIP = sp.getBoolean("isIP", false);
-		signColor =  sp.getString("signColor", "[1;32m");
-		
+		signColor = sp.getString("signColor", "[1;32m");
+
 		backAlpha = sp.getInt("backAlpha", 20);
-		
-	
-		backAlpha = (int) ((int)(100-backAlpha)*2.55);
-		//backWords = backWords.replaceAll(TMStr, "");
-		backWords = backWords.replaceAll("\\$\\{model\\}", androidmodel).replaceAll("\\$\\{manufa\\}", androidmanufacturer);
-		isMoreFast = sp.getBoolean("isMoreFast", false);
+
+		backAlpha = (int) ((int) (100 - backAlpha) * 2.55);
+		// backWords = backWords.replaceAll(TMStr, "");
+		backWords = backWords.replaceAll("\\$\\{model\\}", androidmodel)
+				.replaceAll("\\$\\{manufa\\}", androidmanufacturer);
+		isMoreFast = sp.getBoolean("isMoreMoreFast", false);
 		txtFonts = sp.getInt("txtFonts", 18);
-		
-		
-		
-		
-		
+
 		String fastRe = sp.getString("fastRe", "É³·¢");
-		if ( fastRe.length() < 1)
-		{
+		if (fastRe.length() < 1) {
 			fastReList = null;
 			return;
 		}
-		
-		fastReList= fastRe.split("##");
-		
-		
-		
+
+		fastReList = fastRe.split("##");
+
 	}
-	
-	private void displayMsg(String msg)
-	{
-		Toast.makeText(TestAndroidActivity.this, msg,
-				Toast.LENGTH_SHORT).show();
+
+	private void displayMsg(String msg) {
+		Toast.makeText(TestAndroidActivity.this, msg, Toast.LENGTH_SHORT)
+				.show();
 	}
-	
 
 	/**
-	 * TODO:ÏûÏ¢¿ØÖÆÆ÷
-	 * ÏûÏ¢¿ØÖÆÆ÷£¬ÓÃÀ´¸üÐÂ½çÃæ£¬ÒòÎªÔÚÆÕÍ¨Ïß³ÌÊÇÎÞ·¨ÓÃÀ´¸üÐÂ½çÃæµÄ
+	 * TODO:ÏûÏ¢¿ØÖÆÆ÷ ÏûÏ¢¿ØÖÆÆ÷£¬ÓÃÀ´¸üÐÂ½çÃæ£¬ÒòÎªÔÚÆÕÍ¨Ïß³ÌÊÇÎÞ·¨ÓÃÀ´¸üÐÂ½çÃæµÄ
 	 */
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			
+
 			runningTasks--;
-			
-			if (  msg.what!=Const.MSGPSTNEW && data.equals("error")) {
+
+			if (msg.what != Const.MSGPSTNEW && data.equals("error")) {
 				displayMsg("ÄãµÄÍøÂçÃ²ËÆÓÐµãÐ¡ÎÊÌâ~");
-				
-			}
-			else
-			{
-			switch (msg.what) {
-			case Const.MSGWHAT:
-				// ÉèÖÃÏÔÊ¾ÎÄ±¾
-				// ´¦Àí½âÎödataÊý¾Ý
-				top10TopicList = StringUtil.getTop10Topic(data);
-				convtTopics();
-				break;
-			case Const.MSGTOPIC:
-				// ÉèÖÃÏÔÊ¾ÎÄ±¾
 
-				chaToTopic(topicData);
-				break;
-			case Const.MSGTOPICNEXT:
+			} else {
+				switch (msg.what) {
+				case Const.MSGWHAT:
+					// ÉèÖÃÏÔÊ¾ÎÄ±¾
+					// ´¦Àí½âÎödataÊý¾Ý
+					top10TopicList = StringUtil.getTop10Topic(data);
+					convtTopics();
+					break;
+				case Const.MSGTOPIC:
+					// ÉèÖÃÏÔÊ¾ÎÄ±¾
 
-				textView = (TextView) findViewById(R.id.label);
-				ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
-				sv.scrollTo(0, 0);
-				textView.setText( getURLChanged(topicData));
+					chaToTopic(topicData);
+					break;
+				case Const.MSGTOPICNEXT:
 
-				break;
-			case Const.MSGTOPICREFREASH:
-				textView = (TextView) findViewById(R.id.label);
-				
-				if(textView!=null)
+					textView = (TextView) findViewById(R.id.label);
+					ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
+					sv.scrollTo(0, 0);
 					textView.setText(getURLChanged(topicData));
-				break;
-			case Const.MSGAREA:
-				chaToArea(data);
-				break;
 
-			case Const.MSGAREAPAGES:
-				areaPages(data);
-				break;
+					break;
+				case Const.MSGTOPICREFREASH:
+					textView = (TextView) findViewById(R.id.label);
 
-			case Const.MSGLOGIN:
-				checkLogin(data);
-				break;
-			case Const.MSGAUTOLOGIN:
-				checkAutoLogin(data);
-				break;
-			case Const.MSGPST:
-				checkForm(data);
-				break;
-			case Const.MSGPSTNEW:
-				// ·¢ÎÄ¿ÉÄÜ»áÊ§°Ü£¬×¢Òâ±£ÁôÎÄÕÂ
-				checkRst(data);
-				break;
+					if (textView != null)
+						textView.setText(getURLChanged(topicData));
+					break;
+				case Const.MSGAREA:
+					chaToArea(data);
+					break;
 
-			case Const.MSGVIEWUSER:
-				getUserData(data);
-				break;
-				
-			case Const.MSGSYN:
-				checkSyn(data);
-				break;
-			case Const.MSGSYNFIRST:
-				checkSyn(data);
-				InitMain();
-				break;
-				
-			case Const.MSGHOT:
-				bbsHot();
-				chaToHot("New");
-				break;
-				
-			case Const.TOP20BOARD:
-				convtTOP20Area(data);
-				initAllAreas();
-				chaToAreaToGo();
-				break;
-				
-			case Const.MSGMAIL:
-				getMailCont();
-				chaToMailBox("");
-				break;
-				
-			case  Const.MSGMAILTOPIC:
-				chaToMailTopic();
-				break;
-			case Const.MSGREMAIL:
-				checkMailForm(data);
-				break;
-			default:
-				break;
+				case Const.MSGAREAPAGES:
+					areaPages(data);
+					break;
 
+				case Const.MSGLOGIN:
+					checkLogin(data);
+					break;
+				case Const.MSGAUTOLOGIN:
+					checkAutoLogin(data);
+					break;
+				case Const.MSGPST:
+					checkForm(data);
+					break;
+				case Const.MSGPSTNEW:
+					// ·¢ÎÄ¿ÉÄÜ»áÊ§°Ü£¬×¢Òâ±£ÁôÎÄÕÂ
+					checkRst(data);
+					break;
+
+				case Const.MSGVIEWUSER:
+					getUserData(data);
+					break;
+
+				case Const.MSGSYN:
+					checkSyn(data);
+					break;
+				case Const.MSGSYNFIRST:
+					checkSyn(data);
+					InitMain();
+					break;
+
+				case Const.MSGHOT:
+					bbsHot();
+					chaToHot("New");
+					break;
+
+				case Const.TOP20BOARD:
+					convtTOP20Area(data);
+					initAllAreas();
+					chaToAreaToGo();
+					break;
+
+				case Const.MSGMAIL:
+					getMailCont();
+					chaToMailBox("");
+					break;
+
+				case Const.MSGMAILTOPIC:
+					chaToMailTopic();
+					break;
+				case Const.MSGREMAIL:
+					checkMailForm(data);
+					break;
+				default:
+					break;
+
+				}
 			}
-			}
-			if(runningTasks<1)
-			{
+			if (runningTasks < 1) {
 				runningTasks = 0;
 				progressDialog.dismiss();
 			}
-			
+
 		}
 
-		
-
 	};
-	
+
 	/**
 	 * ÓÊ¼þ½çÃæ·­Ò³
-	 * 
-	 * 
 	 */
 	private void goToMailPage(int pageNo) {
 		int startPage = areaNowTopic + pageNo;
@@ -854,54 +814,47 @@ OnGestureListener {
 		getUrlHtml(mailURL + "?start=" + startPage, Const.MSGMAIL);
 
 	}
-	
-	
+
 	private void chaToMailTopic() {
 		char s = 10;
 		String backS = s + "";
-		
-		data =data.replaceAll(backS, "<br>");
+
+		data = data.replaceAll(backS, "<br>");
 		Document doc = Jsoup.parse(data);
 		Elements scs = doc.getElementsByTag("textarea");
-		
+
 		if (scs.size() != 1) {
 			Toast.makeText(TestAndroidActivity.this, "»ñÈ¡ÓÊ¼þÊ§°Ü",
 					Toast.LENGTH_SHORT).show();
-		}
-		else
-		{
+		} else {
 			Element textArea = scs.get(0);
-			String infoView =  "<br>"+textArea.text();
-			
-			
+			String infoView = "<br>" + textArea.text();
+
 			String withSmile = StringUtil.addSmileySpans(infoView);
 			setContentView(R.layout.mailtopic);
-			
-			
+
 			textView = (TextView) findViewById(R.id.label);
 			textView.setText(Html.fromHtml(withSmile));
 			textView.setTextSize(txtFonts);
 			textView.getBackground().setAlpha(backAlpha);
-			
+
 			Elements as = doc.getElementsByTag("a");
 			for (Element element : as) {
-				if(element.text().equals("»ØÐÅ"))
-				{
-					String ss = (element.getElementsByTag("a")).get(0).attr("href");
+				if (element.text().equals("»ØÐÅ")) {
+					String ss = (element.getElementsByTag("a")).get(0).attr(
+							"href");
 					int lastIndexOf = ss.lastIndexOf("Re:");
-					
-					String sFir = ss.substring(0,lastIndexOf);
+
+					String sFir = ss.substring(0, lastIndexOf);
 					String sSec = ss.substring(lastIndexOf);
-					
-					
+
 					try {
-						sSec = URLEncoder.encode(sSec,
-						"GB2312");
+						sSec = URLEncoder.encode(sSec, "GB2312");
 					} catch (UnsupportedEncodingException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					} 
-					final String attr =bbsURL+sFir+sSec ;
+					}
+					final String attr = bbsURL + sFir + sSec;
 
 					Button btnPre = (Button) findViewById(R.id.btn_huifu);
 					btnPre.setOnClickListener(new OnClickListener() {
@@ -910,25 +863,21 @@ OnGestureListener {
 							getUrlHtml(attr, Const.MSGREMAIL);
 						}
 					});
-					
+
 				}
 			}
-			
-			
+
 		}
-		
-		
-		
-		
+
 	}
-	
+
 	private void chaToMailBox(String place) {
-		
+
 		setTitle("ÎÒµÄÓÊÏä");
 		setContentView(R.layout.mailbox);
 		curStatus = 1;
 		LinkAdr = new ArrayList<String>();
-		
+
 		listView = (ListView) findViewById(R.id.topicList);
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -939,32 +888,25 @@ OnGestureListener {
 
 			String title = topicInfo.getTitle();
 			SpannableString ss = null;
-			
-			
-			if(topicInfo.getMark().length()>0)
-			{
-				
-				if(topicInfo.getMark().equals("unread"))
-				{
+
+			if (topicInfo.getMark().length() > 0) {
+
+				if (topicInfo.getMark().equals("unread")) {
+
+					ss = new SpannableString("[sm]" + title);
+					ss.setSpan(mailSpan, 0, 4,
+							Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					map.put("topicm", "");
 					
-					ss = new SpannableString("[sm]"+title);
-					ss.setSpan(mailSpan,0,4,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-					
-					map.put("topicau",topicInfo.getNums()+" ¼ÄÐÅÈË:" + topicInfo.getAuthor());
+				} else {
+					map.put("topicm", "[" + topicInfo.getMark() + "] ");
 				}
-				else
-				{
-					
-					map.put("topicau","["+topicInfo.getMark()+"] "+topicInfo.getNums()+" ¼ÄÐÅÈË:" + topicInfo.getAuthor() );
-				}
+			} else {
+				map.put("topicm", "");
 			}
-			else
-			{
-				map.put("topicau",topicInfo.getNums()+" ¼ÄÐÅÈË:" + topicInfo.getAuthor());
-			
-			
-			}
-			if(ss==null)
+			map.put("topicau", topicInfo.getNums() + " ¼ÄÐÅÈË:"
+					+ topicInfo.getAuthor());
+			if (ss == null)
 				ss = new SpannableString(title);
 			map.put("topictitle", ss);
 			map.put("topicother", topicInfo.getPubDate());
@@ -974,8 +916,9 @@ OnGestureListener {
 		}
 		if (list.size() > 0) {
 			MyListAdapter adapter = new MyListAdapter(this, list,
-					R.layout.vlist, new String[] { "topictitle", "topicau","topicother" },
-					new int[] { R.id.topictitle, R.id.topicau ,R.id.topicother});
+					R.layout.vlist, new String[] { "topictitle", "topicau",
+							"topicother","topicm" }, new int[] { R.id.topictitle,
+							R.id.topicau, R.id.topicother , R.id.topicm});
 			listView.setAdapter(adapter);
 			// Ìí¼Óµã»÷
 			listView.setOnItemClickListener(new OnItemClickListener() {
@@ -987,17 +930,17 @@ OnGestureListener {
 					if (topicUrl == null)
 						return;
 
-					//huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
+					// huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
 					curStatus = 5;
-					
-					scrollY = listView.getFirstVisiblePosition()+1;
+
+					scrollY = listView.getFirstVisiblePosition() + 1;
 
 					getUrlHtml(topicUrl, Const.MSGMAILTOPIC);
 
 				}
 			});
 		}
-		
+
 		Button btnPre = (Button) findViewById(R.id.btn_pre);
 		btnPre.setOnClickListener(new OnClickListener() {
 
@@ -1013,129 +956,112 @@ OnGestureListener {
 				goToMailPage(20);
 			}
 		});
-		
+
 		Button btnMail = (Button) findViewById(R.id.btn_mail);
 		btnMail.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				beginMail(null,null,null,null);
+				beginMail(null, null, null, null);
 			}
 		});
-		
-	
-		
-		
-		if(place!=null)
-		{
-			listView.setSelection(mailList.size()-1);
-		}
-		else
-		{
+
+		if (place != null) {
+			listView.setSelection(mailList.size() - 1);
+		} else {
 			listView.setSelection(scrollY);
 		}
-		
+
 	}
-	
-	
 
 	private void getMailCont() {
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("td");
-		int getTopicNo =0;
+		int getTopicNo = 0;
 		mailList = new ArrayList<TopicInfo>();
-		if (tds.size() <7) {
+		if (tds.size() < 7) {
 			Toast.makeText(TestAndroidActivity.this, "ÄãµÄÓÊÏäÊÇ¿ÕµÄ",
 					Toast.LENGTH_SHORT).show();
-		}else
-		{
-			int i=6;
-			while(i<tds.size())
-			{
-				
+		} else {
+			int i = 6;
+			while (i < tds.size()) {
+
 				String no = tds.get(i).text();
 				int thisPos = 0;
 				try {
-					thisPos =Integer.parseInt(no);
+					thisPos = Integer.parseInt(no);
 				} catch (Exception e) {
 					return;
 				}
-				
+
 				if (getTopicNo == 0) {
 					areaNowTopic = thisPos;
-					getTopicNo=1;
+					getTopicNo = 1;
 				}
-				
+
 				TopicInfo ti = new TopicInfo();
 				ti.setNums(no);
 				// ÉèÖÃtitle
-				ti.setTitle(tds.get(i+5).text());	
-				ti.setLink((tds.get(i + 5).getElementsByTag("a")).get(0).attr("href"));
-				
-				String date = DateUtil.formatDateToStrNoWeek(DateUtil.getDatefromStrNoWeek(tds.get(i + 4).text()));
-				if(date == null||date.equals("null"))
+				ti.setTitle(tds.get(i + 5).text());
+				ti.setLink((tds.get(i + 5).getElementsByTag("a")).get(0).attr(
+						"href"));
+
+				String date = DateUtil.formatDateToStrNoWeek(DateUtil
+						.getDatefromStrNoWeek(tds.get(i + 4).text()));
+				if (date == null || date.equals("null"))
 					ti.setPubDate(tds.get(i + 4).text());
 				else
 					ti.setPubDate(date);
-				
+
 				ti.setAuthor(tds.get(i + 3).text());
 				ti.setMark(tds.get(i + 2).text());
 				Elements element = (tds.get(i + 2).getElementsByTag("img"));
-				if(element!=null&&element.size()>0)
-				{
+				if (element != null && element.size() > 0) {
 					ti.setMark("unread");
 				}
 				mailList.add(ti);
-				i+=6;
+				i += 6;
 			}
 		}
-		//return tiList;
-		
-		
-	}
+		// return tiList;
 
-	
-	
-	
+	}
 
 	private void bbsHot() {
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("td");
 		int curPos = 0;
-		if(!tds.get(0).text().equals(""))
-		{
+		if (!tds.get(0).text().equals("")) {
 			displayMsg("¸÷ÇøÈÈµã¸ñÊ½ÓÐ±ä»¯£¬ÎÞ·¨½âÎö£¡");
 			return;
 		}
-		hotList =  new ArrayList<TopicInfo> (); ;
+		hotList = new ArrayList<TopicInfo>();
+		;
 		for (int i = 0; i < tds.size(); i++) {
-			Element element= tds.get(i);
+			Element element = tds.get(i);
 			String text = element.text();
-			if(text.equals(""))
-			{
-				//img
+			if (text.equals("")) {
+				// img
 				Elements elementsByTag = element.getElementsByTag("img");
-				if(elementsByTag.size()<1) continue;
+				if (elementsByTag.size() < 1)
+					continue;
 				curPos++;
 				TopicInfo ti = new TopicInfo();
-				ti.setTitle("fb"+curPos);
+				ti.setTitle("fb" + curPos);
 				hotList.add(ti);
-				
-				
+
 				continue;
 			}
 			TopicInfo ti = new TopicInfo();
 			hotList.add(ti);
 			ti.setLink((element.getElementsByTag("a")).get(0).attr("href"));// ÉèÖÃtitle
 			int lastIndexOf = text.lastIndexOf('[');
-			ti.setTitle("¡ð "+text.substring(1,lastIndexOf-1));// ÉèÖÃtitle
-			ti.setArea(text.substring(lastIndexOf,text.length()));
+			ti.setTitle("¡ð " + text.substring(1, lastIndexOf - 1));// ÉèÖÃtitle
+			ti.setArea(text.substring(lastIndexOf, text.length()));
 		}
 		hotList.size();
 	}
-	
-	
-	
-	//Í¬²½ÊÕ²Ø¼Ð
+
+	// Í¬²½ÊÕ²Ø¼Ð
 	private void checkSyn(String data) {
 		Document doc = Jsoup.parse(data);
 
@@ -1143,122 +1069,109 @@ OnGestureListener {
 		int ll = areaNamList.size();
 		for (Element aTag : as) {
 			String href = aTag.attr("href");
-			if(href.contains("board?board="))
-			{
+			if (href.contains("board?board=")) {
 				String tempAreaName = aTag.text().trim().toLowerCase();
-			
-				tempAreaName = tempAreaName.replaceFirst(
-						tempAreaName.substring(0, 1),
-						tempAreaName.substring(0, 1)
-									.toUpperCase());
-				
+
+				tempAreaName = tempAreaName.replaceFirst(tempAreaName
+						.substring(0, 1), tempAreaName.substring(0, 1)
+						.toUpperCase());
+
 				if (areaNamList.contains(tempAreaName)) {
 					continue;
 				}
 				areaNamList.add(tempAreaName);
-				
+
 			}
 		}
-		if(ll<areaNamList.size())
-		{
-			int ii= areaNamList.size()-ll;
+		if (ll < areaNamList.size()) {
+			int ii = areaNamList.size() - ll;
 			storeAreaName();
-			//initAllAreas();
-			displayMsg("Í¬²½WEBÊÕ²Ø¼Ð³É¹¦!¸üÐÂ"+ii+"¸öÒÑÊÕ²Ø°æÃæ");
-		}
-		else
-		{
+			// initAllAreas();
+			displayMsg("Í¬²½WEBÊÕ²Ø¼Ð³É¹¦!¸üÐÂ" + ii + "¸öÒÑÊÕ²Ø°æÃæ");
+		} else {
 			displayMsg("ÄãµÄ±¾µØÊÕ²Ø¼ÐÒÑ¾­ÊÇ×îÐÂµÄÁË£¡");
 		}
-		
+
 	}
-	
-	
-	
+
 	private void convtTOP20Area(String areaData) {
 		Document doc = Jsoup.parse(data);
 
 		Elements tds = doc.getElementsByTag("td");
-		
+
 		top20List = new ArrayList<TopicInfo>();
-		if (tds.size() <12) {
+		if (tds.size() < 12) {
 			Toast.makeText(TestAndroidActivity.this, "»ñÈ¡ÈÈÃÅÌÖÂÛÇøÊ§°Ü",
 					Toast.LENGTH_SHORT).show();
-		}else
-		{
-			int i=6;
-			while(i<tds.size())
-			{
+		} else {
+			int i = 6;
+			while (i < tds.size()) {
 				TopicInfo ti = new TopicInfo();
-				ti.setTitle(tds.get(i+1).text()+" ("+tds.get(i+2).text()+")");	
-				//ti.setNums(tds.get(i+4).text());
+				ti.setTitle(tds.get(i + 1).text() + " ("
+						+ tds.get(i + 2).text() + ")");
+				// ti.setNums(tds.get(i+4).text());
 				top20List.add(ti);
-				i+=6;
+				i += 6;
 			}
 		}
-		//return null;
-		
+		// return null;
+
 	}
 
-	
-	
 	/**
-	 * 
 	 * »ñÈ¡ÓÃ»§ÐÅÏ¢
+	 * 
 	 * @param data
 	 */
 	private void getUserData(String data) {
 		char s = 10;
 		String backS = s + "";
-		
+
 		data = data.replaceAll(backS, "<br>");
 		Document doc = Jsoup.parse(data);
 
 		Elements scs = doc.getElementsByTag("textarea");
-		
+
 		if (scs.size() != 1) {
 			Toast.makeText(TestAndroidActivity.this, "»ñÈ¡ÓÃ»§ÐÅÏ¢Ê§°Ü",
 					Toast.LENGTH_SHORT).show();
-		}
-		else
-		{
+		} else {
 			Element textArea = scs.get(0);
 			final String infoView = textArea.text();
-			
-			
+
 			String withSmile = StringUtil.addSmileySpans(infoView);
 			LayoutInflater factory = LayoutInflater
-			.from(TestAndroidActivity.this);
+					.from(TestAndroidActivity.this);
 			final View info = factory.inflate(R.layout.infodlg, null);
 			Builder dlg = new AlertDialog.Builder(TestAndroidActivity.this)
-			.setTitle("ÓÃ»§ÐÅÏ¢²éÑ¯").setView(info).setNegativeButton("È·¶¨",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int whichButton) {
-						}
-					});
-					
-					
-			if(isLogin)
-			{
-				dlg.setPositiveButton("Ð´ÐÅ", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,
-							int whichButton) {
-						String to = infoView.substring(0,infoView.indexOf(" ("));
-						beginMail(to, null, null, null);
-						
-					}
-				});
-				
+					.setTitle("ÓÃ»§ÐÅÏ¢²éÑ¯").setView(info).setNegativeButton("È·¶¨",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int whichButton) {
+								}
+							});
+
+			if (isLogin) {
+				dlg.setPositiveButton("Ð´ÐÅ",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								String to = infoView.substring(0, infoView
+										.indexOf(" ("));
+								beginMail(to, null, null, null);
+
+							}
+						});
+
 			}
-			
-					AlertDialog ad = dlg.create();
-			//·¢²ÊÕÕ¹¦ÄÜ
+
+			AlertDialog ad = dlg.create();
+			// ·¢²ÊÕÕ¹¦ÄÜ
 			textView = (TextView) info.findViewById(R.id.tvInfo);
 			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
 			sv.scrollTo(0, 0);
 			textView.setText(Html.fromHtml(withSmile));
-			
+
 			dlg.show();
 
 		}
@@ -1270,61 +1183,44 @@ OnGestureListener {
 	 */
 	private void checkRst(String data) {
 
-		if(data.contains("ÐÅ¼þÒÑ¼Ä¸ø"))
-		{
+		if (data.contains("ÐÅ¼þÒÑ¼Ä¸ø")) {
 			displayMsg("·¢ËÍÐÅ¼þ³É¹¦£¡");
-		}
-		else if(data.contains("´íÎóµÄÊÕÐÅÈËÕÊºÅ"))
-		{
+		} else if (data.contains("´íÎóµÄÊÕÐÅÈËÕÊºÅ")) {
 			displayMsg("´íÎóµÄÊÕÐÅÈËÕÊºÅ! ");
-		}
-		else if (data.contains("http-equiv='Refresh'")) {
-			
-			if(reid.equals("0"))
-			{
-				//·¢ÐÂÎÄÕÂÍê³É
+		} else if (data.contains("http-equiv='Refresh'")) {
+
+			if (reid.equals("0")) {
+				// ·¢ÐÂÎÄÕÂÍê³É
 				getUrlHtml(urlString, Const.MSGAREAPAGES);
-			}
-			else
-			{
-				//»Ø¸´Íê³É
-				getUrlHtml(topicUrl + "&start="
-						+ nowPos, Const.MSGTOPICREFREASH);
+			} else {
+				// »Ø¸´Íê³É
+				getUrlHtml(topicUrl + "&start=" + nowPos,
+						Const.MSGTOPICREFREASH);
 			}
 			displayMsg("·¢ÎÄ³É¹¦£¡");
-		}
-		else if (data.contains("ÐÞ¸ÄÎÄÕÂ³É¹¦")) 
-		{
-			
-			//ÐÞ¸ÄÍê³É
-			getUrlHtml(topicUrl + "&start="
-					+ nowPos, Const.MSGTOPICREFREASH);
-			
+		} else if (data.contains("ÐÞ¸ÄÎÄÕÂ³É¹¦")) {
+
+			// ÐÞ¸ÄÍê³É
+			getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICREFREASH);
+
 			displayMsg("ÐÞ¸Ä³É¹¦£¡");
-			
-		}
-		else if (data.contains("·µ»Ø±¾ÌÖÂÛÇø")) 
-		{
-			
-			//»Ø¸´Íê³É
-			getUrlHtml(topicUrl + "&start="
-					+ nowPos, Const.MSGTOPICREFREASH);
-			
+
+		} else if (data.contains("·µ»Ø±¾ÌÖÂÛÇø")) {
+
+			// »Ø¸´Íê³É
+			getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICREFREASH);
+
 			displayMsg("É¾³ý³É¹¦£¡");
-			
+
 		}
 
-		else 
-		{
-			if(data.contains("Á½´Î·¢ÎÄ¼ä¸ô¹ýÃÜ"))
-			{
+		else {
+			if (data.contains("Á½´Î·¢ÎÄ¼ä¸ô¹ýÃÜ")) {
 				displayMsg("Á½´Î·¢ÎÄ¼ä¸ô¹ýÃÜ, ÇëÐÝÏ¢¼¸ÃëºóÔÙÊÔ! ");
-			}
-			else
-			{
+			} else {
 				displayMsg("·¢ËÍÊ§°Ü~·¢ÎÄÄÚÈÝ±£´æÔÚ¼ôÌù°åÉÏ");
 			}
-			
+
 			ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
 			clipboard.setText(cont);
@@ -1363,18 +1259,14 @@ OnGestureListener {
 				editor.putString("loginPwd", "");
 			}
 			editor.commit();
-			
-			//Èç¹ûÊÕ²Ø¼ÐÎª¿Õ£¬ÔòÈ¥·þÎñÆ÷¶ËÈ¡µÃ
-			if(areaNamList.size()<1)
-			{
-				getUrlHtml(synUrl,Const.MSGSYNFIRST);
-			}
-			else
-			{
+
+			// Èç¹ûÊÕ²Ø¼ÐÎª¿Õ£¬ÔòÈ¥·þÎñÆ÷¶ËÈ¡µÃ
+			if (areaNamList.size() < 1) {
+				getUrlHtml(synUrl, Const.MSGSYNFIRST);
+			} else {
 				InitMain();
 			}
 			// progressDialog.dismiss();
-			
 
 		} else if (scs.size() == 1) {
 			if (data.contains("ÃÜÂë´íÎó") || data.contains("´íÎóµÄÊ¹ÓÃÕßÕÊºÅ")) {
@@ -1395,8 +1287,7 @@ OnGestureListener {
 		}
 		return;
 	}
-	
-	
+
 	/**
 	 * ¼ì²âÊÇ·ñ£¡×Ô¶¯£¡µÇÂ¼³É¹¦
 	 * 
@@ -1421,8 +1312,7 @@ OnGestureListener {
 			} else if (data.contains("´ËÕÊºÅ±¾ÈÕlogin´ÎÊý¹ý¶à")) {
 				Toast.makeText(TestAndroidActivity.this, "´ËÕÊºÅ±¾ÈÕlogin´ÎÊý¹ý¶à£¡",
 						Toast.LENGTH_SHORT).show();
-			}
-			else {
+			} else {
 				Toast.makeText(TestAndroidActivity.this, "µÇÂ½Ê§°Ü£¡",
 						Toast.LENGTH_SHORT).show();
 			}
@@ -1431,15 +1321,13 @@ OnGestureListener {
 		}
 		return;
 	}
-	
-	
-	
+
 	protected void checkMailForm(String formData) {
 		Document doc = Jsoup.parse(formData);
 		Elements ins = doc.getElementsByTag("input");
 		// progressDialog.dismiss();
 		if (ins.size() != 12) {
-			
+
 			// µÇÂ¼Ê§°Ü£¬ÒªÇóÖØÐÂµÇÂ¼
 			if (formData.contains("´Ò´Ò¹ý¿Í")) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -1449,14 +1337,13 @@ OnGestureListener {
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int id) {
-										if(isRem.equals("true"))
-										{
-											//×Ô¶¯µÇÂ¼µÄ»°£¬×Ô¶¯µÇÂ¼
-											String url = loginURL + "&id=" + loginId + "&pw=" + loginPwd;
+										if (isRem.equals("true")) {
+											// ×Ô¶¯µÇÂ¼µÄ»°£¬×Ô¶¯µÇÂ¼
+											String url = loginURL + "&id="
+													+ loginId + "&pw="
+													+ loginPwd;
 											getUrlHtml(url, Const.MSGAUTOLOGIN);
-										}
-										else
-										{
+										} else {
 											chaToLogin();
 										}
 									}
@@ -1469,31 +1356,29 @@ OnGestureListener {
 								});
 				AlertDialog alert = builder.create();
 				alert.show();
-			}  else {
+			} else {
 				Toast.makeText(TestAndroidActivity.this, "ÓÉÓÚÎ´Öª´íÎó·¢ÎÄÊ§°Ü",
 						Toast.LENGTH_SHORT).show();
 			}
-			
 
 		} else {
-			String action =  ins.get(0).attr("value");
+			String action = ins.get(0).attr("value");
 			String title = ins.get(1).attr("value");
 			String userId = ins.get(2).attr("value");
-			 String recont = "" ;
-			try
-			{												   
-				recont = formData.substring(formData.indexOf("<textarea name=text id=text rows=20 cols=80 wrap=physicle>")+58,formData.indexOf("</textarea>"));
+			String recont = "";
+			try {
+				recont = formData
+						.substring(
+								formData
+										.indexOf("<textarea name=text id=text rows=20 cols=80 wrap=physicle>") + 58,
+								formData.indexOf("</textarea>"));
+			} catch (Exception e) {
+
 			}
-			catch(Exception e)
-			{
-				
-			}
-			beginMail(userId, title, recont,action);
-			
+			beginMail(userId, title, recont, action);
 
 		}
 	}
-	
 
 	String pid;
 	String reid;
@@ -1501,6 +1386,7 @@ OnGestureListener {
 
 	/**
 	 * »ñÈ¡·¢ÎÄµÄ´°¿Ú
+	 * 
 	 * @param formData
 	 */
 	protected void checkForm(String formData) {
@@ -1508,95 +1394,93 @@ OnGestureListener {
 		Elements ins = doc.getElementsByTag("input");
 		// progressDialog.dismiss();
 		if (ins.size() != 12) {
-			
-			
-			
+
 			if (ins.size() != 5) {
-			// µÇÂ¼Ê§°Ü£¬ÒªÇóÖØÐÂµÇÂ¼
-			if (formData.contains("´Ò´Ò¹ý¿Í")) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						TestAndroidActivity.this);
-				builder.setMessage("Äã»¹Ã»µÇÂ½ÄØ~ÖØÐÂµÇÂ¼?").setCancelable(false)
-						.setPositiveButton("µÇÂ¼",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										if(isRem.equals("true"))
-										{
-											//×Ô¶¯µÇÂ¼µÄ»°£¬×Ô¶¯µÇÂ¼
-											String url = loginURL + "&id=" + loginId + "&pw=" + loginPwd;
-											getUrlHtml(url, Const.MSGAUTOLOGIN);
+				// µÇÂ¼Ê§°Ü£¬ÒªÇóÖØÐÂµÇÂ¼
+				if (formData.contains("´Ò´Ò¹ý¿Í")) {
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							TestAndroidActivity.this);
+					builder.setMessage("Äã»¹Ã»µÇÂ½ÄØ~ÖØÐÂµÇÂ¼?").setCancelable(false)
+							.setPositiveButton("µÇÂ¼",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											if (isRem.equals("true")) {
+												// ×Ô¶¯µÇÂ¼µÄ»°£¬×Ô¶¯µÇÂ¼
+												String url = loginURL + "&id="
+														+ loginId + "&pw="
+														+ loginPwd;
+												getUrlHtml(url,
+														Const.MSGAUTOLOGIN);
+											} else {
+												chaToLogin();
+											}
+
 										}
-										else
-										{
-											chaToLogin();
+									}).setNegativeButton("ËãÁË",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											dialog.cancel();
 										}
-										
-										
-									}
-								}).setNegativeButton("ËãÁË",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										dialog.cancel();
-									}
-								});
-				AlertDialog alert = builder.create();
-				alert.show();
-			} else if (formData.contains("ÄúÎÞÈ¨ÔÚ´ËÌÖÂÛÇø")) {
-				Toast.makeText(TestAndroidActivity.this, "ÄúÎÞÈ¨ÔÚ´ËÌÖÂÛÇø·¢ÎÄ",
-						Toast.LENGTH_SHORT).show();
+									});
+					AlertDialog alert = builder.create();
+					alert.show();
+				} else if (formData.contains("ÄúÎÞÈ¨ÔÚ´ËÌÖÂÛÇø")) {
+					Toast.makeText(TestAndroidActivity.this, "ÄúÎÞÈ¨ÔÚ´ËÌÖÂÛÇø·¢ÎÄ",
+							Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(TestAndroidActivity.this, "ÓÉÓÚÎ´Öª´íÎó·¢ÎÄÊ§°Ü",
+							Toast.LENGTH_SHORT).show();
+				}
 			} else {
-				Toast.makeText(TestAndroidActivity.this, "ÓÉÓÚÎ´Öª´íÎó·¢ÎÄÊ§°Ü",
-						Toast.LENGTH_SHORT).show();
-			}
-			}
-			else
-			{
-				final String type=ins.get(0).attr("value");
-				final String board=ins.get(1).attr("value");
-				final String file=ins.get(2).attr("value");
-				String recont = formData.substring(formData.indexOf("<textarea name=text rows=20 cols=80 wrap=physicle>")+50,formData.indexOf("</textarea>"));
-			
+				final String type = ins.get(0).attr("value");
+				final String board = ins.get(1).attr("value");
+				final String file = ins.get(2).attr("value");
+				String recont = formData
+						.substring(
+								formData
+										.indexOf("<textarea name=text rows=20 cols=80 wrap=physicle>") + 50,
+								formData.indexOf("</textarea>"));
+
 				LayoutInflater factory = LayoutInflater
-				.from(TestAndroidActivity.this);
+						.from(TestAndroidActivity.this);
 				final View acdlgView = factory.inflate(R.layout.editdlg, null);
-					Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
-					.setTitle("ÐÞ¸ÄÎÄÕÂ").setView(acdlgView).setPositiveButton("È·¶¨",
+				Builder altDlg = new AlertDialog.Builder(
+						TestAndroidActivity.this).setTitle("ÐÞ¸ÄÎÄÕÂ").setView(
+						acdlgView).setPositiveButton("È·¶¨",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
-								
+
 								EditText titleEdit = (EditText) acdlgView
 										.findViewById(R.id.edt_cont);
-								String cont = StringUtil.getStrBetter(titleEdit.getText()
-										.toString());
-										
-										sendEdit(cont,type,board,file);
+								String cont = StringUtil.getStrBetter(titleEdit
+										.getText().toString());
+
+								sendEdit(cont, type, board, file);
 							}
 
 						});
-						
 
-			 altDlg.setNegativeButton("È¡Ïû",
+				altDlg.setNegativeButton("È¡Ïû",
 						new DialogInterface.OnClickListener() {
-					public void onClick(
-							DialogInterface dialoginterface, int i) {
+							public void onClick(
+									DialogInterface dialoginterface, int i) {
 
-					}
-				});
-		
-						
-			AlertDialog dlg =altDlg.create();
-//			EditText titleEdit = (EditText) acdlgView
-//				.findViewById(R.id.edt_title);
-			
-			EditText titleEdit = (EditText) acdlgView
-			.findViewById(R.id.edt_cont);
-			titleEdit.setText(recont);
+							}
+						});
 
-			dlg.show();
-				
+				AlertDialog dlg = altDlg.create();
+				// EditText titleEdit = (EditText) acdlgView
+				// .findViewById(R.id.edt_title);
+
+				EditText titleEdit = (EditText) acdlgView
+						.findViewById(R.id.edt_cont);
+				titleEdit.setText(recont);
+
+				dlg.show();
+
 			}
 
 		} else {
@@ -1604,20 +1488,21 @@ OnGestureListener {
 			String title = ins.get(0).attr("value");
 			pid = ins.get(1).attr("value");
 			reid = ins.get(2).attr("value");
-			 String recont = "" ;
-			try
-			{
-				recont = formData.substring(formData.indexOf("<textarea name=text rows=20 cols=80 wrap=physicle>")+50,formData.indexOf("</textarea>"));
-			}
-			catch(Exception e)
-			{
-				
+			String recont = "";
+			try {
+				recont = formData
+						.substring(
+								formData
+										.indexOf("<textarea name=text rows=20 cols=80 wrap=physicle>") + 50,
+								formData.indexOf("</textarea>"));
+			} catch (Exception e) {
+
 			}
 			final String extraRecont = recont;
 			LayoutInflater factory = LayoutInflater
 					.from(TestAndroidActivity.this);
 			final View acdlgView = factory.inflate(R.layout.acdlg, null);
-			 Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
+			Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
 					.setTitle("·¢ÎÄ").setView(acdlgView).setPositiveButton("·¢±í",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
@@ -1628,150 +1513,144 @@ OnGestureListener {
 											.toString();
 									titleEdit = (EditText) acdlgView
 											.findViewById(R.id.edt_cont);
-									cont = StringUtil.getStrBetter(titleEdit.getText()
-											.toString());
-											//ÒýÓÃÔ­ÎÄ
-											CheckBox cb = (CheckBox) acdlgView.findViewById(R.id.cb_recont);
-											if(cb.isChecked()&&extraRecont!=null&&extraRecont.length()>1)
-											{
-												cont+=" "+extraRecont.substring(2);
-											}
-											sendTopic(title,cont);
+									cont = StringUtil.getStrBetter(titleEdit
+											.getText().toString());
+									// ÒýÓÃÔ­ÎÄ
+									CheckBox cb = (CheckBox) acdlgView
+											.findViewById(R.id.cb_recont);
+									if (cb.isChecked() && extraRecont != null
+											&& extraRecont.length() > 1) {
+										cont += " " + extraRecont.substring(2);
+									}
+									sendTopic(title, cont);
 								}
 
 							});
-							
-			 if(extraRecont.length()<4)
-				{
-				 altDlg.setNegativeButton("È¡Ïû",
-							new DialogInterface.OnClickListener() {
-						public void onClick(
-								DialogInterface dialoginterface, int i) {
 
-						}
-					});
-				}
-			 else
-			 {
-				 altDlg.setNegativeButton("¿ìËÙ»Ø¸´",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int whichButton) {
-										if(fastReList.length<1)
-											return;
-										if(isMoreFast)
-										{
-											EditText titleEdit = (EditText) acdlgView
+			if (extraRecont.length() < 4) {
+				altDlg.setNegativeButton("È¡Ïû",
+						new DialogInterface.OnClickListener() {
+							public void onClick(
+									DialogInterface dialoginterface, int i) {
+
+							}
+						});
+			} else {
+				altDlg.setNegativeButton("¿ìËÙ»Ø¸´",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								if (fastReList.length < 1)
+									return;
+								if (isMoreFast) {
+									EditText titleEdit = (EditText) acdlgView
 											.findViewById(R.id.edt_title);
-											String title = titleEdit.getText().toString();
-											String reText = fastReList[0];
-											sendTopic(title,reText);
-											return;
-										}
-										AlertDialog.Builder builder = new AlertDialog.Builder(
-												TestAndroidActivity.this);
+									String title = titleEdit.getText()
+											.toString();
+									String reText = fastReList[0];
+									sendTopic(title, reText);
+									return;
+								}
+								AlertDialog.Builder builder = new AlertDialog.Builder(
+										TestAndroidActivity.this);
 
-										builder.setTitle("Ñ¡ÔñÒªÊ¹ÓÃµÄ¿ì½Ý»Ø¸´£º");
-										
-										builder.setSingleChoiceItems(fastReList, 0,
-												new DialogInterface.OnClickListener() {
-													public void onClick(
-															DialogInterface dialoginterface, int i) {
+								builder.setTitle("Ñ¡ÔñÒªÊ¹ÓÃµÄ¿ì½Ý»Ø¸´£º");
 
-														EditText titleEdit = (EditText) acdlgView
+								builder.setSingleChoiceItems(fastReList, 0,
+										new DialogInterface.OnClickListener() {
+											public void onClick(
+													DialogInterface dialoginterface,
+													int i) {
+
+												EditText titleEdit = (EditText) acdlgView
 														.findViewById(R.id.edt_title);
-														String title = titleEdit.getText().toString();
-														String reText = fastReList[i]+"\n";
-														dialoginterface.dismiss();
-														sendTopic(title,reText);
-													}
-												});
+												String title = titleEdit
+														.getText().toString();
+												String reText = fastReList[i]
+														+ "\n";
+												dialoginterface.dismiss();
+												sendTopic(title, reText);
+											}
+										});
 
-										builder.setPositiveButton("È¡Ïû",
-												new DialogInterface.OnClickListener() {
-													public void onClick(
-															DialogInterface dialoginterface, int i) {
+								builder.setPositiveButton("È¡Ïû",
+										new DialogInterface.OnClickListener() {
+											public void onClick(
+													DialogInterface dialoginterface,
+													int i) {
 
-													}
-												});
-										builder.create().show();
+											}
+										});
+								builder.create().show();
 
-									}
-							});
-			 }
-			 
-							
-				AlertDialog dlg =			altDlg.create();
+							}
+						});
+			}
+
+			AlertDialog dlg = altDlg.create();
 			EditText titleEdit = (EditText) acdlgView
 					.findViewById(R.id.edt_title);
 			CheckBox cb = (CheckBox) acdlgView.findViewById(R.id.cb_recont);
-			if(extraRecont.length()<4)
-			{
-				
+
+			if (extraRecont.length() < 4) {
+
 				cb.setChecked(false);
 				cb.setVisibility(CheckBox.INVISIBLE);
-			}
-			else
-			{
+			} else {
 				cb.setChecked(true);
 			}
 			titleEdit.setText(title);
+
+			if (sLength < 300) {
+				titleEdit = (EditText) acdlgView.findViewById(R.id.edt_cont);
+
+				LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) titleEdit
+						.getLayoutParams(); // È¡¿Ø¼þmGridµ±Ç°µÄ²¼¾Ö²ÎÊý
+				linearParams.height = 90;// µ±¿Ø¼þµÄ¸ßÇ¿ÖÆÉè³É75ÏóËØ
+
+				titleEdit.setLayoutParams(linearParams);
+
+			}
+
 			dlg.show();
 
 		}
 	}
-	
-	private void sendEdit(String cont,String type,String board,String file)
-	{
 
-			
-			String url = "http://bbs.nju.edu.cn/bbsedit?board="
-					+ board
-					+ "&file="
-					+ file
-					+ "&type="
-					+type;
-					
-			// +"&text="+;
+	private void sendEdit(String cont, String type, String board, String file) {
 
-			NameValuePair[] newVp = { new NameValuePair(
-					"text", cont) };
+		String url = "http://bbs.nju.edu.cn/bbsedit?board=" + board + "&file="
+				+ file + "&type=" + type;
 
-			nvpCont = newVp;
+		// +"&text="+;
 
-			getUrlHtml(url, Const.MSGPSTNEW);
-		
+		NameValuePair[] newVp = { new NameValuePair("text", cont) };
+
+		nvpCont = newVp;
+
+		getUrlHtml(url, Const.MSGPSTNEW);
+
 	}
-	
-	
-	private void sendMail(String to, String title,
-			String cont,String action) {
-		//cont = StringUtil.getStrBetter(cont);
-		//ÊÖ»úÇ©Ãû
-		if(isBackWord&&backWords!=null&&backWords.length()>0)
-		{
-			cont+="\n-\n"+signColor+backWords+"[m\n";
+
+	private void sendMail(String to, String title, String cont, String action) {
+		// cont = StringUtil.getStrBetter(cont);
+		// ÊÖ»úÇ©Ãû
+		if (isBackWord && backWords != null && backWords.length() > 0) {
+			cont += "\n-\n" + signColor + backWords + "[m\n";
 		}
-		
+
 		try {
-			title = URLEncoder.encode(title,
-					"GB2312"); 
-			String url = "http://bbs.nju.edu.cn/bbssndmail?pid=0"
-					+ "&title="
-					+ title
-					+ "&userid="
-					+ to
-					+ "&signature=1";
-			if(action!=null)
-			{
+			title = URLEncoder.encode(title, "GB2312");
+			String url = "http://bbs.nju.edu.cn/bbssndmail?pid=0" + "&title="
+					+ title + "&userid=" + to + "&signature=1";
+			if (action != null) {
 				//
-				url+="&action="+action;
+				url += "&action=" + action;
 			}
-					
+
 			// +"&text="+;
 
-			NameValuePair[] newVp = { new NameValuePair(
-					"text", cont) };
+			NameValuePair[] newVp = { new NameValuePair("text", cont) };
 
 			nvpCont = newVp;
 
@@ -1779,39 +1658,25 @@ OnGestureListener {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		
-		
-		
-	}
-	
-	
 
-	private void sendTopic(String title,String cont)
-	{
-		//ÊÖ»úÇ©Ãû
-		if(isBackWord&&backWords!=null&&backWords.length()>0)
-		{
-			cont+="\n-\n"+signColor+backWords+"[m\n";
+	}
+
+	private void sendTopic(String title, String cont) {
+		// ÊÖ»úÇ©Ãû
+		if (isBackWord && backWords != null && backWords.length() > 0) {
+			cont += "\n-\n" + signColor + backWords + "[m\n";
 		}
-		
+
 		try {
-			title = URLEncoder.encode(title,
-					"GB2312"); // new
-								// String((title.replace(" ",
-								// "%20")).getBytes("UTF-8"),"gb2312");
-			String url = "http://bbs.nju.edu.cn/bbssnd?board="
-					+ curAreaName
-					+ "&title="
-					+ title
-					+ "&pid="
-					+ pid
-					+ "&reid="
-					+ reid
+			title = URLEncoder.encode(title, "GB2312"); // new
+			// String((title.replace(" ",
+			// "%20")).getBytes("UTF-8"),"gb2312");
+			String url = "http://bbs.nju.edu.cn/bbssnd?board=" + curAreaName
+					+ "&title=" + title + "&pid=" + pid + "&reid=" + reid
 					+ "&signature=1";
 			// +"&text="+;
 
-			NameValuePair[] newVp = { new NameValuePair(
-					"text", cont) };
+			NameValuePair[] newVp = { new NameValuePair("text", cont) };
 
 			nvpCont = newVp;
 
@@ -1820,7 +1685,7 @@ OnGestureListener {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void setCookies(String cookStr) {
 
 		char[] charArray = cookStr.toCharArray();
@@ -1840,14 +1705,9 @@ OnGestureListener {
 		String NUM = (Integer.parseInt(cookStr.substring(0, sp1)) + 2) + "";
 		String id = cookStr.substring(sp1 + 1, sp2);
 		String KEY = (Integer.parseInt(cookStr.substring(sp2 + 1)) - 2) + "";
-		//saveMyCookie( NUM, id , KEY);
-		NetTraffic.setMyCookie( NUM, id , KEY);
+		// saveMyCookie( NUM, id , KEY);
+		NetTraffic.setMyCookie(NUM, id, KEY);
 	}
-
-
-	
-	
-	
 
 	/**
 	 * ½«ÓÉÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ ¹©10´óÊ¹ÓÃ
@@ -1863,20 +1723,13 @@ OnGestureListener {
 			Map<String, Object> map = new HashMap<String, Object>();
 
 			String title = topicInfo.getTitle();
-//			int begin = title.length();
-//			title+=" (HOT:"+topicInfo.getNums()+")";
-//			
-//			
-//			SpannableString sp = new SpannableString(title);    
-//			sp.setSpan(listColorSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
-//			sp.setSpan(absoluteSizeSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
 			
-			
+
 			map.put("topictitle", title);
-			
+
 			map.put("topicau", "×÷Õß:" + topicInfo.getAuthor());
-			
-			map.put("topicother", "ÐÅÇø:"+ topicInfo.getArea());
+
+			map.put("topicother", "ÐÅÇø:" + topicInfo.getArea());
 
 			list.add(map);
 
@@ -1886,8 +1739,9 @@ OnGestureListener {
 		if (list.size() > 0) {
 
 			SimpleAdapter adapter = new SimpleAdapter(this, list,
-					R.layout.vlist, new String[] { "topictitle", "topicau","topicother" },
-					new int[] { R.id.topictitle, R.id.topicau ,R.id.topicother});
+					R.layout.vlist, new String[] { "topictitle", "topicau",
+							"topicother" }, new int[] { R.id.topictitle,
+							R.id.topicau, R.id.topicother });
 			listView.setAdapter(adapter);
 			// Ìí¼Óµã»÷
 			listView.setOnItemClickListener(new OnItemClickListener() {
@@ -1922,52 +1776,45 @@ OnGestureListener {
 
 			String title = topicInfo.getTitle();
 			int begin = title.length();
-			title+="  ("+topicInfo.getHot()+")";
+			title += "  (" + topicInfo.getHot() + ")";
 			String[] split = topicInfo.getHot().split("/");
 			SpannableString sp = null;
-			
-			
-			if(split.length==2)
-			{
+
+			if (split.length == 2) {
 				int re = Integer.parseInt(split[0]);
 				int watch = Integer.parseInt(split[1]);
-				if(re>9||watch>500)
-				{
-					sp = new SpannableString(title+"[sm]");
-					sp.setSpan(hotTopicSpan,title.length(),title.length()+4,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				if (re > 9 || watch > 500) {
+					sp = new SpannableString(title + "[sm]");
+					sp.setSpan(hotTopicSpan, title.length(),
+							title.length() + 4,
+							Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				}
 			}
-			if(sp ==null)
-			{
+			if (sp == null) {
 				sp = new SpannableString(title);
 			}
-			sp.setSpan(listColorSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
-			sp.setSpan(absoluteSizeSpan,begin,title.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);      
-			
-			
-			
+			sp.setSpan(listColorSpan, begin, title.length(),
+					Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			sp.setSpan(absoluteSizeSpan, begin, title.length(),
+					Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
 			map.put("topictitle", sp);
-			String place ="";
+			String place = "";
 			if (topicInfo.getNums() == null || topicInfo.getNums().equals("")) {
 				place = "";
 			} else {
-				place =  topicInfo.getNums();
+				place = topicInfo.getNums();
 			}
-			
-			if(topicInfo.getMark().length()>0)
-			{
-				
-				map.put("topicau","["+topicInfo.getMark()+"] "+place+" ×÷Õß:" + topicInfo.getAuthor() );
+
+			if (topicInfo.getMark().length() > 0) {
+				map.put("topicm", "[" + topicInfo.getMark() + "] ");
+			} else {
+				map.put("topicm", "");
+
 			}
-			else
-			{
-				map.put("topicau",place+" ×÷Õß:" + topicInfo.getAuthor());
-			
-			
-			}
+			map.put("topicau", place + " ×÷Õß:" + topicInfo.getAuthor());
 			map.put("topicother", topicInfo.getPubDate());
-			
-			
+
 			list.add(map);
 
 			LinkAdr.add("http://bbs.nju.edu.cn/" + topicInfo.getLink());
@@ -1976,8 +1823,9 @@ OnGestureListener {
 		if (list.size() > 0) {
 
 			MyListAdapter adapter = new MyListAdapter(this, list,
-					R.layout.vlist, new String[] { "topictitle", "topicau","topicother" },
-					new int[] { R.id.topictitle, R.id.topicau ,R.id.topicother});
+					R.layout.vlist, new String[] { "topictitle", "topicau",
+							"topicother","topicm" }, new int[] { R.id.topictitle,
+							R.id.topicau, R.id.topicother, R.id.topicm  });
 			listView.setAdapter(adapter);
 			// Ìí¼Óµã»÷
 			listView.setOnItemClickListener(new OnItemClickListener() {
@@ -1992,7 +1840,7 @@ OnGestureListener {
 					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
 					curStatus = 2;
 					nowPos = 0;
-					scrollY = listView.getFirstVisiblePosition()+1;
+					scrollY = listView.getFirstVisiblePosition() + 1;
 
 					getUrlHtml(topicUrl, Const.MSGTOPIC);
 
@@ -2000,47 +1848,40 @@ OnGestureListener {
 			});
 		}
 	}
-	
-	
-	
-	
+
 	/**
-	 * ½«ÓÉHTMLÒ³Ãæ×ª³öµÄÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ 
-	 * ¹©¸÷ÇøÈÈµãÊ¹ÓÃ
+	 * ½«ÓÉHTMLÒ³Ãæ×ª³öµÄÊý¾Ý×ª»¯ÎªListView¿É¶ÁµÄÐÎÊ½ ¹©¸÷ÇøÈÈµãÊ¹ÓÃ
 	 */
 	private void convtHotTopics() {
 
 		LinkAdr = new ArrayList<String>();
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		
+
 		for (TopicInfo topicInfo : hotList) {
 			Map<String, Object> map = new HashMap<String, Object>();
-			if(topicInfo.getArea()==null||topicInfo.getArea().length()<1)
-			{
-				map.put("img",fbAll.get(topicInfo.getTitle()));
-			}
-			else
-			{
-				
+			if (topicInfo.getArea() == null || topicInfo.getArea().length() < 1) {
+				map.put("img", fbAll.get(topicInfo.getTitle()));
+			} else {
+
 				String title = topicInfo.getTitle();
-			
-				
+
 				map.put("topictitle", title);
-			
+
 				map.put("topicau", topicInfo.getArea());
-				
+
 			}
 			list.add(map);
-			
-			LinkAdr.add("http://bbs.nju.edu.cn/" +topicInfo.getLink());
+
+			LinkAdr.add("http://bbs.nju.edu.cn/" + topicInfo.getLink());
 
 		}
 		if (list.size() > 0) {
 
 			MyImageListAdapter adapter = new MyImageListAdapter(this, list,
-					R.layout.hotlist, new String[] { "topictitle","img","topicau" },
-					new int[] { R.id.topictitle, R.id.itemImage,R.id.topicau});
+					R.layout.hotlist, new String[] { "topictitle", "img",
+							"topicau" }, new int[] { R.id.topictitle,
+							R.id.itemImage, R.id.topicau });
 			listView.setAdapter(adapter);
 			// Ìí¼Óµã»÷
 			listView.setOnItemClickListener(new OnItemClickListener() {
@@ -2049,7 +1890,7 @@ OnGestureListener {
 
 					topicUrl = LinkAdr.get(arg2);
 
-					if (topicUrl == null||topicUrl.length()<27)
+					if (topicUrl == null || topicUrl.length() < 27)
 						return;
 
 					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
@@ -2062,16 +1903,14 @@ OnGestureListener {
 			});
 		}
 	}
-	
-	
 
 	private void chaToAreaToGo() {
-		
+
 		setTitle("Ìø×ªÌÖÂÛÇø");
 
 		curStatus = 1;
 		setContentView(R.layout.gotoarea);
-	
+
 		AutoCompleteTextView secondPwd = (AutoCompleteTextView) findViewById(R.id.area_edit);
 		if (secondPwd.getAdapter() == null) {
 			secondPwd.setAdapter(bbsAlladapter);
@@ -2082,149 +1921,129 @@ OnGestureListener {
 
 			public void onClick(View v) {
 				EditText secondPwd = (EditText) findViewById(R.id.area_edit);
-				String inputPwd = secondPwd.getText()
-						.toString();
+				String inputPwd = secondPwd.getText().toString();
 				getToAreaWithName(inputPwd);
 			}
 		});
-		if(parentList==null||parentList.size()<2)
+		if (parentList == null || parentList.size() < 2)
 			initAllAreas();
 
-        android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
-                this,
-                parentList,
-                R.layout.explistparent,
-                new String []{"TITLE"},
-                new int []{android.R.id.text1},
-                allChildList,
-                R.layout.explistchild,
-                new String []{"TITLE"},
-                new int []{android.R.id.text1}
-        );
-        // create child's OnChildClickListener
-        android.widget.ExpandableListView listView = (android.widget.ExpandableListView) findViewById(R.id.area_view);
-        
-        // Adapter set
-        listView.setAdapter(adapter);
-        listView.setOnChildClickListener(new android.widget.ExpandableListView.OnChildClickListener(){
+		android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
+				this, parentList, R.layout.explistparent,
+				new String[] { "TITLE" }, new int[] { android.R.id.text1 },
+				allChildList, R.layout.explistchild, new String[] { "TITLE" },
+				new int[] { android.R.id.text1 });
+		// create child's OnChildClickListener
+		android.widget.ExpandableListView listView = (android.widget.ExpandableListView) findViewById(R.id.area_view);
 
-			public boolean onChildClick(android.widget.ExpandableListView parent,
-					 View v,
-	                    int groupPosition,
-	                    int childPosition,
-	                    long id) {
-					Map<String, Object> childMap = allChildList.get(groupPosition).get(childPosition);
-					String name =	(String)childMap.get("TITLE");
-					if(name==null||name.length()<1) return false;
-					int indexOf = name.indexOf('(');
-					if(indexOf>0)
-					{
-						name = name.substring(0,indexOf);
+		// Adapter set
+		listView.setAdapter(adapter);
+		listView
+				.setOnChildClickListener(new android.widget.ExpandableListView.OnChildClickListener() {
+
+					public boolean onChildClick(
+							android.widget.ExpandableListView parent, View v,
+							int groupPosition, int childPosition, long id) {
+						Map<String, Object> childMap = allChildList.get(
+								groupPosition).get(childPosition);
+						String name = (String) childMap.get("TITLE");
+						if (name == null || name.length() < 1)
+							return false;
+						int indexOf = name.indexOf('(');
+						if (indexOf > 0) {
+							name = name.substring(0, indexOf);
+						}
+						getToAreaWithName(name);
+						return false;
 					}
-					getToAreaWithName(name);
-	                return false;
-	            }
-        });
-		
-				
+				});
+		setIndexBtns(2);
+
 	}
-	
-	private void getToAreaWithName(String name)
-	{
-		if(name==null||name.length()<1) return;
+
+	private void getToAreaWithName(String name) {
+		if (name == null || name.length() < 1)
+			return;
+		name = name.trim();
 		String areaText = bbsAll.get(name);
-		areaText = areaText == null ? name
-				: areaText;
+		areaText = areaText == null ? name : areaText;
 		areaText = areaText.toLowerCase();
-		areaText = areaText.replaceFirst(
-				areaText.substring(0, 1),
-				areaText.substring(0, 1)
-						.toUpperCase());
-		urlString = getResources().getString(
-				R.string.areaStr)
-				+ areaText;
+		areaText = areaText.replaceFirst(areaText.substring(0, 1), areaText
+				.substring(0, 1).toUpperCase());
+		urlString = getResources().getString(R.string.areaStr) + areaText;
 		curAreaName = "" + areaText;
 		getUrlHtml(urlString, Const.MSGAREA);
 	}
-	
-	
-	
+
 	List<TopicInfo> top20List;
+
 	private void initAllAreas() {
-		 parentList = new ArrayList<Map<String,Object>>();
-	     allChildList = new ArrayList<List<Map<String,Object>>>();
+		parentList = new ArrayList<Map<String, Object>>();
+		allChildList = new ArrayList<List<Map<String, Object>>>();
 
-	     Map<String, Object> parentData = new HashMap<String, Object>();
-	     parentData.put("TITLE", "ÎÒµÄÊÕ²Ø");
-	     parentList.add(parentData);
-	     
-	     List<Map<String, Object>> childList = new ArrayList<Map<String,Object>>();
-	     
-	     for (String s : areaNamList) {
-	    	 Map<String, Object> childData = new HashMap<String, Object>();
-             childData.put("TITLE", s);
-             childList.add(childData);
+		Map<String, Object> parentData = new HashMap<String, Object>();
+		parentData.put("TITLE", "ÎÒµÄÊÕ²Ø");
+		parentList.add(parentData);
+
+		List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+
+		for (String s : areaNamList) {
+			Map<String, Object> childData = new HashMap<String, Object>();
+			childData.put("TITLE", s);
+			childList.add(childData);
 		}
-         allChildList.add(childList);
-         
-         if(top20List!=null)
-	     {
-         parentData = new HashMap<String, Object>();
-	     parentData.put("TITLE", "½ñÈÕÈÈÃÅ");
-	     parentList.add(parentData);
-	     
-	    // convtTOP20Area(data);
-	    
-	     childList = new ArrayList<Map<String,Object>>();
-	     for (TopicInfo topicInfo : top20List) {
-	    	 Map<String, Object> childData = new HashMap<String, Object>();
-             childData.put("TITLE", topicInfo.getTitle());
-             childList.add(childData);
+		allChildList.add(childList);
+
+		if (top20List != null) {
+			parentData = new HashMap<String, Object>();
+			parentData.put("TITLE", "½ñÈÕÈÈÃÅ");
+			parentList.add(parentData);
+
+			// convtTOP20Area(data);
+
+			childList = new ArrayList<Map<String, Object>>();
+			for (TopicInfo topicInfo : top20List) {
+				Map<String, Object> childData = new HashMap<String, Object>();
+				childData.put("TITLE", topicInfo.getTitle());
+				childList.add(childData);
+			}
+			allChildList.add(childList);
 		}
-	     allChildList.add(childList);}
-         
+
 	}
-
-
-	
 
 	boolean isNext = true;
 	boolean isPrev = true;
 
-	
-
-	
 	private void chaToHot(String HotData) {
-		
 
 		setTitle("¸÷ÇøÈÈµã");
 
 		curStatus = 1;
 		setContentView(R.layout.hot);
-	
+
 		listView = (ListView) findViewById(R.id.topicList);
 		convtHotTopics();
 		if (HotData == null) {
 			listView.setSelection(scrollY);
-		} 
-				
+		}
+		setIndexBtns(4);
+
 	}
-	
-	
+
 	/**
 	 * Ìø×ªµ½ÌÖÂÛÇø½çÃæ
 	 * 
 	 * @param AreaData
 	 */
 	private void chaToArea(String AreaData) {
-		
-		if(AreaData!=null&&AreaData.contains("´íÎó! ´íÎóµÄÌÖÂÛÇø"))
-				{
+
+		if (AreaData != null && AreaData.contains("´íÎó! ´íÎóµÄÌÖÂÛÇø")) {
 			Toast.makeText(TestAndroidActivity.this, "¸ÃÌÖÂÛÇø²»´æÔÚ£¡",
 					Toast.LENGTH_SHORT).show();
 			return;
-				}
-		
+		}
+
 		setContentView(R.layout.area);
 		curStatus = 4;
 		Button btnBack = (Button) findViewById(R.id.btn_back);
@@ -2309,12 +2128,10 @@ OnGestureListener {
 		Editor editor = sharedPreferences.edit();// »ñÈ¡±à¼­Æ÷
 		editor.putString("areaName", areaName);
 		editor.commit();
-		
+
 		initAllAreas();
 	}
 
-	
-	
 	/**
 	 * ÌÖÂÛÇø½çÃæ·­Ò³
 	 * 
@@ -2336,8 +2153,8 @@ OnGestureListener {
 		convtAreaTopics();
 		listView.setSelection(areaTopic.size() - 1);
 	}
-	
-	 /**
+
+	/**
 	 * ½âÎö»ñÈ¡µÄÒ³Ãæ ´¦ÀíÌÖÂÛÇøµÄ»°ÌâÁÐ±í
 	 * 
 	 * @param data
@@ -2355,10 +2172,11 @@ OnGestureListener {
 				ti.setLink((tds.get(curPos + 4).getElementsByTag("a")).get(0)
 						.attr("href"));// ÉèÖÃtitle
 				ti.setTitle(tds.get(curPos + 4).text());// ÉèÖÃtitle
-				
-				String date = DateUtil.formatDateToStrNoWeek(DateUtil.getDatefromStrNoWeek(tds.get(curPos + 3).text()));
-				if(date == null||date.equals("null"))
-					
+
+				String date = DateUtil.formatDateToStrNoWeek(DateUtil
+						.getDatefromStrNoWeek(tds.get(curPos + 3).text()));
+				if (date == null || date.equals("null"))
+
 					ti.setPubDate(tds.get(curPos + 3).text());
 				else
 					ti.setPubDate(date);
@@ -2383,101 +2201,90 @@ OnGestureListener {
 
 		return tiList;
 	}
+
 	class MyURLSpan extends ClickableSpan {
-		
-		  private String mUrl;
-		   private boolean underline = false;
-		     MyURLSpan(String url) {
-		      mUrl = url;
-		     }
 
+		private String mUrl;
+		private boolean underline = false;
 
-		     
-		     @Override
-		  public void updateDrawState(TextPaint ds) {
-		   super.updateDrawState(ds);
-		    ds.setUnderlineText(underline);//Ò»°ãÁ´ÏÂÃæ¶¼ÓÐÒ»ÌõÏß£¬Í¦¶ñÐÄ£¬ ¸Ã·½·¨¿ÉÒÔÈ¥µôÄÇÌõÏß
-		   // ds.setColor(Color.rgb(0, 0, 237));// ¸Ä±äÁ´½ÓµÄÑÕÉ«ÉèÖÃ
-		  }
+		MyURLSpan(String url) {
+			mUrl = url;
+		}
 
-		  @Override
-		     public void onClick(View widget) {
-		            //´Ë´¦Ð´ÄãµÄ´¦ÀíÂß¼­
-			  //System.out.println("123123");
-			  // processHyperLinkClick(text); //µã»÷³¬Á´½ÓÊ±µ÷ÓÃ
-			   if(mUrl.toLowerCase().startsWith("http:")
-						&& (mUrl.toLowerCase().endsWith(".jpg") 
-								|| mUrl.toLowerCase().endsWith(".png")
-								||mUrl.toLowerCase().endsWith(".jpeg")
-								||mUrl.toLowerCase().endsWith(".gif")
-								))
-			  {
-				  Intent intent = new Intent(TestAndroidActivity.this, ImageActivity.class);
-				  intent.putExtra("mUrl", mUrl); 
-				 
-				  startActivity(intent);
-			  }
-			  else if(mUrl.contains("bbsqry?userid"))
-			  {
-				  //²é¿´ÓÃ»§
-				  getUrlHtml(mUrl, Const.MSGVIEWUSER);
-			  }
-			  else if(mUrl.contains("bbspst?board"))
-			  {
-				  // »Ø¸´
-				  getUrlHtml(mUrl, Const.MSGPST);
-			  } 
-			   
-			  else if(mUrl.contains("bbsedit?board"))
-			  {
-				  // ÐÞ¸Ä
-				  getUrlHtml(mUrl, Const.MSGPST);
-			  } 
-			   
-			  else if(mUrl.contains("bbsdel?board"))
-			  {
-				  // É¾³ý
-				  AlertDialog.Builder builder = new AlertDialog.Builder(
-							TestAndroidActivity.this);
-				  
-				  
-				  builder.setTitle("ÌáÊ¾")
-					.setMessage("È·¶¨É¾³ý±¾ÎÄ£¿").setPositiveButton("È·¶¨",
-							new DialogInterface.OnClickListener() {
+		@Override
+		public void updateDrawState(TextPaint ds) {
+			super.updateDrawState(ds);
+			ds.setUnderlineText(underline);// Ò»°ãÁ´ÏÂÃæ¶¼ÓÐÒ»ÌõÏß£¬Í¦¶ñÐÄ£¬ ¸Ã·½·¨¿ÉÒÔÈ¥µôÄÇÌõÏß
+			// ds.setColor(Color.rgb(0, 0, 237));// ¸Ä±äÁ´½ÓµÄÑÕÉ«ÉèÖÃ
+		}
 
-								public void onClick(DialogInterface dialog,
-										int which) {
-									 getUrlHtml(mUrl, Const.MSGPSTNEW);
-								}
+		@Override
+		public void onClick(View widget) {
+			// ´Ë´¦Ð´ÄãµÄ´¦ÀíÂß¼­
+			// System.out.println("123123");
+			// processHyperLinkClick(text); //µã»÷³¬Á´½ÓÊ±µ÷ÓÃ
+			if (mUrl.toLowerCase().startsWith("http:")
+					&& (mUrl.toLowerCase().endsWith(".jpg")
+							|| mUrl.toLowerCase().endsWith(".png")
+							|| mUrl.toLowerCase().endsWith(".jpeg") || mUrl
+							.toLowerCase().endsWith(".gif"))) {
+				Intent intent = new Intent(TestAndroidActivity.this,
+						ImageActivity.class);
+				intent.putExtra("mUrl", mUrl);
 
-							}).setNegativeButton("È¡Ïû",
-							new DialogInterface.OnClickListener() {
+				startActivity(intent);
+			} else if (mUrl.contains("bbsqry?userid")) {
+				// ²é¿´ÓÃ»§
+				getUrlHtml(mUrl, Const.MSGVIEWUSER);
+			} else if (mUrl.contains("bbspst?board")) {
+				// »Ø¸´
+				getUrlHtml(mUrl, Const.MSGPST);
+			}
 
-								public void onClick(DialogInterface dialog,
-										int which) {
+			else if (mUrl.contains("bbsedit?board")) {
+				// ÐÞ¸Ä
+				getUrlHtml(mUrl, Const.MSGPST);
+			}
 
-								}
-							}).show();
-				 
-			  } 
-				  
-				  
+			else if (mUrl.contains("bbsdel?board")) {
+				// É¾³ý
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						TestAndroidActivity.this);
 
-		   }
-		 }
+				builder.setTitle("ÌáÊ¾").setMessage("È·¶¨É¾³ý±¾ÎÄ£¿").setPositiveButton(
+						"È·¶¨", new DialogInterface.OnClickListener() {
 
-	 public  SpannableStringBuilder getURLChanged(Spanned topicData)
-	 {
-		 URLSpan[] spans = topicData.getSpans(0, topicData.length(), URLSpan.class);  
-			SpannableStringBuilder style = new SpannableStringBuilder(topicData);
-			for (URLSpan url : spans) {
-				 style.removeSpan(url);
-			     MyURLSpan myURLSpan = new MyURLSpan(url.getURL());
-			     style.setSpan(myURLSpan, topicData.getSpanStart(url), topicData
-			       .getSpanEnd(url), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-			    }
-			return style;
-	 }
+							public void onClick(DialogInterface dialog,
+									int which) {
+								getUrlHtml(mUrl, Const.MSGPSTNEW);
+							}
+
+						}).setNegativeButton("È¡Ïû",
+						new DialogInterface.OnClickListener() {
+
+							public void onClick(DialogInterface dialog,
+									int which) {
+
+							}
+						}).show();
+
+			}
+
+		}
+	}
+
+	public SpannableStringBuilder getURLChanged(Spanned topicData) {
+		URLSpan[] spans = topicData.getSpans(0, topicData.length(),
+				URLSpan.class);
+		SpannableStringBuilder style = new SpannableStringBuilder(topicData);
+		for (URLSpan url : spans) {
+			style.removeSpan(url);
+			MyURLSpan myURLSpan = new MyURLSpan(url.getURL());
+			style.setSpan(myURLSpan, topicData.getSpanStart(url), topicData
+					.getSpanEnd(url), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+		}
+		return style;
+	}
 
 	/**
 	 * Ìø×ªµ½Ä³¸ö»°Ìâ½çÃæ
@@ -2487,7 +2294,7 @@ OnGestureListener {
 	private void chaToTopic(Spanned topicData) {
 
 		setContentView(R.layout.topic);
-		
+
 		SpannableStringBuilder urlChanged = getURLChanged(topicData);
 
 		textView = (TextView) findViewById(R.id.label);
@@ -2496,35 +2303,33 @@ OnGestureListener {
 		textView.setMovementMethod(LinkMovementMethod.getInstance());
 
 		textView.getBackground().setAlpha(backAlpha);
-		if(isTouch)
-		{
+		if (isTouch) {
 			textView.setOnTouchListener(this);
 			textView.setFocusable(true);
 			textView.setLongClickable(true);
 		}
-		
+
 		Button btnBack = (Button) findViewById(R.id.btn_back);
 		btnBack.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-//
-//				if (curStatus == 1) {
-//					chaToMain();
-//					if (top10TopicList != null) {
-//						convtTopics();
-//					}
-//				} else if (curStatus == 2) {
-//					chaToArea(null);
-//				} 
-//				 else if (curStatus == 3) {
-//						chaToHot(null);
-//				} 
-				
-				urlString = "http://bbs.nju.edu.cn/bbstdoc?board=" + curAreaName;
+				//
+				// if (curStatus == 1) {
+				// chaToMain();
+				// if (top10TopicList != null) {
+				// convtTopics();
+				// }
+				// } else if (curStatus == 2) {
+				// chaToArea(null);
+				// }
+				// else if (curStatus == 3) {
+				// chaToHot(null);
+				// }
+
+				urlString = "http://bbs.nju.edu.cn/bbstdoc?board="
+						+ curAreaName;
 				getUrlHtml(urlString, Const.MSGAREA);
-				
-				
-				
+
 			}
 		});
 
@@ -2556,10 +2361,11 @@ OnGestureListener {
 		btnNext.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				
+
 				if (isNext) {
 					nowPos = nowPos + 30;
-					getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICNEXT);
+					getUrlHtml(topicUrl + "&start=" + nowPos,
+							Const.MSGTOPICNEXT);
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							TestAndroidActivity.this);
@@ -2569,7 +2375,8 @@ OnGestureListener {
 										public void onClick(
 												DialogInterface dialog, int id) {
 											getUrlHtml(topicUrl + "&start="
-													+ nowPos, Const.MSGTOPICREFREASH);
+													+ nowPos,
+													Const.MSGTOPICREFREASH);
 										}
 									}).setNegativeButton("ËãÁË",
 									new DialogInterface.OnClickListener() {
@@ -2587,14 +2394,13 @@ OnGestureListener {
 
 	}
 
-
 	private String dataUrl = "";
 	private int datamsg = -1;
 	NameValuePair[] nvpCont = null;
 	Thread imageTrd;
 
 	private void getUrlHtml(String url, int msg) {
-		if (msg ==123 ||progressDialog == null || !progressDialog.isShowing()) {
+		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
 			progressDialog = ProgressDialog.show(TestAndroidActivity.this,
 					"ÇëÉÔµÈ...", "×¥È¡ÍøÒ³ÐÅÏ¢ÖÐ...", true);
 		}
@@ -2620,97 +2426,112 @@ OnGestureListener {
 				}
 
 				if (datamsg == Const.MSGTOPIC || datamsg == Const.MSGTOPICNEXT
-						|| datamsg == Const.MSGTOPICREFREASH)
-				{
-					
-					if(imageTrd!=null&&imageTrd.isAlive())
-					{
+						|| datamsg == Const.MSGTOPICREFREASH) {
+
+					if (imageTrd != null && imageTrd.isAlive()) {
 						imageTrd.setName("NoUse");
 					}
 					topicWithImg = false;
-					final  String topicDataInfo = StringUtil.getTopicInfo(data,nowPos,isIP,isWifi,isPic,nowLoginId);
-					if(topicDataInfo!=null)
-					{
-					isNext = StringUtil.isNext;
-					if(StringUtil.curAreaName!=null&&!StringUtil.curAreaName.equals("byztm"))
-						curAreaName =  StringUtil.curAreaName;
-					topicWithImg = StringUtil.topicWithImg;
-					
-					topicData = Html.fromHtml(topicDataInfo,
-							new Html.ImageGetter() {
-								public Drawable getDrawable(String source) {
-									
-									Drawable drawable = null;
-									if ("xian".equals(source)) {
-										drawable = xianDraw;
-										drawable.setBounds(0, 0, sWidth, 2);
-									}
-									else if (source.startsWith("[")) 
-									{
-										try {
-											drawable = fetchDrawable(source); 
-										} catch (Exception e) {
-											return null;
+					final String topicDataInfo = StringUtil.getTopicInfo(data,
+							nowPos, isIP, isWifi, isPic, nowLoginId);
+					if (topicDataInfo != null) {
+						isNext = StringUtil.isNext;
+						if (StringUtil.curAreaName != null
+								&& !StringUtil.curAreaName.equals("byztm"))
+							curAreaName = StringUtil.curAreaName;
+						topicWithImg = StringUtil.topicWithImg;
+
+						topicData = Html.fromHtml(topicDataInfo,
+								new Html.ImageGetter() {
+									public Drawable getDrawable(String source) {
+
+										Drawable drawable = null;
+										if ("xian".equals(source)) {
+											drawable = xianDraw;
+											drawable.setBounds(0, 0, sWidth, 2);
+										} else if (source.startsWith("[")) {
+											try {
+												drawable = fetchDrawable(source);
+											} catch (Exception e) {
+												return null;
+											}
+											if (drawable == null)
+												return null;
+											int iw = drawable
+													.getIntrinsicWidth();
+											drawable
+													.setBounds(
+															0,
+															0,
+															iw,
+															drawable
+																	.getIntrinsicHeight());
 										}
-										if (drawable==null) return null;
-										int iw = drawable.getIntrinsicWidth();
-										drawable.setBounds(0, 0, iw, drawable
-												.getIntrinsicHeight());
+										return drawable;
+
 									}
-									return drawable;
+								}, null);
+						if (topicWithImg) {
+
+							imageTrd = new Thread(topicDataInfo) {
+
+								@Override
+								public void interrupt() {
+									this.stop();
+								}
+
+								@Override
+								public void run() {
+									// ÐèÒª»¨Ê±¼ä¼ÆËãµÄ·½·¨
+									topicData = Html.fromHtml(topicDataInfo,
+											new Html.ImageGetter() {
+
+												public Drawable getDrawable(
+														String source) {
+
+													Drawable drawable = null;
+													if ("xian".equals(source)) {
+														drawable = xianDraw;
+														drawable.setBounds(0,
+																0, sWidth, 2);
+													}
+
+													else if (source
+															.startsWith("http")
+															|| source
+																	.startsWith("[")) {
+														try {
+															drawable = fetchDrawable(source);
+														} catch (Exception e) {
+															return null;
+														}
+														if (drawable == null)
+															return null;
+														int iw = drawable
+																.getIntrinsicWidth();
+														drawable
+																.setBounds(
+																		0,
+																		0,
+																		iw,
+																		drawable
+																				.getIntrinsicHeight());
+													}
+													return drawable;
+
+												}
+											}, null);
+									if (this.getName() != null
+											&& !this.getName().equals("NoUse")) {
+										sendMsg(Const.MSGTOPICREFREASH);
+									}
 
 								}
-							}, null);
-					if(topicWithImg)
-					{
-						
-						imageTrd = new Thread(topicDataInfo) {
-
-						@Override
-						public void interrupt() {
-							this.stop();
+							};
+							imageTrd.start();
 						}
-
-						@Override
-						public void run() {
-							// ÐèÒª»¨Ê±¼ä¼ÆËãµÄ·½·¨
-							topicData = Html.fromHtml(topicDataInfo,
-									new Html.ImageGetter() {
-
-										public Drawable getDrawable(String source) {
-											
-											Drawable drawable = null;
-											if ("xian".equals(source)) {
-												drawable = xianDraw;
-												drawable.setBounds(0, 0, sWidth, 2);
-											} 
-											
-											else if (source.startsWith("http")||source.startsWith("[")) {
-												try {
-													drawable = fetchDrawable(source); 
-												} catch (Exception e) {
-													return null;
-												}
-												if (drawable==null) return null;
-												int iw = drawable.getIntrinsicWidth();
-												drawable.setBounds(0, 0, iw, drawable
-														.getIntrinsicHeight());
-											}
-											return drawable;
-
-										}
-									}, null);
-							if(this.getName()!=null&&!this.getName().equals("NoUse"))
-							{
-								sendMsg(Const.MSGTOPICREFREASH);
-							}
-
-						}
-					};
-					imageTrd.start();
 					}
-					}
-					
+
 				}
 				sendMsg(datamsg);
 			}
@@ -2729,24 +2550,17 @@ OnGestureListener {
 
 			drawableMap.remove(source);
 		}
-		Drawable drawable =null;
-		if(source.startsWith("["))
-		{
+		Drawable drawable = null;
+		if (source.startsWith("[")) {
 			Resources res = getResources();
 			Integer i = smilyAll.get(source);
-			if(i!=null)
-			{
-				drawable = res.getDrawable( i);
-			}
-			else
+			if (i != null) {
+				drawable = res.getDrawable(i);
+			} else
 				return null;
-		}
-		else if(source.startsWith("http"))
-		{
-			 drawable = zoomDrawable(source);
-		}
-		else
-		{
+		} else if (source.startsWith("http")) {
+			drawable = zoomDrawable(source);
+		} else {
 			return null;
 		}
 
@@ -2849,10 +2663,9 @@ OnGestureListener {
 		options.inJustDecodeBounds = false;
 		options.inPurgeable = true;
 		options.inInputShareable = true;
-		
-		
-		int widthRatio = (int) Math.ceil(options.outWidth*1.0 / sWidth);
-		int heightRatio = (int) Math.ceil(options.outHeight*1.0 / sLength);
+
+		int widthRatio = (int) Math.ceil(options.outWidth * 1.0 / sWidth);
+		int heightRatio = (int) Math.ceil(options.outHeight * 1.0 / sLength);
 		if (widthRatio > 1 || heightRatio > 1) {
 			if (widthRatio > heightRatio) {
 				options.inSampleSize = widthRatio;
@@ -2860,17 +2673,14 @@ OnGestureListener {
 				options.inSampleSize = heightRatio;
 			}
 		}
-		if(sWidth<260)
-			options.inSampleSize = options.inSampleSize*2;
-
+		if (sWidth < 260)
+			options.inSampleSize = options.inSampleSize * 2;
 
 		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
 				options);
 		return new BitmapDrawable(null, bitmaps);
 
 	}
-
-	
 
 	private void exitPro() {
 		new AlertDialog.Builder(TestAndroidActivity.this).setTitle("ÌáÊ¾")
@@ -2879,12 +2689,12 @@ OnGestureListener {
 
 							public void onClick(DialogInterface dialog,
 									int which) {
-								getUrlHtml(loginoutURL,123);
-								
+								getUrlHtml(loginoutURL, 123);
+
 								try {
 									Thread.sleep(500);
 								} catch (InterruptedException e) {
-	
+
 									e.printStackTrace();
 								}
 								android.os.Process
@@ -2907,19 +2717,17 @@ OnGestureListener {
 		handler.sendMessage(msg);
 	}
 
-	
-
 	@Override
 	protected void onDestroy() {
 
 		super.onDestroy();
 
-		getUrlHtml(loginoutURL,123);
-		
+		getUrlHtml(loginoutURL, 123);
+
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
 
@@ -2936,38 +2744,26 @@ OnGestureListener {
 	public boolean onDown(MotionEvent arg0) {
 		return false;
 	}
-	
-	
-	private static final int SWIPE_MIN_DISTANCE = 120;   
-	private static final int SWIPE_THRESHOLD_VELOCITY = 200; 
-	
+
+	private static final int SWIPE_MIN_DISTANCE = 120;
+	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
 
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		
-		if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE ) { 
-			
-			getUrlHtml(huifuUrl, Const.MSGPST);
-			
-			} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE ) {   
-				
-				if (curStatus == 1) {
-					chaToMain();
-					if (top10TopicList != null) {
-						convtTopics();
-					}
-				} else {
-					chaToArea(null);
-				}
-			}  
 
-		
-		
+		if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE) {
+
+			getUrlHtml(huifuUrl, Const.MSGPST);
+
+		} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
+			retBtn();
+		}
+
 		return false;
 	}
 
 	public void onLongPress(MotionEvent arg0) {
-		
+
 	}
 
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
@@ -2977,25 +2773,22 @@ OnGestureListener {
 
 	public void onShowPress(MotionEvent arg0) {
 
-		
 	}
 
 	public boolean onSingleTapUp(MotionEvent arg0) {
 		ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
 		float x = arg0.getRawX();
 		float y = arg0.getRawY();
-		//µã»÷ÉÏ·­ºÍµã»÷ÏÂ·­
-		if(y>sv.getHeight()-sLength/6&&x>(sWidth*3/4))
-		{
-			sv.scrollBy(0, sv.getHeight()-20);
+		// µã»÷ÉÏ·­ºÍµã»÷ÏÂ·­
+		if (y > sv.getHeight() - sLength / 6 && x > (sWidth * 3 / 4)) {
+			sv.scrollBy(0, sv.getHeight() - 20);
 			return true;
 		}
-		if(y<sLength/3&&x>(sWidth*3/4))
-		{
-			sv.scrollBy(0, 20-sv.getHeight());
+		if (y < sLength / 3 && x > (sWidth * 3 / 4)) {
+			sv.scrollBy(0, 20 - sv.getHeight());
 			return true;
 		}
-	return false;
+		return false;
 	}
 
 }

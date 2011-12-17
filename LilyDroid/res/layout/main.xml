@@ -1,56 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-     >
+    android:layout_height="wrap_content" >
+
     <LinearLayout
         android:id="@+id/linearLayout1"
-        style="@android:style/ButtonBar"  
-        android:layout_width="fill_parent"
-        android:layout_height="50sp" 
-        android:layout_centerHorizontal = "true"
-        android:layout_alignParentBottom="true">
-
-        <Button   
+        style="@style/normalTab" >
+<com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_link"
-            android:layout_width="77dp"
-            android:layout_height="45dp"
-            android:text="@string/top10Str" 
-            />
-            
+            style="@style/normalBtn"
+            android:icon="@drawable/top"
+            android:text="@string/top10Str" >
+        </com.sonyericsson.zoom.ImageTextButton>
 
-        <Button
+        <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_all"
-            android:layout_width="77dp"
-          android:layout_height="45dp"
-            android:text="@string/allStr" />
-            
-        <Button
+            style="@style/normalBtn"
+            android:icon="@drawable/board"
+            android:text="@string/allStr" >
+        </com.sonyericsson.zoom.ImageTextButton>
+
+        <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_like"
-            android:layout_width="77dp"
-         android:layout_height="45dp"
-            android:text="@string/like" />
-            
-           <Button   
+            style="@style/normalBtn"
+            android:icon="@drawable/mailbox"
+            android:text="@string/like" >
+        </com.sonyericsson.zoom.ImageTextButton>
+
+        <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_set"
-            android:layout_width="77dp"
-            android:layout_height="45dp"
-            android:text="@string/bbshot" 
-            />
-            
+            style="@style/normalBtn"
+            android:icon="@drawable/hot"
+            android:text="@string/bbshot" >
+        </com.sonyericsson.zoom.ImageTextButton>
     </LinearLayout>
-    
-    
+
     <ListView
         android:id="@+id/topicList"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/linearLayout1"
         android:cacheColorHint="@android:color/transparent"
-        android:textColor="#000000" 
-        android:divider="#D3D3D3"  
+        android:divider="#D3D3D3"
         android:dividerHeight="1dp"
-		android:scrollingCache="false" 
-        android:layout_above="@id/linearLayout1">
+        android:scrollingCache="false"
+        android:textColor="#000000" >
     </ListView>
-    
+
 </RelativeLayout>

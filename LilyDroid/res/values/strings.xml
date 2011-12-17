@@ -4,25 +4,21 @@
     <string name="app_name">小百合</string>
     <string name="bbstop10">http://bbs.nju.edu.cn/bbstop10</string>
     <string name="areaStr">http://bbs.nju.edu.cn/bbstdoc?board=</string>
-    <string name="top10Str">刷新</string>
+    <string name="top10Str">十 大</string>
     <string name="back">返回</string>
-    <string name="pre">上一页</string>
-    <string name="next">下一页</string>
-     <string name="exitStr">退出</string>
-          <string name="setting">设置</string>
-     <string name="like">邮箱</string>
-    <string name="allStr">版面</string>
-     <string name="huifu">回复</string>
-    <string name="login_label_username">帐号</string>
-    <string name="bbshot">热门</string>
+    <string name="pre">上 页</string>
+   <string name="next">下 页</string>
+     <string name="exitStr">退 出</string>
+     <string name="like">邮 箱</string>
+    <string name="allStr">版 面</string>
+     <string name="huifu">回 复</string>
+    <string name="login_label_username">帐 号</string>
+    <string name="bbshot">热门话题</string>
      <string name="area">讨论区</string>
-       
-        
     <string name="login_label_password">密码</string>
     <string name="login_label_signin">登 录</string>
     <string name="login_status_logging_in">登录中...</string>
     <string name="login_username_hint">小百合用户名</string>
-    <string name="login_register_link">没有帐号？ <a href="#">注册</a></string>
     <string name="getnew">网络故障请重试!</string>
      <string name="listColor">#0080FF</string>
      <string-array name="pic_value">  
