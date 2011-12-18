@@ -17,7 +17,7 @@
         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_all"
             style="@style/normalBtn"
-            android:icon="@drawable/board"
+            android:icon="@drawable/board1"
             android:text="@string/allStr" >
         </com.sonyericsson.zoom.ImageTextButton>
 

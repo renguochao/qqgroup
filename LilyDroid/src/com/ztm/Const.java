@@ -40,5 +40,9 @@ public class Const {
 	public static final int MSGMAILTOPIC = 0x000014;
 	public static final int MSGREMAIL = 0x000015;
 	
+	public static final int MSGFORUM =0x000016;
+	public static final int MSGRECBRD =0x000017;
+	
+	
 
 }

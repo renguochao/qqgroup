@@ -27,6 +27,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.sonyericsson.zoom.ImageTextButton;
 import com.ztm.R;
 
 import android.app.Activity;
@@ -190,12 +191,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String loginoutURL = "http://bbs.nju.edu.cn/bbslogout";
 
 	String synUrl = "http://bbs.nju.edu.cn/bbsleft";
+	
+	String forumUrl ="http://bbs.nju.edu.cn/cache/t_forum.js";
+	
+	String recbrdUrl ="http://bbs.nju.edu.cn/cache/t_recbrd.js";
 
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
 
 	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
 
 	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
+	
+	HashMap<String, String> fbNameAll = new HashMap<String, String>();
+	
 	String bbsHotString = "http://bbs.nju.edu.cn/bbstopall";
 	List<Map<String, Object>> parentList = null;
 	List<List<Map<String, Object>>> allChildList = null;
@@ -276,6 +284,23 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		fbAll.put("fb10", R.drawable.fb10);
 		fbAll.put("fb11", R.drawable.fb11);
 		fbAll.put("fb12", R.drawable.fb12);
+		
+		
+		
+		fbNameAll.put("1", "※本站系统※");
+		fbNameAll.put("2", "※南京大学※");
+		fbNameAll.put("3", "※乡情校谊※");
+		fbNameAll.put("4", "※电脑技术※");
+		fbNameAll.put("5", "※学术科学※");
+		fbNameAll.put("6", "※文化艺术※");
+		fbNameAll.put("7", "※体育娱乐※");
+		fbNameAll.put("8", "※感性休闲※");
+		fbNameAll.put("9", "※新闻信息※");
+		fbNameAll.put("10", "※百合广角※");
+		fbNameAll.put("11", "※校务信箱※");
+		fbNameAll.put("12", "※社团群体※");
+		fbNameAll.put("13", "※冷门讨论区※");
+		
 
 	}
 
@@ -478,11 +503,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// 建立菜单
-		menu.add(Menu.NONE, menuSettings, 2, "设置");
-		menu.add(Menu.NONE, menuSyn, 2, "同步收藏");
-		menu.add(Menu.NONE, menuJump, 2, "快速跳转");
-		menu.add(Menu.NONE, menuReport, 2, "意见反馈");
-		menu.add(Menu.NONE, menuLogout, 2, "注销");
+		menu.add(Menu.NONE, menuSettings, 2, "设置").setIcon(R.drawable.set);
+		menu.add(Menu.NONE, menuSyn, 2, "同步收藏").setIcon(R.drawable.syn);
+		menu.add(Menu.NONE, menuJump, 2, "快速跳转").setIcon(R.drawable.fast);
+		menu.add(Menu.NONE, menuReport, 2, "意见反馈").setIcon(R.drawable.info);
+		menu.add(Menu.NONE, menuLogout, 2, "注销").setIcon(R.drawable.key);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -774,9 +799,18 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				case Const.TOP20BOARD:
 					convtTOP20Area(data);
+					getUrlHtml(forumUrl, Const.MSGFORUM);
+					break;
+				case Const.MSGFORUM:
+					convtForum(data);
+					getUrlHtml(recbrdUrl, Const.MSGRECBRD);
+					break;
+				case Const.MSGRECBRD:
+					convtRecbrd(data);
 					initAllAreas();
 					chaToAreaToGo();
 					break;
+					
 
 				case Const.MSGMAIL:
 					getMailCont();
@@ -800,6 +834,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 
 		}
+
+		
 
 	};
 
@@ -1099,24 +1135,79 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		Elements tds = doc.getElementsByTag("td");
 
-		top20List = new ArrayList<TopicInfo>();
+		top20List = new ArrayList<String>();
 		if (tds.size() < 12) {
 			Toast.makeText(TestAndroidActivity.this, "获取热门讨论区失败",
 					Toast.LENGTH_SHORT).show();
 		} else {
 			int i = 6;
 			while (i < tds.size()) {
-				TopicInfo ti = new TopicInfo();
-				ti.setTitle(tds.get(i + 1).text() + " ("
-						+ tds.get(i + 2).text() + ")");
+				
 				// ti.setNums(tds.get(i+4).text());
-				top20List.add(ti);
+				top20List.add(tds.get(i + 1).text() + " ("
+						+ tds.get(i + 2).text() + ")");
 				i += 6;
 			}
 		}
 		// return null;
 
 	}
+	
+	
+	private void convtRecbrd(String data) {
+		// TODO Auto-generated method stub
+		String[] split = data.split("\\{brd:");
+		recbrdList = new ArrayList<String>();
+		if(split.length<2)
+		{
+			displayMsg("获取推荐讨论区失败");
+		}
+		else
+		{
+			int i = 1;
+			while(i<split.length)
+			{
+				//'JobExpress',bm:'SYSOP yika1985',title:'就业特快 '},
+				String[] split2 = split[i].split("'");
+				if(split2.length>5)
+				{
+					recbrdList.add(split2[1]+" ("+split2[5]+")");
+				}
+				i++;
+			}
+			
+		}
+	}
+	
+	
+
+	private void convtForum(String data) {
+		// TODO Auto-generated method stub
+		String[] split = data.split("\\{d:");
+		forumList = new ArrayList<String>();
+		if(split.length<2)
+		{
+			displayMsg("获取分类精彩讨论区失败");
+		}
+		else
+		{
+			int i = 1;
+			while(i<split.length)
+			{
+				String nowStr = split[i];
+				String[] split2 = nowStr.split("'");
+				forumList.add(fbNameAll.get(i+""));
+				int j=1;
+				while(j<split2.length-3)
+				{
+					forumList.add(split2[j]+" ("+split2[j+2]+")");
+					j+=4;
+				}
+				i+=1;
+			}
+		}
+	}
+	
 
 	/**
 	 * 获取用户信息
@@ -1428,6 +1519,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					alert.show();
 				} else if (formData.contains("您无权在此讨论区")) {
 					Toast.makeText(TestAndroidActivity.this, "您无权在此讨论区发文",
+							Toast.LENGTH_SHORT).show();
+				} else if (formData.contains("本文不可回复")) {
+					Toast.makeText(TestAndroidActivity.this, "本文不可回复",
 							Toast.LENGTH_SHORT).show();
 				} else {
 					Toast.makeText(TestAndroidActivity.this, "由于未知错误发文失败",
@@ -1947,7 +2041,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						Map<String, Object> childMap = allChildList.get(
 								groupPosition).get(childPosition);
 						String name = (String) childMap.get("TITLE");
-						if (name == null || name.length() < 1)
+						if (name == null || name.length() < 1||name.startsWith("※"))
 							return false;
 						int indexOf = name.indexOf('(');
 						if (indexOf > 0) {
@@ -1975,7 +2069,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		getUrlHtml(urlString, Const.MSGAREA);
 	}
 
-	List<TopicInfo> top20List;
+	List<String> top20List;
+	List<String> forumList;
+	List<String> recbrdList;
 
 	private void initAllAreas() {
 		parentList = new ArrayList<Map<String, Object>>();
@@ -2002,13 +2098,47 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			// convtTOP20Area(data);
 
 			childList = new ArrayList<Map<String, Object>>();
-			for (TopicInfo topicInfo : top20List) {
+			for (String topicInfo : top20List) {
 				Map<String, Object> childData = new HashMap<String, Object>();
-				childData.put("TITLE", topicInfo.getTitle());
+				childData.put("TITLE",topicInfo);
 				childList.add(childData);
 			}
 			allChildList.add(childList);
 		}
+		
+		if (forumList != null) {
+			parentData = new HashMap<String, Object>();
+			parentData.put("TITLE", "分类精彩");
+			parentList.add(parentData);
+
+			// convtTOP20Area(data);
+
+			childList = new ArrayList<Map<String, Object>>();
+			for (String topicInfo : forumList) {
+				Map<String, Object> childData = new HashMap<String, Object>();
+				childData.put("TITLE",topicInfo);
+				childList.add(childData);
+			}
+			allChildList.add(childList);
+		}
+		
+		if (recbrdList != null) {
+			parentData = new HashMap<String, Object>();
+			parentData.put("TITLE", "首页推荐");
+			parentList.add(parentData);
+
+			// convtTOP20Area(data);
+
+			childList = new ArrayList<Map<String, Object>>();
+			for (String topicInfo : recbrdList) {
+				Map<String, Object> childData = new HashMap<String, Object>();
+				childData.put("TITLE",topicInfo);
+				childList.add(childData);
+			}
+			allChildList.add(childList);
+		}
+
+		
 
 	}
 
@@ -2072,29 +2202,35 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		setTitle("当前讨论区：" + curAreaName);
 
-		Button btnLike = (Button) findViewById(R.id.btn_like);
+		ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 
 		if (areaNamList.contains(curAreaName)) {
 			// btnLike.setBackgroundDrawable(drawableDis);
-			btnLike.setText("退订");
+			btnLike.setText("退 订");
+			btnLike.setIcon(R.drawable.fav);
 		} else {
 			// btnLike.setBackgroundDrawable(drawableFav);
-			btnLike.setText("收藏");
+			btnLike.setText("收 藏");
+			btnLike.setIcon(R.drawable.unfav);
+			
 		}
 
 		btnLike.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				Button btnLike = (Button) findViewById(R.id.btn_like);
+				ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 				if (areaNamList.contains(curAreaName)) {
 					areaNamList.remove(curAreaName);
 
 					// btnLike.setBackgroundDrawable(drawableFav);
-					btnLike.setText("收藏");
+					btnLike.setText("收 藏");
+					btnLike.setIcon(R.drawable.unfav);
+					
 
 				} else {
 					areaNamList.add(curAreaName);
 					// btnLike.setBackgroundDrawable(drawableDis);
-					btnLike.setText("退订");
+					btnLike.setText("退 订");
+					btnLike.setIcon(R.drawable.fav);
 				}
 				storeAreaName();
 			}
@@ -2113,6 +2249,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		} else {
 
 			listView.setSelection(areaTopic.size() - 1);
+
 		}
 
 	}

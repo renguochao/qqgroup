@@ -9,7 +9,7 @@
 <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_link"
             style="@style/normalBtn"
-            android:icon="@drawable/top"
+            android:icon="@drawable/top1"
             android:text="@string/top10Str" >
         </com.sonyericsson.zoom.ImageTextButton>
 

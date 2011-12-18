@@ -126,8 +126,8 @@ public class StringUtil {
 		
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("textarea");
-		if(tds.size()>reList.size())
-			return null;
+//		if(tds.size()>reList.size())
+//			return null;
 		
 		String lz = "";
 		int k = 0;
@@ -315,11 +315,13 @@ public class StringUtil {
 			}
 			if(userId.equalsIgnoreCase(nowLoginId))
 			{
+				if(reList.size()>0)
+				{
 				tiList.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1)+"'>[<font color=#0000EE >»Ø¸´</font>]</a>&nbsp;&nbsp;")
 				.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1).replace("bbspst?", "bbsedit?")+"'>[<font color=#0000EE>ÐÞ¸Ä</font>]</a>&nbsp;&nbsp;")
-				.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1).replace("bbspst?", "bbsdel?")+"'>[<font color=#0000EE>É¾³ý</font>]</a><br>")
-				
-				.append(sFL)
+				.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1).replace("bbspst?", "bbsdel?")+"'>[<font color=#0000EE>É¾³ý</font>]</a><br>");
+				}
+				tiList.append(sFL)
 				.append(content)
 				
 				.append("</font>")
@@ -328,7 +330,12 @@ public class StringUtil {
 			}
 			else
 			{
-				tiList.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1)+"'>[<font color=#0000EE >»Ø¸´</font>]</a>").append(sFL).append(content).append(
+				if(reList.size()>0)
+				{
+				tiList.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1)+"'>[<font color=#0000EE >»Ø¸´</font>]</a>");
+				}
+				
+				tiList.append(sFL).append(content).append(
 				"</font><img src='xian'><br><br>");
 			}
 			

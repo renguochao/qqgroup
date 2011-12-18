@@ -10,8 +10,7 @@
         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_like"
             style="@style/normalBtn"
-            android:icon="@drawable/fav"
-            android:text="" >
+            >
         </com.sonyericsson.zoom.ImageTextButton>
 
         <com.sonyericsson.zoom.ImageTextButton
