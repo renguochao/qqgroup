@@ -14,6 +14,7 @@
     <EditText
         android:id="@+id/edt_title"
         android:layout_width="fill_parent"
+        android:singleLine="true"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp" />
@@ -27,6 +28,7 @@
     <EditText
         android:id="@+id/edt_to"
         android:layout_width="fill_parent"
+        android:singleLine="true"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp" />

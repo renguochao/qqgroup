@@ -51,7 +51,7 @@ public class MyListAdapter  extends BaseAdapter{
 		}
 
 		public View getView(int position, View convertView, ViewGroup parent) {
-			myInflater = LayoutInflater.from(context);
+				myInflater = LayoutInflater.from(context);
 
 				item = (HashMap) list.get(position);
 				convertView = myInflater.inflate(layoutid, null);

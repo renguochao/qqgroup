@@ -191,7 +191,11 @@ public class StringUtil {
 					if (j < 3) {
 						j++;
 						if (j == 1) {
-							if(!sconA.startsWith("发信人:")) break;
+							if(!sconA.startsWith("发信人:"))
+							{
+								 sb.append(sconA).append(nbs);
+								 continue;
+							 }
 							sconA = sconA.substring(4);
 							int ind = sconA.indexOf(" (");
 							int inArea = sconA.indexOf(", 信区");
@@ -234,7 +238,11 @@ public class StringUtil {
 							continue;
 						 if(j==3)
 						 {
-							 if(!sconA.startsWith("发信站:")) break;
+							 if(!sconA.startsWith("发信站:")) 
+							 {
+								 sb.append(sconA).append(nbs);
+								 continue;
+							 }
 							 if(sconA.length()<16) break;
 							 sconA =  sconA.substring(15,sconA.length()-1);
 							 String date = DateUtil.formatDateToStr(DateUtil.getDatefromStr(sconA));

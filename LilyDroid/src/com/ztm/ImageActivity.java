@@ -259,7 +259,7 @@ public class ImageActivity extends Activity {
 
 		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
 				options);
-		return new BitmapDrawable(null, bitmaps);
+		return new BitmapDrawable(this.getResources(), bitmaps);
 
 	}
 

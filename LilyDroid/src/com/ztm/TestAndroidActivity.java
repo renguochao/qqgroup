@@ -212,11 +212,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	Drawable xianDraw;
 	int sWidth = 480;
 	int sLength = 800;
+	
 	ForegroundColorSpan listColorSpan;
 	List<TopicInfo> hotList;
 	AbsoluteSizeSpan absoluteSizeSpan;
 	List<TopicInfo> mailList = null;
-
+	
 	// String TMStr;
 	// TODO:定义全局变量
 	/**
@@ -250,6 +251,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
 		sWidth = metric.widthPixels - 30; // 屏幕宽度（像素）
 		sLength = metric.heightPixels - 40; // 屏幕宽度（像素）
+	
 
 		this.getWindow().setBackgroundDrawable(drawable);
 		bbsAll = BBSAll.getBBSAll();
@@ -1997,7 +1999,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			});
 		}
 	}
-
+	int lastPar = -1;
+	int lastChd = -1;
 	private void chaToAreaToGo() {
 
 		setTitle("跳转讨论区");
@@ -2032,26 +2035,41 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		// Adapter set
 		listView.setAdapter(adapter);
-		listView
-				.setOnChildClickListener(new android.widget.ExpandableListView.OnChildClickListener() {
+		listView.setOnChildClickListener(new android.widget.ExpandableListView.OnChildClickListener() {
 
 					public boolean onChildClick(
 							android.widget.ExpandableListView parent, View v,
 							int groupPosition, int childPosition, long id) {
+						
+						//parent.get
+						
 						Map<String, Object> childMap = allChildList.get(
 								groupPosition).get(childPosition);
 						String name = (String) childMap.get("TITLE");
-						if (name == null || name.length() < 1||name.startsWith("※"))
+						if (name == null || name.length() < 1||name.contains("※"))
 							return false;
 						int indexOf = name.indexOf('(');
 						if (indexOf > 0) {
 							name = name.substring(0, indexOf);
 						}
 						getToAreaWithName(name);
+						lastPar = groupPosition;
+						lastChd=childPosition;
 						return false;
 					}
 				});
 		setIndexBtns(2);
+		
+		if(lastPar>-1)
+		{
+			
+			listView.expandGroup(lastPar);
+			
+			
+			listView.setSelectedChild(lastPar, lastChd, true);
+			lastPar = -1;
+			lastChd = -1;
+		}
 
 	}
 
@@ -2245,7 +2263,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		convtAreaTopics();
 		if (AreaData == null) {
+			// listView.requestFocusFromTouch();
+
 			listView.setSelection(scrollY);
+			//listView.getSelectedView().
+			//listView.p
 		} else {
 
 			listView.setSelection(areaTopic.size() - 1);
@@ -2800,6 +2822,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		options.inJustDecodeBounds = false;
 		options.inPurgeable = true;
 		options.inInputShareable = true;
+		//options.inDensity = sdensity;
 
 		int widthRatio = (int) Math.ceil(options.outWidth * 1.0 / sWidth);
 		int heightRatio = (int) Math.ceil(options.outHeight * 1.0 / sLength);
@@ -2815,7 +2838,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
 				options);
-		return new BitmapDrawable(null, bitmaps);
+		return new BitmapDrawable(this.getResources(), bitmaps);
 
 	}
 
