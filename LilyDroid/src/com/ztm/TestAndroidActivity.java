@@ -212,6 +212,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	Drawable xianDraw;
 	int sWidth = 480;
 	int sLength = 800;
+	int sdensity;
 	
 	ForegroundColorSpan listColorSpan;
 	List<TopicInfo> hotList;
@@ -251,7 +252,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
 		sWidth = metric.widthPixels - 30; // ÆÁÄ»¿í¶È£¨ÏñËØ£©
 		sLength = metric.heightPixels - 40; // ÆÁÄ»¿í¶È£¨ÏñËØ£©
-	
+		sdensity =(int) metric.density;
 
 		this.getWindow().setBackgroundDrawable(drawable);
 		bbsAll = BBSAll.getBBSAll();
@@ -2835,10 +2836,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		if (sWidth < 260)
 			options.inSampleSize = options.inSampleSize * 2;
-
+		
 		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
 				options);
-		return new BitmapDrawable(this.getResources(), bitmaps);
+	
+		if(options.inSampleSize>1)
+		return new BitmapDrawable(null, bitmaps);
+		else
+			return new BitmapDrawable(this.getResources(), bitmaps);
 
 	}
 
