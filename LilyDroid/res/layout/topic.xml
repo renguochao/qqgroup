@@ -11,7 +11,7 @@
             android:id="@+id/btn_back"
             style="@style/normalBtn"
             android:icon="@drawable/board"
-            android:text="所属版面" >
+            android:text="所在版面" >
         </com.sonyericsson.zoom.ImageTextButton>
 
          <com.sonyericsson.zoom.ImageTextButton
