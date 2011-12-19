@@ -336,6 +336,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void chaToLogin() {
 		setContentView(R.layout.login);
 		setTitle("Ð¡°ÙºÏ");
+		curStatus = 0;
 		Button btnlog = (Button) findViewById(R.id.btn_login);
 		btnlog.setOnClickListener(new OnClickListener() {
 
@@ -1013,13 +1014,25 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 
 	private void getMailCont() {
+		
+		
+		
+		
+		
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("td");
 		int getTopicNo = 0;
 		mailList = new ArrayList<TopicInfo>();
 		if (tds.size() < 7) {
+			
+			if (data.contains("ÄúÉÐÎ´µÇÂ¼")) {
+				displayMsg("ÄúÉÐÎ´µÇÂ¼");
+			}
+			else
+			{
 			Toast.makeText(TestAndroidActivity.this, "ÄãµÄÓÊÏäÊÇ¿ÕµÄ",
 					Toast.LENGTH_SHORT).show();
+			}
 		} else {
 			int i = 6;
 			while (i < tds.size()) {
