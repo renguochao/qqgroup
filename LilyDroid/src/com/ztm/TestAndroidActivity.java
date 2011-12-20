@@ -2252,7 +2252,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 				if (areaNamList.contains(curAreaName)) {
 					areaNamList.remove(curAreaName);
-
 					// btnLike.setBackgroundDrawable(drawableFav);
 					btnLike.setText(" ’ ≤ÿ");
 					btnLike.setIcon(R.drawable.unfav);

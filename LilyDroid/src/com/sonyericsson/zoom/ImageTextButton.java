@@ -1,5 +1,7 @@
 package com.sonyericsson.zoom;
 
+import com.ztm.R;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,7 +18,7 @@ public class ImageTextButton extends Button {
 		super(context, attrs);
 		setClickable(true);
 		resourceId = attrs.getAttributeResourceValue(namespace, "icon",
-				1);
+				R.drawable.fav);
 		bitmap = BitmapFactory.decodeResource(getResources(), resourceId);
 	}
 

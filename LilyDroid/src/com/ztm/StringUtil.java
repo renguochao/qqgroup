@@ -177,8 +177,16 @@ public class StringUtil {
 			String nbs = "<br>";// &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 
 			if (k == 1 && nowPos > 1) {
+				int indexOf = content.indexOf("发信站:");
+				if(indexOf<0)
+				{
+					content="<br><br>(以下省略)<br>";
+				}
+				else
+				{
 				content = content.substring(4, content.indexOf("发信站:"))
-						+ "<br><br>...(以下省略)<br>";
+						+ "<br><br>(以下省略)<br>";
+				}
 			} else {
 				/** * 处理硬回车 */
 				String[] split = content.split("<br>");
@@ -321,7 +329,7 @@ public class StringUtil {
 			} else {
 				sFL = nowP+"楼:";
 			}
-			if(userId.equalsIgnoreCase(nowLoginId))
+			if(userId.length()>1&&userId.equalsIgnoreCase(nowLoginId))
 			{
 				if(reList.size()>0)
 				{
