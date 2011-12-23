@@ -72,6 +72,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -136,6 +138,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String curTopicId = "";
 
 	String isPic;
+	String isFull;
+	String barStat;
+	
 	String signColor;
 	String isRem = "false";
 	boolean isTouch;
@@ -228,6 +233,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mGestureDetector = new GestureDetector(this);
+		
 
 		Resources res = getResources();
 		String color = res.getString(R.string.listColor);
@@ -263,6 +269,30 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				android.R.layout.simple_dropdown_item_1line, bbsAllArray);
 		initPhoneState();
 		initAllParams();
+		
+		if(isFull.equals("2"))
+		{
+			//设置无标题  
+	        requestWindowFeature(Window.FEATURE_NO_TITLE);  
+		}
+		else if(isFull.equals("3"))
+		{
+			//设置无标题  
+	        requestWindowFeature(Window.FEATURE_NO_TITLE);  
+	        //设置全屏  
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+		}
+		else if(isFull.equals("4"))
+		{
+			
+	        //设置全屏  
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+		}
+	
+		
+		
 		initfbAll();
 		StringUtil.initAll();
 
@@ -578,8 +608,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 								EditText titleEdit = (EditText) acdlgView
 										.findViewById(R.id.edt_cont);
-								String cont = StringUtil.getStrBetter(titleEdit
-										.getText().toString());
+								String cont = titleEdit
+										.getText().toString();
 
 								titleEdit = (EditText) acdlgView
 										.findViewById(R.id.edt_to);
@@ -626,6 +656,22 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		dlg.show();
 	}
+	
+	int btnBarVis = View.GONE;
+	private int getBtnRevtVis()
+	{
+		if(btnBarVis ==  View.VISIBLE)
+		{
+			btnBarVis = View.GONE;
+			
+		}
+		else
+		{
+			btnBarVis = View.VISIBLE;
+		}
+		return btnBarVis;
+			
+	}
 
 	/**
 	 * 捕获按键事件
@@ -636,9 +682,21 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			retBtn();
 			return true;
 
-		} else {
-			return super.onKeyDown(keyCode, event);
+		} else if (keyCode == KeyEvent.KEYCODE_MENU) {
+			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+			if(mLoadingLayout!=null)
+			{
+				mLoadingLayout.setVisibility(getBtnRevtVis());
+				return true;
+			}
+			else
+			{
+				return super.onKeyDown(keyCode, event);
+			}
 		}
+		
+			return super.onKeyDown(keyCode, event);
+		
 	}
 
 	
@@ -692,6 +750,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		SharedPreferences sp = getSharedPreferences("com.ztm_preferences",
 				Context.MODE_PRIVATE);
 		isPic = sp.getString("picDS", "1");
+		isFull = sp.getString("isFull", "1");
+		barStat = sp.getString("barStat", "1");
+		
 		isTouch = sp.getBoolean("isTouch", true);
 		isBackWord = sp.getBoolean("isBackWord", true);
 		backWords = sp
@@ -854,12 +915,68 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		getUrlHtml(mailURL + "?start=" + startPage, Const.MSGMAIL);
 
 	}
+	
+	private String getBetterTopic(String infoView)
+	{
+		String nbs = "<br>";
+		String content="";
+		String[] split = infoView.split(nbs);
+		StringBuffer sb = new StringBuffer();
+		int tempBr=0;
+		for (String sconA : split) {
+			if (sconA.length() < 1) {
+				if (tempBr == 0) {
+					tempBr = 1;
+					sb.append(sconA).append(nbs);
+				}
+				continue;
+			}
+			
+			sconA = sconA.trim();
+//			if(isPic.equals(Const.AllPic)||(isWifi &&isPic.equals(Const.WIFIPic)))
+//
+//			{
+//				if (sconA.toLowerCase().startsWith("http:")
+//						&& (sconA.toLowerCase().endsWith(".jpg") 
+//								|| sconA.toLowerCase().endsWith(".png")
+//								||sconA.toLowerCase().endsWith(".jpeg")
+//								||sconA.toLowerCase().endsWith(".gif")
+//								))
+//				{
+//					sb.append("<a href='"+sconA+"'><img src='").append(sconA).append("'></a><br>");
+//					continue;
+//				}
+//			}
+
+			tempBr = 0;
+			String scon = "";
+			try {
+				scon = new String(sconA.getBytes("gb2312"),
+						"iso-8859-1");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			if (scon.length() < 71 || scon.length() > 89) {
+				sb.append(sconA + nbs);
+			} else {
+				sb.append(sconA);
+			}
+
+		}
+		
+		if(sb.length()>0)
+			content = sb.toString();
+
+	
+		return content;
+		
+	}
 
 	private void chaToMailTopic() {
 		char s = 10;
 		String backS = s + "";
-
-		data = data.replaceAll(backS, "<br>");
+		String nbs = "<br>";
+		data = data.replaceAll(backS,nbs );
 		Document doc = Jsoup.parse(data);
 		Elements scs = doc.getElementsByTag("textarea");
 
@@ -868,7 +985,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					Toast.LENGTH_SHORT).show();
 		} else {
 			Element textArea = scs.get(0);
-			String infoView = "<br>" + textArea.text();
+			String infoView = nbs + textArea.text();
+			
+			infoView = getBetterTopic(infoView);
 
 			String withSmile = StringUtil.addSmileySpans(infoView);
 			setContentView(R.layout.mailtopic);
@@ -877,6 +996,21 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			textView.setText(Html.fromHtml(withSmile));
 			textView.setTextSize(txtFonts);
 			textView.getBackground().setAlpha(backAlpha);
+			
+			if(barStat.equals("1"))
+			{
+
+				btnBarVis = View.GONE;
+				
+			}		
+			else if(barStat.equals("2"))
+			{
+				btnBarVis = View.VISIBLE; 
+			}
+			
+			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+			
+			mLoadingLayout.setVisibility(btnBarVis);
 
 			Elements as = doc.getElementsByTag("a");
 			for (Element element : as) {
@@ -1626,13 +1760,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 									cont = StringUtil.getStrBetter(titleEdit
 											.getText().toString());
 									// 引用原文
+									String toCont = cont;
 									CheckBox cb = (CheckBox) acdlgView
 											.findViewById(R.id.cb_recont);
 									if (cb.isChecked() && extraRecont != null
 											&& extraRecont.length() > 1) {
-										cont += " " + extraRecont.substring(2);
+										toCont += " " + extraRecont.substring(2);
 									}
-									sendTopic(title, cont);
+									sendTopic(title, toCont);
 								}
 
 							});
@@ -1650,10 +1785,24 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
+								EditText titleEdit = (EditText) acdlgView
+								.findViewById(R.id.edt_cont);
+								String ss = StringUtil.getStrBetter(titleEdit
+								.getText().toString());
+								
+								if(ss!=null&&ss.length()>1)
+								{
+									displayMsg("你输入了一些内容，暂存在剪贴板上");
+									ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+									clipboard.setText(ss);
+								}
+								
+								
+								
 								if (fastReList.length < 1)
 									return;
 								if (isMoreFast) {
-									EditText titleEdit = (EditText) acdlgView
+									titleEdit = (EditText) acdlgView
 											.findViewById(R.id.edt_title);
 									String title = titleEdit.getText()
 											.toString();
@@ -2480,6 +2629,22 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			textView.setFocusable(true);
 			textView.setLongClickable(true);
 		}
+		
+		if(barStat.equals("1"))
+		{
+
+			btnBarVis = View.GONE;
+			
+		}		
+		else if(barStat.equals("2"))
+		{
+			btnBarVis = View.VISIBLE; 
+		}
+		
+		
+		
+		LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+		mLoadingLayout.setVisibility(btnBarVis);
 
 		Button btnBack = (Button) findViewById(R.id.btn_back);
 		btnBack.setOnClickListener(new OnClickListener() {
@@ -2923,20 +3088,33 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 
 	private static final int SWIPE_MIN_DISTANCE = 120;
-	private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+	private static final int SWIPE_MAX_OFF_PATH = 250;
+	private static final int SWIPE_THRESHOLD_VELOCITY = 50;
 
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
 
-		if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE) {
-
-			getUrlHtml(huifuUrl, Const.MSGPST);
-
-		} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE) {
+		
+		if (Math.abs(e1.getY() - e2.getY()) <= SWIPE_MAX_OFF_PATH) 
+		{ 
+		if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) 
+		{ 
 			retBtn();
-		}
+		} 
+		if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) 
+		{ 
+			getUrlHtml(huifuUrl, Const.MSGPST);
+		} 
+		} 
+		
 
-		return false;
+	
+		
+			return false;
+		
+		
+		
+		
 	}
 
 	public void onLongPress(MotionEvent arg0) {

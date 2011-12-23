@@ -52,6 +52,19 @@
         <item>蓝绿</item>  
     </string-array>  
     
+    
+    <string-array name="full_value">
+    	<item>1</item>    
+        <item>2</item>  
+         <item>4</item>  
+        <item>3</item>  
+    </string-array>  
+    <string-array name="full_text">  
+     	<item>不全屏</item>  
+        <item>隐藏标题栏</item>  
+        <item>隐藏状态栏</item>  
+        <item>隐藏状态栏和标题栏</item>  
+    </string-array>  
 
     <string-array name="back_value">
     	<item>1</item>    
@@ -62,5 +75,16 @@
      	<item>百合原生</item>  
         <item>绿色护眼</item>  
         <item>夜间模式</item>  
+    </string-array>  
+    
+    <string-array name="bar_value">
+    	<item>1</item>    
+        <item>2</item>  
+        <item>3</item>  
+    </string-array>  
+    <string-array name="bar_text">  
+     	<item>不显示</item>  
+        <item>显示</item>  
+        <item>保持上次状态</item>  
     </string-array>  
 </resources>
