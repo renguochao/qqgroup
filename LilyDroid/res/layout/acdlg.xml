@@ -45,17 +45,29 @@
         <requestFocus />
     </EditText>
     
-    
+  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
     <CheckBox android:id="@+id/cb_recont"  
  	 android:text="引用原文"    
  	 android:defaultValue="true"
      android:layout_below="@id/edt_cont"
-     android:layout_alignRight="@id/edt_cont"
-     android:layout_marginRight="10dp"
+     android:layout_marginLeft="10dp"
      android:layout_width="wrap_content"   
      android:layout_height="wrap_content"   
     />  
     
+    
+    
+       <ImageButton 
+        android:id="@+id/btn_cam"
+       	android:layout_marginRight="10dp"
+       	android:layout_alignParentRight="true"
+       	android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:src="@drawable/photo" 
+        />
+    </RelativeLayout>
     <!-- 
          <LinearLayout
              android:id="@+id/linearLayout1"

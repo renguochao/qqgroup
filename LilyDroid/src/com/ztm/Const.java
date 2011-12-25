@@ -42,6 +42,7 @@ public class Const {
 	
 	public static final int MSGFORUM =0x000016;
 	public static final int MSGRECBRD =0x000017;
+	public static final int MSGPSTFILE = 0x000018;
 	
 	
 

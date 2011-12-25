@@ -2,6 +2,10 @@ package com.ztm;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +16,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +41,9 @@ import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -46,10 +55,15 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.provider.MediaStore.Images.Media;
 
 import android.text.ClipboardManager;
 import android.text.Html;
@@ -65,6 +79,8 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -85,7 +101,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
@@ -593,8 +611,139 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	// Settings设置界面返回的结果
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		myParams();
+		if (resultCode != RESULT_OK)
+			return;
+		switch (requestCode) {
+		case PHOTO_PICKED_WITH_DATA: {// 调用Gallery返回的
+			doGetPhoto( data.getData()); 
+			break;
+		}
+		case CAMERA_WITH_DATA: {// 照相机程序返回的,再次调用图片剪辑程序去修剪图片
+			doCropPhoto(mCurrentPhotoFile);
+			break;
+		}
+		//考虑文件上传：uploadFileBBS
+		case REQ_SYSTEM_SETTINGS:
+			myParams();
+			break;
+		
+		}
 	}
+
+	protected void doGetPhoto(Uri f) {
+		ContentResolver cr = this.getContentResolver(); 
+		try {
+			getPhotoBitMap(cr.openInputStream(f));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
+
+	protected void doCropPhoto(String f) {
+		File file = new File(f);
+		try {
+			InputStream is =new FileInputStream(file);
+			getPhotoBitMap(is);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	String bbsUploadURL = "http://bbs.nju.edu.cn/bbsdoupload";
+	
+	public static byte[] getBytes(InputStream is)
+   
+    {
+		 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         byte[] b = new byte[1024];
+         int len = 0;
+
+         try {
+			while ((len = is.read(b, 0, 1024)) != -1) 
+			 {
+			  baos.write(b, 0, len);
+			  baos.flush();
+			 }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         byte[] bytes = baos.toByteArray();
+         return bytes;
+
+    }
+	
+	
+	
+	protected void getPhotoBitMap(InputStream is) 
+	{
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+
+		
+	    byte imageByte[]=getBytes(is);
+		
+		
+		Bitmap bitmap = BitmapFactory.decodeByteArray(imageByte, 0,
+				imageByte.length, options);
+
+
+		options.inJustDecodeBounds = false;
+		options.inPurgeable = true;
+		options.inInputShareable = true;
+		
+
+		int widthRatio = (int) Math.ceil(options.outWidth * 1.0 / 600);
+		int heightRatio = (int) Math.ceil(options.outHeight * 1.0 / 800);
+		if (widthRatio > 1 || heightRatio > 1) {
+			if (widthRatio > heightRatio) {
+				options.inSampleSize = widthRatio;
+			} else {
+				options.inSampleSize = heightRatio;
+			}
+		}
+		
+		try {
+		Bitmap photo =  BitmapFactory.decodeByteArray(imageByte, 0,
+				imageByte.length, options);
+		//displayMsg(photo.getHeight()+"");
+		String outFilePath = PHOTO_DIR+File.separator+getUpFileName();
+		FileOutputStream out;
+		
+			out = new FileOutputStream(outFilePath);
+			photo.compress(Bitmap.CompressFormat.JPEG, 90, out);
+			uploadFileBBS(outFilePath);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	File uploadFile = null;
+	private void uploadFileBBS(String outFilePath) {
+		
+			//title = URLEncoder.encode(title, "GB2312");
+			String url = bbsUploadURL ;// + "?ptext=text"		+ "&board=" + curAreaName+ "&exp=UploadByLilyDroid";
+			
+			uploadFile = new File(outFilePath);
+
+			getUrlHtml(url, Const.MSGPSTFILE);
+		
+
+		
+	}
+
+	private String getUpFileName() {
+		Date date = new Date(System.currentTimeMillis());
+		SimpleDateFormat dateFormat = new SimpleDateFormat(
+				"'LilyDroid'MMddHHmmss");
+		return dateFormat.format(date) + ".jpg";
+	}
+	
+
+	
 
 	private void beginMail(String to, String title, String cont, String action) {
 		final String thisAction = action;
@@ -888,6 +1037,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				case Const.MSGREMAIL:
 					checkMailForm(data);
 					break;
+				case Const.MSGPSTFILE:
+					checkRst(data);
+					break;
+					
+					
 				default:
 					break;
 
@@ -1423,13 +1577,31 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	 * 检查发文结果
 	 */
 	private void checkRst(String data) {
-
+		//System.out.print(data);
 		if (data.contains("信件已寄给")) {
 			displayMsg("发送信件成功！");
 		} else if (data.contains("错误的收信人帐号")) {
 			displayMsg("错误的收信人帐号! ");
 		} else if (data.contains("http-equiv='Refresh'")) {
 
+			if (data.contains("bbsupload2")) {
+
+				int indexOf = data.indexOf("bbsupload2");
+				String substring = data.substring(indexOf, data.length()-3);
+				String replaceAll = substring.replaceAll("\n", "");
+				String url = "http://bbs.nju.edu.cn/"+replaceAll;
+				getUrlHtml(url, Const.MSGPSTFILE);
+			}
+			else if (data.contains("bbsfexp")) {
+
+				int indexOf = data.indexOf("bbsfexp");
+				String substring = data.substring(indexOf, data.length()-3);
+				String url = "http://bbs.nju.edu.cn/"+substring;
+				getUrlHtml(url, Const.MSGPSTFILE);
+			}
+			
+			else
+			{
 			if (reid.equals("0")) {
 				// 发新文章完成
 				getUrlHtml(urlString, Const.MSGAREAPAGES);
@@ -1439,6 +1611,22 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						Const.MSGTOPICREFREASH);
 			}
 			displayMsg("发文成功！");
+			}
+		}else if (data.contains("class=hand>[复制URL地址]")) {
+			// 上传成功,将上传的文件地址回传到输入框
+			data = data.substring(data.indexOf("target=_blank>"));
+			String picurl = data.substring(14,data.indexOf("</a>"));
+			
+			if(acdlgView!=null)
+			{
+			EditText titleEdit = (EditText) acdlgView
+			.findViewById(R.id.edt_cont);
+			if(titleEdit!=null)
+			{
+				titleEdit.append("\r\n"+picurl);
+			}
+			}
+			
 		} else if (data.contains("修改文章成功")) {
 
 			// 修改完成
@@ -1624,7 +1812,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String pid;
 	String reid;
 	String cont;
-
+	View acdlgView;
 	/**
 	 * 获取发文的窗口
 	 * 
@@ -1745,7 +1933,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			final String extraRecont = recont;
 			LayoutInflater factory = LayoutInflater
 					.from(TestAndroidActivity.this);
-			final View acdlgView = factory.inflate(R.layout.acdlg, null);
+			acdlgView = factory.inflate(R.layout.acdlg, null);
 			Builder altDlg = new AlertDialog.Builder(TestAndroidActivity.this)
 					.setTitle("发文").setView(acdlgView).setPositiveButton("发表",
 							new DialogInterface.OnClickListener() {
@@ -1850,6 +2038,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			EditText titleEdit = (EditText) acdlgView
 					.findViewById(R.id.edt_title);
 			CheckBox cb = (CheckBox) acdlgView.findViewById(R.id.cb_recont);
+			
+			ImageButton btnlog = (ImageButton) acdlgView.findViewById(R.id.btn_cam);
+			btnlog.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View arg0) {
+					doPickPhotoAction();
+					//displayMsg("我拍~");
+				}
+
+			});
+			
+			
+			
 
 			if (extraRecont.length() < 4) {
 
@@ -1875,6 +2076,134 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		}
 	}
+	
+	private void doPickPhotoAction() {
+		//Context context = TestAndroidActivity.this;
+		String[] choices;
+		choices = new String[2];
+		choices[0] = "拍照";
+		choices[1] = "从图库中选择一张";
+		final ListAdapter adapter = new ArrayAdapter<String>( TestAndroidActivity.this,
+				android.R.layout.simple_list_item_1, choices);
+
+		final AlertDialog.Builder builder = new AlertDialog.Builder(
+				 TestAndroidActivity.this);
+		
+		builder.setSingleChoiceItems(adapter, -1,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						switch (which) {
+						case 0:{
+							String status=Environment.getExternalStorageState();
+							if(status.equals(Environment.MEDIA_MOUNTED)){//判断是否有SD卡
+								doTakePhoto();// 用户点击了从照相机获取
+							}
+							else{
+								displayMsg("没有SD卡");
+							}
+							break;
+							
+						}
+						case 1:
+							doPickPhotoFromGallery();// 从相册中去获取
+							break;
+						}
+					}
+				});
+		builder.setNegativeButton("返回", new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int which) {
+			
+			}
+
+			
+		});
+		builder.create().show();
+	}
+	
+	private String mCurrentPhotoFile;//照相机拍照得到的图片
+	/**
+	 * 拍照获取图片
+	 * 
+	 */
+	protected void doTakePhoto() {
+		try {
+			// Launch camera to take photo for selected contact
+			if(!PHOTO_DIR.exists())
+				PHOTO_DIR.mkdirs();// 创建照片的存储目录
+			mCurrentPhotoFile = PHOTO_DIR.getAbsolutePath()+File.separator+ getPhotoFileName();// 给新照的照片文件命名
+			Intent intent = getTakePickIntent(mCurrentPhotoFile);
+			startActivityForResult(intent, CAMERA_WITH_DATA);
+		} catch (ActivityNotFoundException e) {
+			displayMsg("照相机没拍到照片");
+		}
+	}
+
+	public  Intent getTakePickIntent(String ss) {
+		
+		 File imageDirectory = PHOTO_DIR;
+         String path = imageDirectory.toString().toLowerCase();
+          String name = imageDirectory.getName().toLowerCase();
+
+
+           ContentValues values = new ContentValues(); 
+           values.put(Media.TITLE, "Image"); 
+           values.put(Images.Media.BUCKET_ID, path.hashCode());
+           values.put(Images.Media.BUCKET_DISPLAY_NAME,name);
+
+           values.put(Images.Media.MIME_TYPE, "image/jpeg");
+           values.put(Media.DESCRIPTION, "Image capture by camera");
+          values.put("_data",mCurrentPhotoFile);
+          Uri uri = getContentResolver().insert( Media.EXTERNAL_CONTENT_URI , values);
+           Intent it = new Intent("android.media.action.IMAGE_CAPTURE"); 
+           it.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+	
+		return it;
+	}
+
+	/**
+	 * 用当前时间给取得的图片命名
+	 * 
+	 */
+	private String getPhotoFileName() {
+		Date date = new Date(System.currentTimeMillis());
+		SimpleDateFormat dateFormat = new SimpleDateFormat(
+				"'IMG'yyyyMMddHHmmss");
+		return dateFormat.format(date) + ".jpg";
+	}
+
+	// 用来标识请求照相功能的activity
+	private static final int CAMERA_WITH_DATA = 3023;
+
+	// 用来标识请求gallery的activity
+	private static final int PHOTO_PICKED_WITH_DATA = 3021;
+
+	// 拍照的照片存储位置
+	private static final File PHOTO_DIR = new File(Environment
+			.getExternalStorageDirectory()
+			+ "/lilyDroid/Photos");
+	// 请求Gallery程序
+	protected void doPickPhotoFromGallery() {
+		try {
+			// Launch picker to choose photo for selected contact
+			final Intent intent = getPhotoPickIntent();
+			startActivityForResult(intent, PHOTO_PICKED_WITH_DATA);
+		} catch (ActivityNotFoundException e) {
+			displayMsg("手机里面没有照片");
+		}
+	}
+	
+
+	// 封装请求Gallery的intent
+	public static Intent getPhotoPickIntent() {
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
+		intent.setType("image/*");
+		return intent;
+	}
+	
+	
+	
 
 	private void sendEdit(String cont, String type, String board, String file) {
 
@@ -2751,12 +3080,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			public void run() {
 				// 需要花时间计算的方法
 				try {
-					if (nvpCont == null) {
-						data = NetTraffic.getHtmlContent(dataUrl);
-					} else {
+					 if (uploadFile !=null)
+					{
+						data = NetTraffic.postFile(dataUrl, uploadFile,curAreaName);
+						uploadFile = null;
+					}
+					else if (nvpCont !=null){
 						data = NetTraffic.postHtmlContent(dataUrl, nvpCont);
 						nvpCont = null;
 					}
+					else {
+							data = NetTraffic.getHtmlContent(dataUrl);
+						} 
+					 
 					// Thread.sleep(5000);
 				} catch (Exception e) {
 					data = "error";
