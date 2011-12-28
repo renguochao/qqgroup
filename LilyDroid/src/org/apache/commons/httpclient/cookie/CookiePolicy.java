@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Cookie management policy class. The cookie policy provides corresponding
@@ -149,7 +149,7 @@ public abstract class CookiePolicy {
     private static int defaultPolicy = RFC2109;
 
     /** Log object. */
-    protected static final Log LOG = LogFactory.getLog(CookiePolicy.class);
+   //   protected static final Log LOG = LogFactory.getLog(CookiePolicy.class);
 
     /**
      * Registers a new {@link CookieSpec cookie specification} with the given identifier. 
@@ -211,7 +211,7 @@ public abstract class CookiePolicy {
             try {
                 return (CookieSpec)clazz.newInstance();
             } catch (Exception e) {
-                LOG.error("Error initializing cookie spec: " + id, e);
+                //LOG.error("Error initializing cookie spec: " + id, e);
                 throw new IllegalStateException(id + 
                     " cookie spec implemented by " +
                     clazz.getName() + " could not be initialized");
@@ -278,7 +278,7 @@ public abstract class CookiePolicy {
         try {
             return getCookieSpec(DEFAULT);
         } catch (IllegalStateException e) {
-            LOG.warn("Default cookie policy is not registered");
+            //LOG.warn("Default cookie policy is not registered");
             return new RFC2109Spec();
         }
     }

@@ -44,7 +44,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.httpclient.util.ParameterFormatter;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -77,7 +77,7 @@ import org.apache.commons.logging.LogFactory;
 public class DigestScheme extends RFC2617Scheme {
     
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(DigestScheme.class);
+   ////   private static final Log LOG = LogFactory.getLog(DigestScheme.class);
 
     /**
      * Hexa values used when creating 32 character long digest in HTTP DigestScheme
@@ -184,7 +184,7 @@ public class DigestScheme extends RFC2617Scheme {
                     qopVariant = QOP_AUTH_INT;               
                 } else {
                     unsupportedQop = true;
-                    LOG.warn("Unsupported qop detected: "+ variant);   
+                  //  //LOG.warn("Unsupported qop detected: "+ variant);   
                 }     
             }
         }        
@@ -257,7 +257,7 @@ public class DigestScheme extends RFC2617Scheme {
     public String authenticate(Credentials credentials, String method, String uri)
       throws AuthenticationException {
 
-        LOG.trace("enter DigestScheme.authenticate(Credentials, String, String)");
+        //LOG.trace("enter DigestScheme.authenticate(Credentials, String, String)");
 
         UsernamePasswordCredentials usernamepassword = null;
         try {
@@ -294,7 +294,7 @@ public class DigestScheme extends RFC2617Scheme {
     public String authenticate(Credentials credentials, HttpMethod method)
     throws AuthenticationException {
 
-        LOG.trace("enter DigestScheme.authenticate(Credentials, HttpMethod)");
+        //LOG.trace("enter DigestScheme.authenticate(Credentials, HttpMethod)");
 
         UsernamePasswordCredentials usernamepassword = null;
         try {
@@ -338,7 +338,7 @@ public class DigestScheme extends RFC2617Scheme {
      */
     private String createDigest(final String uname, final String pwd) throws AuthenticationException {
 
-        LOG.trace("enter DigestScheme.createDigest(String, String, Map)");
+        //LOG.trace("enter DigestScheme.createDigest(String, String, Map)");
 
         final String digAlg = "MD5";
 
@@ -360,7 +360,7 @@ public class DigestScheme extends RFC2617Scheme {
         }
 
         if (qopVariant == QOP_AUTH_INT) {
-            LOG.warn("qop=auth-int is not supported");
+            //LOG.warn("qop=auth-int is not supported");
             throw new AuthenticationException(
                 "Unsupported qop in HTTP Digest authentication");   
         }
@@ -399,13 +399,13 @@ public class DigestScheme extends RFC2617Scheme {
             tmp3.append(cnonce);
             a1 = tmp3.toString();
         } else if(!algorithm.equals("MD5")) {
-            LOG.warn("Unhandled algorithm " + algorithm + " requested");
+            //LOG.warn("Unhandled algorithm " + algorithm + " requested");
         }
         String md5a1 = encode(md5Helper.digest(EncodingUtil.getBytes(a1, charset)));
 
         String a2 = null;
         if (qopVariant == QOP_AUTH_INT) {
-            LOG.error("Unhandled qop auth-int");
+            //LOG.error("Unhandled qop auth-int");
             //we do not have access to the entity-body or its hash
             //TODO: add Method ":" digest-uri-value ":" H(entity-body)      
         } else {
@@ -416,7 +416,7 @@ public class DigestScheme extends RFC2617Scheme {
         // 3.2.2.1
         String serverDigestValue;
         if (qopVariant == QOP_MISSING) {
-            LOG.debug("Using null qop method");
+           //   LOG.debug("Using null qop method");
             StringBuffer tmp2 = new StringBuffer(md5a1.length() + nonce.length() + md5a2.length());
             tmp2.append(md5a1);
             tmp2.append(':');
@@ -425,9 +425,9 @@ public class DigestScheme extends RFC2617Scheme {
             tmp2.append(md5a2);
             serverDigestValue = tmp2.toString();
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Using qop method " + qop);
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Using qop method " + qop);
+          //  }
             String qopOption = getQopVariantString();
             StringBuffer tmp2 = new StringBuffer(md5a1.length() + nonce.length()
                 + NC.length() + cnonce.length() + qopOption.length() + md5a2.length() + 5);
@@ -462,8 +462,8 @@ public class DigestScheme extends RFC2617Scheme {
     private String createDigestHeader(final String uname, final String digest) 
         throws AuthenticationException {
 
-        LOG.trace("enter DigestScheme.createDigestHeader(String, Map, "
-            + "String)");
+        //LOG.trace("enter DigestScheme.createDigestHeader(String, Map, "
+         //   + "String)");
 
         String uri = getParameter("uri");
         String realm = getParameter("realm");
@@ -523,7 +523,7 @@ public class DigestScheme extends RFC2617Scheme {
      * @return encoded MD5, or <CODE>null</CODE> if encoding failed
      */
     private static String encode(byte[] binaryData) {
-        LOG.trace("enter DigestScheme.encode(byte[])");
+        //LOG.trace("enter DigestScheme.encode(byte[])");
 
         if (binaryData.length != 16) {
             return null;
@@ -548,7 +548,7 @@ public class DigestScheme extends RFC2617Scheme {
      * @throws HttpClientError if MD5 algorithm is not supported.
      */
     public static String createCnonce() {
-        LOG.trace("enter DigestScheme.createCnonce()");
+        //LOG.trace("enter DigestScheme.createCnonce()");
 
         String cnonce;
         final String digAlg = "MD5";

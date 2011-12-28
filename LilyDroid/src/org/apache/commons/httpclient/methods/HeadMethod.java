@@ -39,7 +39,7 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.ProtocolException;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Implements the HTTP HEAD method.
@@ -70,7 +70,7 @@ public class HeadMethod extends HttpMethodBase {
     //~ Static variables/initializers
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HeadMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(HeadMethod.class);
 
     //~ Constructors
 
@@ -147,8 +147,8 @@ public class HeadMethod extends HttpMethodBase {
      */
     protected void readResponseBody(HttpState state, HttpConnection conn)
     throws HttpException, IOException {
-        LOG.trace(
-            "enter HeadMethod.readResponseBody(HttpState, HttpConnection)");
+        //LOG.trace(
+            //"enter HeadMethod.readResponseBody(HttpState, HttpConnection)");
         
         int bodyCheckTimeout = 
             getParams().getIntParameter(HttpMethodParams.HEAD_BODY_CHECK_TIMEOUT, -1);
@@ -156,17 +156,17 @@ public class HeadMethod extends HttpMethodBase {
         if (bodyCheckTimeout < 0) {
             responseBodyConsumed();
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Check for non-compliant response body. Timeout in " 
-                 + bodyCheckTimeout + " ms");    
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Check for non-compliant response body. Timeout in " 
+               //  + bodyCheckTimeout + " ms");    
+           // }
             boolean responseAvailable = false;
             try {
                 responseAvailable = conn.isResponseAvailable(bodyCheckTimeout);
             } catch (IOException e) {
-                LOG.debug("An IOException occurred while testing if a response was available,"
-                    + " we will assume one is not.", 
-                    e);
+               //   LOG.debug("An IOException occurred while testing if a response was available,"
+                  //  + " we will assume one is not.", 
+                  //  e);
                 responseAvailable = false;
             }
             if (responseAvailable) {
@@ -174,7 +174,7 @@ public class HeadMethod extends HttpMethodBase {
                     throw new ProtocolException(
                         "Body content may not be sent in response to HTTP HEAD request");
                 } else {
-                    LOG.warn("Body content returned in response to HTTP HEAD");    
+                    //LOG.warn("Body content returned in response to HTTP HEAD");    
                 }
                 super.readResponseBody(state, conn);
             }

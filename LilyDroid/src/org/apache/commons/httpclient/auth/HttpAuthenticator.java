@@ -40,7 +40,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Utility methods for HTTP authorization and authentication.  This class
@@ -73,7 +73,7 @@ import org.apache.commons.logging.LogFactory;
 public final class HttpAuthenticator {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpAuthenticator.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpAuthenticator.class);
 
     /**
      * The www authenticate challange header.
@@ -118,7 +118,7 @@ public final class HttpAuthenticator {
      */
     public static AuthScheme selectAuthScheme(final Header[] challenges)
       throws MalformedChallengeException {
-        LOG.trace("enter HttpAuthenticator.selectAuthScheme(Header[])");
+        //LOG.trace("enter HttpAuthenticator.selectAuthScheme(Header[])");
         if (challenges == null) {
             throw new IllegalArgumentException("Array of challenges may not be null");
         }
@@ -215,8 +215,8 @@ public final class HttpAuthenticator {
         HttpConnection conn,
         HttpState state)
       throws AuthenticationException {
-        LOG.trace(
-            "enter HttpAuthenticator.authenticateDefault(HttpMethod, HttpConnection, HttpState)");
+        //LOG.trace(
+         //   "enter HttpAuthenticator.authenticateDefault(HttpMethod, HttpConnection, HttpState)");
         return doAuthenticateDefault(method, conn, state, false);
     }
 
@@ -248,7 +248,7 @@ public final class HttpAuthenticator {
         HttpConnection conn,
         HttpState state)
       throws AuthenticationException {
-        LOG.trace("enter HttpAuthenticator.authenticateProxyDefault(HttpMethod, HttpState)");
+        //LOG.trace("enter HttpAuthenticator.authenticateProxyDefault(HttpMethod, HttpState)");
         return doAuthenticateDefault(method, conn, state, true);
     }
 
@@ -281,20 +281,20 @@ public final class HttpAuthenticator {
             }
         }
         String realm = authscheme.getRealm();
-        if (LOG.isDebugEnabled()) {
-            StringBuffer buffer = new StringBuffer();
-            buffer.append("Using credentials for ");
-            if (realm == null) {
-                buffer.append("default");
-            } else {
-                buffer.append('\'');
-                buffer.append(realm);
-                buffer.append('\'');
-            }
-            buffer.append(" authentication realm at "); 
-            buffer.append(host); 
-            LOG.debug(buffer.toString());
-        }
+       //  if (LOG.isDebugEnabled()) {
+//            StringBuffer buffer = new StringBuffer();
+//            buffer.append("Using credentials for ");
+//            if (realm == null) {
+//                buffer.append("default");
+//            } else {
+//                buffer.append('\'');
+//                buffer.append(realm);
+//                buffer.append('\'');
+//            }
+//            buffer.append(" authentication realm at "); 
+//            buffer.append(host); 
+//           //   LOG.debug(buffer.toString());
+//        }
         Credentials credentials = proxy 
             ? state.getProxyCredentials(realm, host) 
             : state.getCredentials(realm, host);
@@ -351,9 +351,9 @@ public final class HttpAuthenticator {
         HttpConnection conn,
         HttpState state) 
         throws AuthenticationException {
-       LOG.trace(
-            "enter HttpAuthenticator.authenticate(AuthScheme, HttpMethod, HttpConnection, "
-            + "HttpState)");
+       //LOG.trace(
+       //     "enter HttpAuthenticator.authenticate(AuthScheme, HttpMethod, HttpConnection, "
+        //    + "HttpState)");
         return doAuthenticate(authscheme, method, conn, state, false);
     }
 
@@ -387,7 +387,7 @@ public final class HttpAuthenticator {
         HttpConnection conn,
         HttpState state
     ) throws AuthenticationException {
-       LOG.trace("enter HttpAuthenticator.authenticateProxy(AuthScheme, HttpMethod, HttpState)");
+       //LOG.trace("enter HttpAuthenticator.authenticateProxy(AuthScheme, HttpMethod, HttpState)");
        return doAuthenticate(authscheme, method, conn, state, true);
     }
 }

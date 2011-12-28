@@ -37,7 +37,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * This class implements a part of a Multipart post object that
@@ -66,7 +66,7 @@ public class FilePart extends PartBase {
     public static final String DEFAULT_TRANSFER_ENCODING = "binary";
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(FilePart.class);
+   //   private static final Log LOG = LogFactory.getLog(FilePart.class);
 
     /** Attachment's file name */
     protected static final String FILE_NAME = "; filename=";
@@ -187,7 +187,7 @@ public class FilePart extends PartBase {
      */
     protected void sendDispositionHeader(OutputStream out) 
     throws IOException {
-        LOG.trace("enter sendDispositionHeader(OutputStream out)");
+        //LOG.trace("enter sendDispositionHeader(OutputStream out)");
         super.sendDispositionHeader(out);
         String filename = this.source.getFileName();
         if (filename != null) {
@@ -205,13 +205,13 @@ public class FilePart extends PartBase {
      * @see org.apache.commons.httpclient.methods.multipart.Part#sendData(OutputStream)
      */
     protected void sendData(OutputStream out) throws IOException {
-        LOG.trace("enter sendData(OutputStream out)");
+        //LOG.trace("enter sendData(OutputStream out)");
         if (lengthOfData() == 0) {
             
             // this file contains no data, so there is nothing to send.
             // we don't want to create a zero length buffer as this will
             // cause an infinite loop when reading.
-            LOG.debug("No data to send.");
+           //   LOG.debug("No data to send.");
             return;
         }
         
@@ -234,7 +234,7 @@ public class FilePart extends PartBase {
      * @return The source.
      */
     protected PartSource getSource() {
-        LOG.trace("enter getSource()");
+        //LOG.trace("enter getSource()");
         return this.source;
     }
 
@@ -245,7 +245,7 @@ public class FilePart extends PartBase {
      * @see org.apache.commons.httpclient.methods.multipart.Part#lengthOfData()
      */    
     protected long lengthOfData() throws IOException {
-        LOG.trace("enter lengthOfData()");
+        //LOG.trace("enter lengthOfData()");
         return source.getLength();
     }    
 

@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * A utility class for parsing http header values according to
@@ -51,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
 public class HttpParser {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpParser.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpParser.class);
     
     /**
      * Constructor for HttpParser.
@@ -71,7 +71,7 @@ public class HttpParser {
      * @return a byte array from the stream
      */
     public static byte[] readRawLine(InputStream inputStream) throws IOException {
-        LOG.trace("enter HttpParser.readRawLine()");
+        //LOG.trace("enter HttpParser.readRawLine()");
 
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         int ch;
@@ -102,7 +102,7 @@ public class HttpParser {
      * @since 3.0
      */
     public static String readLine(InputStream inputStream, String charset) throws IOException {
-        LOG.trace("enter HttpParser.readLine(InputStream, String)");
+        //LOG.trace("enter HttpParser.readLine(InputStream, String)");
         byte[] rawdata = readRawLine(inputStream);
         if (rawdata == null) {
             return null;
@@ -122,14 +122,14 @@ public class HttpParser {
         }
         final String result =
             EncodingUtil.getString(rawdata, 0, len - offset, charset);
-        if (Wire.HEADER_WIRE.enabled()) {
-            String logoutput = result;
-            if (offset == 2)
-                logoutput = result + "\r\n";
-            else if (offset == 1)
-                logoutput = result + "\n";
-            Wire.HEADER_WIRE.input(logoutput);
-        }
+//        if (Wire.HEADER_WIRE.enabled()) {
+//            String logoutput = result;
+//            if (offset == 2)
+//                logoutput = result + "\r\n";
+//            else if (offset == 1)
+//                logoutput = result + "\n";
+//            Wire.HEADER_WIRE.input(logoutput);
+//        }
         return result;
     }
 
@@ -148,7 +148,7 @@ public class HttpParser {
      */
 
     public static String readLine(InputStream inputStream) throws IOException {
-        LOG.trace("enter HttpParser.readLine(InputStream)");
+        //LOG.trace("enter HttpParser.readLine(InputStream)");
         return readLine(inputStream, "US-ASCII");
     }
     
@@ -167,7 +167,7 @@ public class HttpParser {
      * @since 3.0
      */
     public static Header[] parseHeaders(InputStream is, String charset) throws IOException, HttpException {
-        LOG.trace("enter HeaderParser.parseHeaders(InputStream, String)");
+        //LOG.trace("enter HeaderParser.parseHeaders(InputStream, String)");
 
         ArrayList headers = new ArrayList();
         String name = null;
@@ -229,7 +229,7 @@ public class HttpParser {
      * @deprecated use #parseHeaders(InputStream, String)
      */
     public static Header[] parseHeaders(InputStream is) throws IOException, HttpException {
-        LOG.trace("enter HeaderParser.parseHeaders(InputStream, String)");
+        //LOG.trace("enter HeaderParser.parseHeaders(InputStream, String)");
         return parseHeaders(is, "US-ASCII");
     }
 }

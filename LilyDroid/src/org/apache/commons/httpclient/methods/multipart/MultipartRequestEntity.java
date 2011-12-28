@@ -37,7 +37,7 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Implements a request entity suitable for an HTTP multipart POST method.
@@ -76,7 +76,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MultipartRequestEntity implements RequestEntity {
 
-    private static final Log log = LogFactory.getLog(MultipartRequestEntity.class);
+   //   private static final Log LOG = LogFactory.getLog(MultipartRequestEntity.class);
     
     /** The Content-Type for multipart/form-data. */
     private static final String MULTIPART_FORM_CONTENT_TYPE = "multipart/form-data";
@@ -171,7 +171,7 @@ public class MultipartRequestEntity implements RequestEntity {
         try {
             return Part.getLengthOfParts(parts, getMultipartBoundary());            
         } catch (Exception e) {
-            log.error("An exception occurred while getting the length of the parts", e);
+            //LOG.error("An exception occurred while getting the length of the parts", e);
             return 0;
         }
     }

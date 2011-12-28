@@ -36,7 +36,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -56,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
 public class BasicScheme extends RFC2617Scheme {
     
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(BasicScheme.class);
+    //private static final Log LOG = LogFactory.getLog(BasicScheme.class);
     
     /** Whether the basic authentication process is complete */
     private boolean complete;
@@ -144,7 +144,7 @@ public class BasicScheme extends RFC2617Scheme {
     public String authenticate(Credentials credentials, String method, String uri)
       throws AuthenticationException {
 
-        LOG.trace("enter BasicScheme.authenticate(Credentials, String, String)");
+        ////LOG.trace("enter BasicScheme.authenticate(Credentials, String, String)");
 
         UsernamePasswordCredentials usernamepassword = null;
         try {
@@ -184,7 +184,7 @@ public class BasicScheme extends RFC2617Scheme {
      */
     public String authenticate(Credentials credentials, HttpMethod method) throws AuthenticationException {
 
-        LOG.trace("enter BasicScheme.authenticate(Credentials, HttpMethod)");
+        ////LOG.trace("enter BasicScheme.authenticate(Credentials, HttpMethod)");
 
         if (method == null) {
             throw new IllegalArgumentException("Method may not be null");
@@ -229,7 +229,7 @@ public class BasicScheme extends RFC2617Scheme {
      */
     public static String authenticate(UsernamePasswordCredentials credentials, String charset) {
 
-        LOG.trace("enter BasicScheme.authenticate(UsernamePasswordCredentials, String)");
+        ////LOG.trace("enter BasicScheme.authenticate(UsernamePasswordCredentials, String)");
 
         if (credentials == null) {
             throw new IllegalArgumentException("Credentials may not be null"); 

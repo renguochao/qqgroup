@@ -35,7 +35,7 @@ import java.io.IOException;
 
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Simple string parameter for a multipart post
@@ -50,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
 public class StringPart extends PartBase {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(StringPart.class);
+   //   private static final Log LOG = LogFactory.getLog(StringPart.class);
 
     /** Default content encoding of string parameters. */
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
@@ -122,7 +122,7 @@ public class StringPart extends PartBase {
      * @throws IOException if there is a write error
      */
     protected void sendData(OutputStream out) throws IOException {
-        LOG.trace("enter sendData(OutputStream)");
+        //LOG.trace("enter sendData(OutputStream)");
         out.write(getContent());
     }
     
@@ -133,7 +133,7 @@ public class StringPart extends PartBase {
      * @see org.apache.commons.httpclient.methods.multipart.Part#lengthOfData()
      */
     protected long lengthOfData() throws IOException {
-        LOG.trace("enter lengthOfData()");
+        //LOG.trace("enter lengthOfData()");
         return getContent().length;
     }
     

@@ -49,12 +49,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -116,28 +120,17 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		OnGestureListener {
 
 	private GestureDetector mGestureDetector;
-	// ¿Ø¼þ
-
 	private TextView textView;
-
 	private ListView listView;
-
 	private Button btnLink;
-
 	// È«¾Ö±äÁ¿
-
 	private List<String> LinkAdr;
-
 	private String data;
-
 	private List<TopicInfo> top10TopicList;
-
 	private String topicUrl;
-
 	private String newUrl;
-
 	private String huifuUrl;
-
+	
 	// 1 ±íÊ¾´Ó10´óÌø×ª¹ýÈ¥µÄ£¬2±íÊ¾´ÓÌÖÂÛÇøÌø×ª¹ýÈ¥µÄ£¬3±íÊ¾´Ó¸÷ÇøÈÈµãÌø¹ýÈ¥
 	int curStatus = 0;
 
@@ -156,6 +149,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String curTopicId = "";
 
 	String isPic;
+	String camwidth;
 	String isFull;
 	String barStat;
 	
@@ -186,47 +180,27 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	Drawable drawableFav;
 
 	Drawable drawableDis;
-
 	boolean isLogin = false;
-
 	String nowLoginId = "";
-
 	int txtFonts;
-
 	int backAlpha;
-
 	Spanned topicData;
-
 	int scrollY = 0;
-
 	boolean topicWithImg = false;
-
 	HashMap<String, String> bbsAll;
-
+	HashMap<String, String> bbsAllName;
 	HashMap<String, Integer> smilyAll;
-
 	ArrayAdapter<String> bbsAlladapter;
-
 	String bbsURL = "http://bbs.nju.edu.cn/";
-
 	String loginURL = "http://bbs.nju.edu.cn/bbslogin?type=2";
-
 	String loginoutURL = "http://bbs.nju.edu.cn/bbslogout";
-
 	String synUrl = "http://bbs.nju.edu.cn/bbsleft";
-	
 	String forumUrl ="http://bbs.nju.edu.cn/cache/t_forum.js";
-	
 	String recbrdUrl ="http://bbs.nju.edu.cn/cache/t_recbrd.js";
-
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
-
 	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
-
 	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
-	
 	HashMap<String, String> fbNameAll = new HashMap<String, String>();
-	
 	String bbsHotString = "http://bbs.nju.edu.cn/bbstopall";
 	List<Map<String, Object>> parentList = null;
 	List<List<Map<String, Object>>> allChildList = null;
@@ -242,8 +216,22 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	AbsoluteSizeSpan absoluteSizeSpan;
 	List<TopicInfo> mailList = null;
 	
-	// String TMStr;
+	private String dataUrl = "";
+	private int datamsg = -1;
+	NameValuePair[] nvpCont = null;
+	Thread imageTrd;
+	
+
+	// ÅÄÕÕµÄÕÕÆ¬´æ´¢Î»ÖÃ
+	private static final File PHOTO_DIR = new File(Environment
+			.getExternalStorageDirectory()
+			+ "/lilyDroid/Photos");
+	
+	 String TMStr;
 	// TODO:¶¨ÒåÈ«¾Ö±äÁ¿
+	 
+	 
+	 
 	/**
 	 * Called when the activity is first created.
 	 */
@@ -252,7 +240,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		super.onCreate(savedInstanceState);
 		mGestureDetector = new GestureDetector(this);
 		
-
 		Resources res = getResources();
 		String color = res.getString(R.string.listColor);
 		listColorSpan = new ForegroundColorSpan(Color.parseColor(color));
@@ -269,7 +256,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 
 		mailSpan = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
-		// TMStr = "©I";
+		TMStr = "©Y";
 
 		xianDraw = res.getDrawable(R.drawable.xian);
 		DisplayMetrics metric = new DisplayMetrics();
@@ -280,7 +267,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		this.getWindow().setBackgroundDrawable(drawable);
 		bbsAll = BBSAll.getBBSAll();
-
+		bbsAllName = BBSAll.getBBSRightName();
 		smilyAll = BBSAll.getSmilyAll();
 		String[] bbsAllArray = StringUtil.getArray(bbsAll);
 		bbsAlladapter = new ArrayAdapter<String>(TestAndroidActivity.this,
@@ -315,6 +302,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		StringUtil.initAll();
 
 		chaToLogin();
+		
 	}
 
 	private void InitMain() {
@@ -612,7 +600,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	// SettingsÉèÖÃ½çÃæ·µ»ØµÄ½á¹û
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != RESULT_OK)
+		{
+			myParams();
 			return;
+		}
 		switch (requestCode) {
 		case PHOTO_PICKED_WITH_DATA: {// µ÷ÓÃGallery·µ»ØµÄ
 			doGetPhoto( data.getData()); 
@@ -629,13 +620,30 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		}
 	}
-
+	
 	protected void doGetPhoto(Uri f) {
 		ContentResolver cr = this.getContentResolver(); 
 		try {
-			getPhotoBitMap(cr.openInputStream(f));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			String[] proj = { MediaStore.Images.Media.DATA };
+			Cursor actualimagecursor = managedQuery(f,proj,null,null,null);
+			if(actualimagecursor==null)
+			{
+				FileInputStream fileInputStream = new FileInputStream(f.getPath()); 
+				getPhotoBitMap(fileInputStream,f.getPath());
+			}
+			else
+			{
+			int actual_image_column_index = actualimagecursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+
+			actualimagecursor.moveToFirst();
+
+			String img_path = actualimagecursor.getString(actual_image_column_index);
+			
+			getPhotoBitMap(cr.openInputStream(f),img_path);
+			}
+			
+		
+		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 	}
@@ -644,9 +652,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		File file = new File(f);
 		try {
 			InputStream is =new FileInputStream(file);
-			getPhotoBitMap(is);
+			getPhotoBitMap(is,f);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
@@ -666,36 +674,79 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			  baos.flush();
 			 }
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
          byte[] bytes = baos.toByteArray();
          return bytes;
 
     }
+
+	public static int getExifOrientation(String filepath) {
+		int degree = 0;
+		ExifInterface exif = null;
+		try {
+			exif = new ExifInterface(filepath);
+		} catch (IOException ex) {
+		
+		}
+		if (exif != null) {
+			int orientation = exif.getAttributeInt(
+					ExifInterface.TAG_ORIENTATION, -1);
+			if (orientation != -1) {
+				// We only recognize a subset of orientation tag values.
+				switch (orientation) {
+				case ExifInterface.ORIENTATION_ROTATE_90:
+					degree = 90;
+					break;
+				case ExifInterface.ORIENTATION_ROTATE_180:
+					degree = 180;
+					break;
+				case ExifInterface.ORIENTATION_ROTATE_270:
+					degree = 270;
+					break;
+				}
+			}
+		}
+		return degree;
+	}
+	
+	
+	  public static Bitmap rotate(Bitmap b, int degrees) {
+	         if (degrees != 0 && b != null) {
+	             Matrix m = new Matrix();
+	             m.setRotate(degrees,
+	                     (float) b.getWidth() / 2, (float) b.getHeight() / 2);
+	             try {
+	                 Bitmap b2 = Bitmap.createBitmap(
+	                         b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+	                 if (b != b2) {
+	                     b.recycle();  //ÔÙ´ÎÌáÊ¾Bitmap²Ù×÷ÍêÓ¦¸ÃÏÔÊ¾µÄÊÍ·Å
+	                     b = b2;
+	                 }
+	             } catch (OutOfMemoryError ex) {
+	                 
+	             }
+	         }
+	         return b;
+	     }
 	
 	
 	
-	protected void getPhotoBitMap(InputStream is) 
+	
+	protected void getPhotoBitMap(InputStream is,String filePath) 
 	{
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
-
-		
 	    byte imageByte[]=getBytes(is);
-		
-		
 		Bitmap bitmap = BitmapFactory.decodeByteArray(imageByte, 0,
 				imageByte.length, options);
-
-
 		options.inJustDecodeBounds = false;
 		options.inPurgeable = true;
 		options.inInputShareable = true;
-		
-
-		int widthRatio = (int) Math.ceil(options.outWidth * 1.0 / 600);
-		int heightRatio = (int) Math.ceil(options.outHeight * 1.0 / 800);
+		int parseInt = 800;
+		int widthRatio = (int) Math.ceil(options.outWidth * 1.0 / (parseInt*0.75));
+		int heightRatio = (int) Math.ceil(options.outHeight * 1.0 / parseInt);
 		if (widthRatio > 1 || heightRatio > 1) {
 			if (widthRatio > heightRatio) {
 				options.inSampleSize = widthRatio;
@@ -703,36 +754,39 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				options.inSampleSize = heightRatio;
 			}
 		}
-		
+		if(options.inSampleSize <2)
+		{
+			//TODO:´ý²âÊÔ
+			uploadFileBBS(filePath);
+		}
+		else
+		{
 		try {
-		Bitmap photo =  BitmapFactory.decodeByteArray(imageByte, 0,
-				imageByte.length, options);
-		//displayMsg(photo.getHeight()+"");
-		String outFilePath = PHOTO_DIR+File.separator+getUpFileName();
-		FileOutputStream out;
-		
+			Bitmap photo =  BitmapFactory.decodeByteArray(imageByte, 0,
+					imageByte.length, options);
+			int exifOrientation = getExifOrientation(filePath);
+			if(exifOrientation!=0)
+				photo=rotate(photo,90);
+			String outFilePath = PHOTO_DIR+File.separator+getUpFileName();
+			FileOutputStream out;
 			out = new FileOutputStream(outFilePath);
 			photo.compress(Bitmap.CompressFormat.JPEG, 90, out);
 			uploadFileBBS(outFilePath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
+		}
 		}
 		
 	}
 	
 	File uploadFile = null;
 	private void uploadFileBBS(String outFilePath) {
-		
-			//title = URLEncoder.encode(title, "GB2312");
-			String url = bbsUploadURL ;// + "?ptext=text"		+ "&board=" + curAreaName+ "&exp=UploadByLilyDroid";
+			String url = bbsUploadURL ;
 			
 			uploadFile = new File(outFilePath);
 
 			getUrlHtml(url, Const.MSGPSTFILE);
-		
-
-		
 	}
 
 	private String getUpFileName() {
@@ -885,13 +939,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		if (mWiFiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
 			isWifi = true;
 		}
-
 		if (name == null || name.length() < 1)
 			return;
-
 		String[] split = name.split(",");
 		for (String string : split) {
-			areaNamList.add(string);
+			String string2 = bbsAllName.get(string.toLowerCase());
+			if(string2==null)
+				areaNamList.add(string);
+			else
+				areaNamList.add(string2);
 		}
 	}
 
@@ -908,12 +964,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				.getString("backWords", "·¢ËÍ×Ô ÎÒµÄÐ¡°ÙºÏAndroid¿Í»§¶Ë by ${model}");
 		isIP = sp.getBoolean("isIP", false);
 		signColor = sp.getString("signColor", "[1;32m");
-
+		camwidth =  sp.getString("camwidth", "800");
 		backAlpha = sp.getInt("backAlpha", 20);
 
 		backAlpha = (int) ((int) (100 - backAlpha) * 2.55);
-		// backWords = backWords.replaceAll(TMStr, "");
-		backWords = backWords.replaceAll("\\$\\{model\\}", androidmodel)
+		backWords = backWords.replaceAll(TMStr, "");
+		backWords = backWords.replaceAll("\\$\\{model\\}", androidmodel+TMStr)
 				.replaceAll("\\$\\{manufa\\}", androidmanufacturer);
 		isMoreFast = sp.getBoolean("isMoreMoreFast", false);
 		txtFonts = sp.getInt("txtFonts", 18);
@@ -934,7 +990,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 
 	/**
-	 * TODO:ÏûÏ¢¿ØÖÆÆ÷ ÏûÏ¢¿ØÖÆÆ÷£¬ÓÃÀ´¸üÐÂ½çÃæ£¬ÒòÎªÔÚÆÕÍ¨Ïß³ÌÊÇÎÞ·¨ÓÃÀ´¸üÐÂ½çÃæµÄ
+	 *  ÏûÏ¢¿ØÖÆÆ÷£¬ÓÃÀ´¸üÐÂ½çÃæ£¬ÒòÎªÔÚÆÕÍ¨Ïß³ÌÊÇÎÞ·¨ÓÃÀ´¸üÐÂ½çÃæµÄ
 	 */
 	private Handler handler = new Handler() {
 		@Override
@@ -948,18 +1004,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			} else {
 				switch (msg.what) {
 				case Const.MSGWHAT:
-					// ÉèÖÃÏÔÊ¾ÎÄ±¾
-					// ´¦Àí½âÎödataÊý¾Ý
+					// ´¦ÀíÊ®´ó
 					top10TopicList = StringUtil.getTop10Topic(data);
 					convtTopics();
 					break;
 				case Const.MSGTOPIC:
-					// ÉèÖÃÏÔÊ¾ÎÄ±¾
-
+					// ÉèÖÃÖ÷ÌâÎÄÕÂ
 					chaToTopic(topicData);
 					break;
 				case Const.MSGTOPICNEXT:
-
+					// Ö÷ÌâÎÄÕÂ·­Ò³
 					textView = (TextView) findViewById(R.id.label);
 					ScrollView sv = (ScrollView) findViewById(R.id.scrollView);
 					sv.scrollTo(0, 0);
@@ -967,84 +1021,94 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 					break;
 				case Const.MSGTOPICREFREASH:
+					// Ö÷ÌâÎÄÕÂË¢ÐÂ
 					textView = (TextView) findViewById(R.id.label);
-
 					if (textView != null)
 						textView.setText(getURLChanged(topicData));
 					break;
 				case Const.MSGAREA:
+					//ÌÖÂÛÇø
 					chaToArea(data);
 					break;
 
 				case Const.MSGAREAPAGES:
+					//ÌÖÂÛÇø·­Ò³
 					areaPages(data);
 					break;
 
 				case Const.MSGLOGIN:
+					//µÇÂ¼
 					checkLogin(data);
 					break;
 				case Const.MSGAUTOLOGIN:
+					//ÔÚµ±Ç°Ò³ÃæµÇÂ¼£¬²»Ìø×ª
 					checkAutoLogin(data);
 					break;
 				case Const.MSGPST:
+					//»ñÈ¡·¢ÎÄµÄform
 					checkForm(data);
 					break;
 				case Const.MSGPSTNEW:
-					// ·¢ÎÄ¿ÉÄÜ»áÊ§°Ü£¬×¢Òâ±£ÁôÎÄÕÂ
+					// ·¢ÎÄ - ¿ÉÄÜ»áÊ§°Ü£¬×¢Òâ±£ÁôÎÄÕÂ
 					checkRst(data);
 					break;
 
 				case Const.MSGVIEWUSER:
+					//²é¿´ÓÃ»§ÐÅÏ¢
 					getUserData(data);
 					break;
 
 				case Const.MSGSYN:
+					//Í¬²½ÊÕ²Ø¼Ð
 					checkSyn(data);
 					break;
 				case Const.MSGSYNFIRST:
+					//Ê×´ÎµÇÂ¼Í¬²½ÊÕ²Ø¼Ð
 					checkSyn(data);
 					InitMain();
 					break;
 
 				case Const.MSGHOT:
+					//ÈÈÃÅÌÖÂÛÇø
 					bbsHot();
 					chaToHot("New");
 					break;
 
 				case Const.TOP20BOARD:
+					//ÈÈÃÅ20°æÃæ
 					convtTOP20Area(data);
 					getUrlHtml(forumUrl, Const.MSGFORUM);
 					break;
 				case Const.MSGFORUM:
+					//°æÃæ
 					convtForum(data);
 					getUrlHtml(recbrdUrl, Const.MSGRECBRD);
 					break;
 				case Const.MSGRECBRD:
+					//ËùÓÐÈÈÃÅÌÖÂÛÇø
 					convtRecbrd(data);
 					initAllAreas();
 					chaToAreaToGo();
 					break;
-					
-
 				case Const.MSGMAIL:
+					//ÊÕÓÊ¼þ
 					getMailCont();
 					chaToMailBox("");
 					break;
-
 				case Const.MSGMAILTOPIC:
+					//ÓÊ¼þÖ÷Ìâ²é¿´
 					chaToMailTopic();
 					break;
 				case Const.MSGREMAIL:
+					//»Ø¸´ÓÊ¼þ
 					checkMailForm(data);
 					break;
 				case Const.MSGPSTFILE:
+					//ÉÏ´«ÎÄ¼þ
 					checkRst(data);
 					break;
-					
-					
 				default:
 					break;
-
 				}
 			}
 			if (runningTasks < 1) {
@@ -1143,7 +1207,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			
 			infoView = getBetterTopic(infoView);
 
-			String withSmile = StringUtil.addSmileySpans(infoView);
+			String withSmile = StringUtil.addSmileySpans(infoView,null);
 			setContentView(R.layout.mailtopic);
 
 			textView = (TextView) findViewById(R.id.label);
@@ -1179,7 +1243,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					try {
 						sSec = URLEncoder.encode(sSec, "GB2312");
 					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
+						
 						e.printStackTrace();
 					}
 					final String attr = bbsURL + sFir + sSec;
@@ -1412,10 +1476,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			if (href.contains("board?board=")) {
 				String tempAreaName = aTag.text().trim().toLowerCase();
 
-				tempAreaName = tempAreaName.replaceFirst(tempAreaName
-						.substring(0, 1), tempAreaName.substring(0, 1)
-						.toUpperCase());
-
+				tempAreaName = tempAreaName.toLowerCase();
+				String string = bbsAllName.get(tempAreaName);
+				if(string !=null)
+					tempAreaName = string;
 				if (areaNamList.contains(tempAreaName)) {
 					continue;
 				}
@@ -1459,7 +1523,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	
 	
 	private void convtRecbrd(String data) {
-		// TODO Auto-generated method stub
+		// 
 		String[] split = data.split("\\{brd:");
 		recbrdList = new ArrayList<String>();
 		if(split.length<2)
@@ -1486,7 +1550,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	
 
 	private void convtForum(String data) {
-		// TODO Auto-generated method stub
+		// 
 		String[] split = data.split("\\{d:");
 		forumList = new ArrayList<String>();
 		if(split.length<2)
@@ -1534,7 +1598,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			Element textArea = scs.get(0);
 			final String infoView = textArea.text();
 
-			String withSmile = StringUtil.addSmileySpans(infoView);
+			
+			String withSmile = StringUtil.addSmileySpans(infoView,"×ù[m]");
 			LayoutInflater factory = LayoutInflater
 					.from(TestAndroidActivity.this);
 			final View info = factory.inflate(R.layout.infodlg, null);
@@ -1918,6 +1983,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		} else {
 
 			String title = ins.get(0).attr("value");
+			if(title==null||title.length()<1)
+				title = "ÎÞ±êÌâ";
 			pid = ins.get(1).attr("value");
 			reid = ins.get(2).attr("value");
 			String recont = "";
@@ -1943,6 +2010,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 											.findViewById(R.id.edt_title);
 									String title = titleEdit.getText()
 											.toString();
+									
+									if(title==null||title.length()<1)
+									{
+										displayMsg("ÇëÊäÈëÎÄÕÂ±êÌâ~");
+										return;
+									}
+									
 									titleEdit = (EditText) acdlgView
 											.findViewById(R.id.edt_cont);
 									cont = StringUtil.getStrBetter(titleEdit
@@ -2082,9 +2156,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		String[] choices;
 		choices = new String[2];
 		choices[0] = "ÅÄÕÕ";
-		choices[1] = "´ÓÍ¼¿âÖÐÑ¡ÔñÒ»ÕÅ";
+		choices[1] = "´ÓÍ¼¿âÑ¡Ôñ";
 		final ListAdapter adapter = new ArrayAdapter<String>( TestAndroidActivity.this,
-				android.R.layout.simple_list_item_1, choices);
+				android.R.layout.simple_dropdown_item_1line, choices);
 
 		final AlertDialog.Builder builder = new AlertDialog.Builder(
 				 TestAndroidActivity.this);
@@ -2132,7 +2206,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			// Launch camera to take photo for selected contact
 			if(!PHOTO_DIR.exists())
 				PHOTO_DIR.mkdirs();// ´´½¨ÕÕÆ¬µÄ´æ´¢Ä¿Â¼
-			mCurrentPhotoFile = PHOTO_DIR.getAbsolutePath()+File.separator+ getPhotoFileName();// ¸øÐÂÕÕµÄÕÕÆ¬ÎÄ¼þÃüÃû
+			mCurrentPhotoFile = PHOTO_DIR.getAbsolutePath()+File.separator+ getPhotoFileName("IMG");// ¸øÐÂÕÕµÄÕÕÆ¬ÎÄ¼þÃüÃû
 			Intent intent = getTakePickIntent(mCurrentPhotoFile);
 			startActivityForResult(intent, CAMERA_WITH_DATA);
 		} catch (ActivityNotFoundException e) {
@@ -2161,15 +2235,41 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	
 		return it;
 	}
+	
+	 	@Override 
+	    public void onSaveInstanceState(Bundle savedInstanceState) { 
+	      super.onSaveInstanceState(savedInstanceState); 
+	      
+	    } 
+
+	    
+	    @Override 
+	    public void onRestoreInstanceState(Bundle savedInstanceState) { 
+	      super.onRestoreInstanceState(savedInstanceState); 
+	    } 
+	    
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+
+		super.onConfigurationChanged(newConfig);
+		
+		int s = sWidth;
+		sWidth = sLength;
+		
+		sLength = s;
+	}
+
+
+	
 
 	/**
 	 * ÓÃµ±Ç°Ê±¼ä¸øÈ¡µÃµÄÍ¼Æ¬ÃüÃû
 	 * 
 	 */
-	private String getPhotoFileName() {
+	private String getPhotoFileName(String beginName) {
 		Date date = new Date(System.currentTimeMillis());
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"'IMG'yyyyMMddHHmmss");
+				"'"+beginName+"'yyyyMMddHHmmss");
 		return dateFormat.format(date) + ".jpg";
 	}
 
@@ -2179,10 +2279,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	// ÓÃÀ´±êÊ¶ÇëÇógalleryµÄactivity
 	private static final int PHOTO_PICKED_WITH_DATA = 3021;
 
-	// ÅÄÕÕµÄÕÕÆ¬´æ´¢Î»ÖÃ
-	private static final File PHOTO_DIR = new File(Environment
-			.getExternalStorageDirectory()
-			+ "/lilyDroid/Photos");
 	// ÇëÇóGallery³ÌÐò
 	protected void doPickPhotoFromGallery() {
 		try {
@@ -2570,10 +2666,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			return;
 		name = name.trim();
 		String areaText = bbsAll.get(name);
-		areaText = areaText == null ? name : areaText;
-		areaText = areaText.toLowerCase();
-		areaText = areaText.replaceFirst(areaText.substring(0, 1), areaText
-				.substring(0, 1).toUpperCase());
+		if(areaText == null)
+		{
+			areaText = name;
+			areaText = areaText.toLowerCase();
+			String string = bbsAllName.get(areaText);
+			if(string !=null)
+				areaText = string;
+		}
+		
+		
 		urlString = getResources().getString(R.string.areaStr) + areaText;
 		curAreaName = "" + areaText;
 		getUrlHtml(urlString, Const.MSGAREA);
@@ -2796,7 +2898,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		getUrlHtml(urlString + "&start=" + startPage, Const.MSGAREAPAGES);
 
 	}
-
 	private void areaPages(String AreaData) {
 		areaTopic = getAreaTopic(AreaData);
 		listView = (ListView) findViewById(R.id.topicList);
@@ -2826,7 +2927,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				String date = DateUtil.formatDateToStrNoWeek(DateUtil
 						.getDatefromStrNoWeek(tds.get(curPos + 3).text()));
 				if (date == null || date.equals("null"))
-
 					ti.setPubDate(tds.get(curPos + 3).text());
 				else
 					ti.setPubDate(date);
@@ -3060,10 +3160,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	}
 
-	private String dataUrl = "";
-	private int datamsg = -1;
-	NameValuePair[] nvpCont = null;
-	Thread imageTrd;
+
 
 	private void getUrlHtml(String url, int msg) {
 		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
@@ -3111,7 +3208,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						isNext = StringUtil.isNext;
 						if (StringUtil.curAreaName != null
 								&& !StringUtil.curAreaName.equals("byztm"))
+						{
 							curAreaName = StringUtil.curAreaName;
+							String string = bbsAllName.get(curAreaName.toLowerCase());
+							if(string!=null)
+								curAreaName = string;
+						}
 						topicWithImg = StringUtil.topicWithImg;
 
 						topicData = Html.fromHtml(topicDataInfo,
@@ -3263,6 +3365,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			conn.setRequestMethod("GET");
 			conn.setConnectTimeout(6000);
 			is = conn.getInputStream();
+			
+			//getPhotoFileName("");
+			
 			if (conn.getResponseCode() == 200) {
 				data = readInputStream(is);
 			} else {

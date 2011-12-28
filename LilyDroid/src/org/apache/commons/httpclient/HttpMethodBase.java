@@ -47,7 +47,7 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.httpclient.util.ExceptionUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * An abstract base implementation of HttpMethod.
@@ -101,7 +101,7 @@ public abstract class HttpMethodBase implements HttpMethod {
     // -------------------------------------------------------------- Constants
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpMethodBase.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpMethodBase.class);
 
     // ----------------------------------------------------- Instance variables 
 
@@ -383,10 +383,10 @@ public abstract class HttpMethodBase implements HttpMethod {
      * @param header the header to add to the request
      */
     public void addRequestHeader(Header header) {
-        LOG.trace("HttpMethodBase.addRequestHeader(Header)");
+        //LOG.trace("HttpMethodBase.addRequestHeader(Header)");
 
         if (header == null) {
-            LOG.debug("null header value ignored");
+           //   LOG.debug("null header value ignored");
         } else {
             getRequestHeaderGroup().addHeader(header);
         }
@@ -439,7 +439,7 @@ public abstract class HttpMethodBase implements HttpMethod {
      * @see #setQueryString(String)
      */
     public void setQueryString(NameValuePair[] params) {
-        LOG.trace("enter HttpMethodBase.setQueryString(NameValuePair[])");
+        //LOG.trace("enter HttpMethodBase.setQueryString(NameValuePair[])");
         queryString = EncodingUtil.formUrlEncode(params, "UTF-8");
     }
 
@@ -636,16 +636,16 @@ public abstract class HttpMethodBase implements HttpMethod {
             return -1;
         }
         if (headers.length > 1) {
-            LOG.warn("Multiple content-length headers detected");
+            //LOG.warn("Multiple content-length headers detected");
         }
         for (int i = headers.length - 1; i >= 0; i--) {
             Header header = headers[i];
             try {
                 return Long.parseLong(header.getValue());
             } catch (NumberFormatException e) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Invalid content-length value: " + e.getMessage());
-                }
+//                if (LOG.isWarnEnabled()) {
+//                    //LOG.warn("Invalid content-length value: " + e.getMessage());
+//                }
             }
             // See if we can have better luck with another header, if present
         }
@@ -679,10 +679,10 @@ public abstract class HttpMethodBase implements HttpMethod {
                 }
                 int limit = getParams().getIntParameter(HttpMethodParams.BUFFER_WARN_TRIGGER_LIMIT, 1024*1024);
                 if ((contentLength == -1) || (contentLength > limit)) {
-                    LOG.warn("Going to buffer response body of large or unknown size. "
-                            +"Using getResponseBodyAsStream instead is recommended.");
+                    //LOG.warn("Going to buffer response body of large or unknown size. "
+                        //    +"Using getResponseBodyAsStream instead is recommended.");
                 }
-                LOG.debug("Buffering response body");
+               //   LOG.debug("Buffering response body");
                 ByteArrayOutputStream outstream = new ByteArrayOutputStream(
                         contentLength > 0 ? (int) contentLength : DEFAULT_INITIAL_BUFFER_SIZE);
                 byte[] buffer = new byte[4096];
@@ -730,7 +730,7 @@ public abstract class HttpMethodBase implements HttpMethod {
                             "Content-Length is " + contentLength, maxlen);
                 }
                 
-                LOG.debug("Buffering response body");
+               //   LOG.debug("Buffering response body");
                 ByteArrayOutputStream rawdata = new ByteArrayOutputStream(
                         contentLength > 0 ? (int) contentLength : DEFAULT_INITIAL_BUFFER_SIZE);
                 byte[] buffer = new byte[2048];
@@ -774,7 +774,7 @@ public abstract class HttpMethodBase implements HttpMethod {
         }
         if (responseBody != null) {
             InputStream byteResponseStream = new ByteArrayInputStream(responseBody);
-            LOG.debug("re-creating response stream from byte array");
+           //   LOG.debug("re-creating response stream from byte array");
             return byteResponseStream;
         }
         return null;
@@ -963,9 +963,9 @@ public abstract class HttpMethodBase implements HttpMethod {
      * otherwise.
      */
     protected void setConnectionCloseForced(boolean b) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Force-close connection: " + b);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Force-close connection: " + b);
+       // }
         this.connectionCloseForced = b;
     }
 
@@ -981,7 +981,7 @@ public abstract class HttpMethodBase implements HttpMethod {
     protected boolean shouldCloseConnection(HttpConnection conn) {
         // Connection must be closed due to an abnormal circumstance 
         if (isConnectionCloseForced()) {
-            LOG.debug("Should force-close connection.");
+           //   LOG.debug("Should force-close connection.");
             return true;
         }
 
@@ -1004,33 +1004,33 @@ public abstract class HttpMethodBase implements HttpMethod {
         }
         if (connectionHeader != null) {
             if (connectionHeader.getValue().equalsIgnoreCase("close")) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Should close connection in response to directive: " 
-                        + connectionHeader.getValue());
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("Should close connection in response to directive: " 
+                 //       + connectionHeader.getValue());
+               // }
                 return true;
             } else if (connectionHeader.getValue().equalsIgnoreCase("keep-alive")) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Should NOT close connection in response to directive: " 
-                        + connectionHeader.getValue());
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("Should NOT close connection in response to directive: " 
+                    //    + connectionHeader.getValue());
+               // }
                 return false;
             } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Unknown directive: " + connectionHeader.toExternalForm());
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("Unknown directive: " + connectionHeader.toExternalForm());
+                //}
             }
         }
-        LOG.debug("Resorting to protocol version default close connection policy");
+       //   LOG.debug("Resorting to protocol version default close connection policy");
         // missing or invalid connection header, do the default
         if (this.effectiveVersion.greaterEquals(HttpVersion.HTTP_1_1)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Should NOT close connection, using " + this.effectiveVersion.toString());
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Should NOT close connection, using " + this.effectiveVersion.toString());
+         //   }
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Should close connection, using " + this.effectiveVersion.toString());
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Should close connection, using " + this.effectiveVersion.toString());
+            //}
         }
         return this.effectiveVersion.lessEquals(HttpVersion.HTTP_1_0);
     }
@@ -1076,7 +1076,7 @@ public abstract class HttpMethodBase implements HttpMethod {
     public int execute(HttpState state, HttpConnection conn)
         throws HttpException, IOException {
                 
-        LOG.trace("enter HttpMethodBase.execute(HttpState, HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.execute(HttpState, HttpConnection)");
 
         // this is our connection now, assign it to a local variable so 
         // that it can be released later
@@ -1140,7 +1140,7 @@ public abstract class HttpMethodBase implements HttpMethod {
      *             version of HttpClient
      */
     public void recycle() {
-        LOG.trace("enter HttpMethodBase.recycle()");
+        //LOG.trace("enter HttpMethodBase.recycle()");
 
         releaseConnection();
 
@@ -1263,8 +1263,8 @@ public abstract class HttpMethodBase implements HttpMethod {
     protected void addCookieRequestHeader(HttpState state, HttpConnection conn)
         throws IOException, HttpException {
 
-        LOG.trace("enter HttpMethodBase.addCookieRequestHeader(HttpState, "
-                  + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.addCookieRequestHeader(HttpState, "
+               //   + "HttpConnection)");
 
         Header[] cookieheaders = getRequestHeaderGroup().getHeaders("Cookie");
         for (int i = 0; i < cookieheaders.length; i++) {
@@ -1325,8 +1325,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void addHostRequestHeader(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter HttpMethodBase.addHostRequestHeader(HttpState, "
-                  + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.addHostRequestHeader(HttpState, "
+               //   + "HttpConnection)");
 
         // Per 19.6.1.1 of RFC 2616, it is legal for HTTP/1.0 based
         // applications to send the Host request-header.
@@ -1334,7 +1334,7 @@ public abstract class HttpMethodBase implements HttpMethod {
         //       HTTP/1.0 requests.
         String host = this.params.getVirtualHost();
         if (host != null) {
-            LOG.debug("Using virtual host name: " + host);
+           //   LOG.debug("Using virtual host name: " + host);
         } else {
             host = conn.getHost();
         }
@@ -1348,9 +1348,9 @@ public abstract class HttpMethodBase implements HttpMethod {
         // send blank, I interpret this as a small misstatement in the RFC, where
         // they meant to say "internet host".  So IP numbers get sent as host
         // entries too. -- Eric Johnson 12/13/2002
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Adding Host request header");
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Adding Host request header");
+       // }
 
         //appends the port only if not using the default port for the protocol
         if (conn.getProtocol().getDefaultPort() != port) {
@@ -1376,8 +1376,8 @@ public abstract class HttpMethodBase implements HttpMethod {
     protected void addProxyConnectionHeader(HttpState state,
                                             HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter HttpMethodBase.addProxyConnectionHeader("
-                  + "HttpState, HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.addProxyConnectionHeader("
+               //   + "HttpState, HttpConnection)");
         if (!conn.isTransparent()) {
             if (getRequestHeader("Proxy-Connection") == null) {
                 addRequestHeader("Proxy-Connection", "Keep-Alive");
@@ -1414,8 +1414,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void addRequestHeaders(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter HttpMethodBase.addRequestHeaders(HttpState, "
-            + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.addRequestHeaders(HttpState, "
+          //  + "HttpConnection)");
 
         addUserAgentRequestHeader(state, conn);
         addHostRequestHeader(state, conn);
@@ -1439,8 +1439,8 @@ public abstract class HttpMethodBase implements HttpMethod {
     protected void addUserAgentRequestHeader(HttpState state,
                                              HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter HttpMethodBase.addUserAgentRequestHeaders(HttpState, "
-            + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.addUserAgentRequestHeaders(HttpState, "
+          //  + "HttpConnection)");
 
         if (getRequestHeader("User-Agent") == null) {
             String agent = (String)getParams().getParameter(HttpMethodParams.USER_AGENT);
@@ -1493,8 +1493,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected static String generateRequestLine(HttpConnection connection,
         String name, String requestPath, String query, String version) {
-        LOG.trace("enter HttpMethodBase.generateRequestLine(HttpConnection, "
-            + "String, String, String, String)");
+        //LOG.trace("enter HttpMethodBase.generateRequestLine(HttpConnection, "
+         //   + "String, String, String, String)");
 
         StringBuffer buf = new StringBuffer();
         // Append method name
@@ -1576,8 +1576,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void processResponseHeaders(HttpState state,
         HttpConnection conn) {
-        LOG.trace("enter HttpMethodBase.processResponseHeaders(HttpState, "
-            + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.processResponseHeaders(HttpState, "
+          //  + "HttpConnection)");
 
         CookieSpec parser = getCookieSpec(state);
 
@@ -1612,8 +1612,8 @@ public abstract class HttpMethodBase implements HttpMethod {
             final Header[] headers, 
             final HttpState state, 
             final HttpConnection conn) {
-        LOG.trace("enter HttpMethodBase.processCookieHeaders(Header[], HttpState, "
-                  + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.processCookieHeaders(Header[], HttpState, "
+              //    + "HttpConnection)");
 
         String host = this.params.getVirtualHost();
         if (host == null) {
@@ -1630,11 +1630,11 @@ public abstract class HttpMethodBase implements HttpMethod {
                   conn.isSecure(),
                   header);
             } catch (MalformedCookieException e) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Invalid cookie header: \"" 
-                        + header.getValue() 
-                        + "\". " + e.getMessage());
-                }
+//                if (LOG.isWarnEnabled()) {
+//                    //LOG.warn("Invalid cookie header: \"" 
+//                        + header.getValue() 
+//                        + "\". " + e.getMessage());
+//                }
             }
             if (cookies != null) {
                 for (int j = 0; j < cookies.length; j++) {
@@ -1647,15 +1647,15 @@ public abstract class HttpMethodBase implements HttpMethod {
                           conn.isSecure(),
                           cookie);
                         state.addCookie(cookie);
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Cookie accepted: \"" 
-                                + parser.formatCookie(cookie) + "\"");
-                        }
+                       //  if (LOG.isDebugEnabled()) {
+                           //   LOG.debug("Cookie accepted: \"" 
+                              //  + parser.formatCookie(cookie) + "\"");
+                       // }
                     } catch (MalformedCookieException e) {
-                        if (LOG.isWarnEnabled()) {
-                            LOG.warn("Cookie rejected: \"" + parser.formatCookie(cookie) 
-                                + "\". " + e.getMessage());
-                        }
+                        //if (LOG.isWarnEnabled()) {
+                            //LOG.warn("Cookie rejected: \"" + parser.formatCookie(cookie) 
+                         //       + "\". " + e.getMessage());
+                        //}
                     }
                 }
             }
@@ -1727,8 +1727,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void readResponse(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace(
-        "enter HttpMethodBase.readResponse(HttpState, HttpConnection)");
+        //LOG.trace(
+        //"enter HttpMethodBase.readResponse(HttpState, HttpConnection)");
         // Status line & line may have already been received
         // if 'expect - continue' handshake has been used
         while (this.statusLine == null) {
@@ -1739,9 +1739,9 @@ public abstract class HttpMethodBase implements HttpMethod {
             
             int status = this.statusLine.getStatusCode();
             if ((status >= 100) && (status < 200)) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Discarding unexpected response: " + this.statusLine.toString()); 
-                }
+//                if (LOG.isInfoEnabled()) {
+//                    LOG.info("Discarding unexpected response: " + this.statusLine.toString()); 
+//                }
                 this.statusLine = null;
             }
         }
@@ -1778,8 +1778,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void readResponseBody(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace(
-            "enter HttpMethodBase.readResponseBody(HttpState, HttpConnection)");
+        //LOG.trace(
+           // "enter HttpMethodBase.readResponseBody(HttpState, HttpConnection)");
 
         // assume we are not done with the connection if we get a stream
         InputStream stream = readResponseBody(conn);
@@ -1813,13 +1813,13 @@ public abstract class HttpMethodBase implements HttpMethod {
     private InputStream readResponseBody(HttpConnection conn)
         throws HttpException, IOException {
 
-        LOG.trace("enter HttpMethodBase.readResponseBody(HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.readResponseBody(HttpConnection)");
 
         responseBody = null;
         InputStream is = conn.getResponseInputStream();
-        if (Wire.CONTENT_WIRE.enabled()) {
-            is = new WireLogInputStream(is, Wire.CONTENT_WIRE);
-        }
+//        if (Wire.CONTENT_WIRE.enabled()) {
+//            is = new WireLogInputStream(is, Wire.CONTENT_WIRE);
+//        }
         boolean canHaveBody = canResponseHaveBody(statusLine.getStatusCode());
         InputStream result = null;
         Header transferEncodingHeader = responseHeaders.getFirstHeader("Transfer-Encoding");
@@ -1830,9 +1830,9 @@ public abstract class HttpMethodBase implements HttpMethod {
             String transferEncoding = transferEncodingHeader.getValue();
             if (!"chunked".equalsIgnoreCase(transferEncoding) 
                 && !"identity".equalsIgnoreCase(transferEncoding)) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Unsupported transfer encoding: " + transferEncoding);
-                }
+//                if (LOG.isWarnEnabled()) {
+//                    //LOG.warn("Unsupported transfer encoding: " + transferEncoding);
+//                }
             }
             HeaderElement[] encodings = transferEncodingHeader.getElements();
             // The chunked encoding must be the last one applied
@@ -1846,11 +1846,11 @@ public abstract class HttpMethodBase implements HttpMethod {
                     if (getParams().isParameterTrue(HttpMethodParams.STRICT_TRANSFER_ENCODING)) {
                         throw new ProtocolException("Chunk-encoded body declared but not sent");
                     } else {
-                        LOG.warn("Chunk-encoded body missing");
+                        //LOG.warn("Chunk-encoded body missing");
                     }
                 }
             } else {
-                LOG.info("Response content is not chunk-encoded");
+               // LOG.info("Response content is not chunk-encoded");
                 // The connection must be terminated by closing 
                 // the socket as per RFC 2616, 3.6
                 setConnectionCloseForced(true);
@@ -1866,7 +1866,7 @@ public abstract class HttpMethodBase implements HttpMethod {
                         connectionDirective = connectionHeader.getValue();
                     }
                     if (!"close".equalsIgnoreCase(connectionDirective)) {
-                        LOG.info("Response content length is not known");
+                        //LOG.info("Response content length is not known");
                         setConnectionCloseForced(true);
                     }
                 }
@@ -1927,8 +1927,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void readResponseHeaders(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter HttpMethodBase.readResponseHeaders(HttpState,"
-            + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.readResponseHeaders(HttpState,"
+          //  + "HttpConnection)");
 
         getResponseHeaderGroup().clear();
         
@@ -1961,7 +1961,7 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void readStatusLine(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter HttpMethodBase.readStatusLine(HttpState, HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.readStatusLine(HttpState, HttpConnection)");
 
         final int maxGarbageLines = getParams().
             getIntParameter(HttpMethodParams.STATUS_LINE_GARBAGE_LIMIT, Integer.MAX_VALUE);
@@ -1976,9 +1976,9 @@ public abstract class HttpMethodBase implements HttpMethod {
                 throw new NoHttpResponseException("The server " + conn.getHost() + 
                     " failed to respond");
             }
-            if (Wire.HEADER_WIRE.enabled()) {
-                Wire.HEADER_WIRE.input(s + "\r\n");
-            }
+//            if (Wire.HEADER_WIRE.enabled()) {
+//                Wire.HEADER_WIRE.input(s + "\r\n");
+//            }
             if (s != null && StatusLine.startsWithHTTP(s)) {
                 // Got one
                 break;
@@ -1998,10 +1998,10 @@ public abstract class HttpMethodBase implements HttpMethod {
         if (getParams().isParameterFalse(HttpMethodParams.UNAMBIGUOUS_STATUS_LINE) 
            && versionStr.equals("HTTP")) {
             getParams().setVersion(HttpVersion.HTTP_1_0);
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Ambiguous status line (HTTP protocol version missing):" +
-                statusLine.toString());
-            }
+//            if (LOG.isWarnEnabled()) {
+//                //LOG.warn("Ambiguous status line (HTTP protocol version missing):" +
+//                statusLine.toString());
+//            }
         } else {
             this.effectiveVersion = HttpVersion.parse(versionStr);
         }
@@ -2054,14 +2054,14 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void writeRequest(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace(
-            "enter HttpMethodBase.writeRequest(HttpState, HttpConnection)");
+        //LOG.trace(
+           // "enter HttpMethodBase.writeRequest(HttpState, HttpConnection)");
         writeRequestLine(state, conn);
         writeRequestHeaders(state, conn);
         conn.writeLine(); // close head
-        if (Wire.HEADER_WIRE.enabled()) {
-            Wire.HEADER_WIRE.output("\r\n");
-        }
+//        if (Wire.HEADER_WIRE.enabled()) {
+//            Wire.HEADER_WIRE.output("\r\n");
+//        }
 
         HttpVersion ver = getParams().getVersion();
         Header expectheader = getRequestHeader("Expect");
@@ -2087,7 +2087,7 @@ public abstract class HttpMethodBase implements HttpMethod {
                     if (this.statusLine.getStatusCode() == HttpStatus.SC_CONTINUE) {
                         // Discard status line
                         this.statusLine = null;
-                        LOG.debug("OK to continue received");
+                       //   LOG.debug("OK to continue received");
                     } else {
                         return;
                     }
@@ -2099,15 +2099,15 @@ public abstract class HttpMethodBase implements HttpMethod {
                     // Remove the header to signal the method 
                     // that it's okay to go ahead with sending data
                     removeRequestHeader("Expect");
-                    LOG.info("100 (continue) read timeout. Resume sending the request");
+                  //  LOG.info("100 (continue) read timeout. Resume sending the request");
                 } finally {
                     conn.setSocketTimeout(readTimeout);
                 }
                 
             } else {
                 removeRequestHeader("Expect");
-                LOG.info("'Expect: 100-continue' handshake is only supported by "
-                    + "HTTP/1.1 or higher");
+//                LOG.info("'Expect: 100-continue' handshake is only supported by "
+//                    + "HTTP/1.1 or higher");
             }
         }
 
@@ -2172,8 +2172,8 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void writeRequestHeaders(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter HttpMethodBase.writeRequestHeaders(HttpState,"
-            + "HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.writeRequestHeaders(HttpState,"
+         //   + "HttpConnection)");
         addRequestHeaders(state, conn);
 
         String charset = getParams().getHttpElementCharset();
@@ -2181,9 +2181,9 @@ public abstract class HttpMethodBase implements HttpMethod {
         Header[] headers = getRequestHeaders();
         for (int i = 0; i < headers.length; i++) {
             String s = headers[i].toExternalForm();
-            if (Wire.HEADER_WIRE.enabled()) {
-                Wire.HEADER_WIRE.output(s);
-            }
+//            if (Wire.HEADER_WIRE.enabled()) {
+//                Wire.HEADER_WIRE.output(s);
+//            }
             conn.print(s, charset);
         }
     }
@@ -2209,12 +2209,12 @@ public abstract class HttpMethodBase implements HttpMethod {
      */
     protected void writeRequestLine(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace(
-            "enter HttpMethodBase.writeRequestLine(HttpState, HttpConnection)");
+        //LOG.trace(
+           // "enter HttpMethodBase.writeRequestLine(HttpState, HttpConnection)");
         String requestLine = getRequestLine(conn);
-        if (Wire.HEADER_WIRE.enabled()) {
-            Wire.HEADER_WIRE.output(requestLine);
-        }
+//        if (Wire.HEADER_WIRE.enabled()) {
+//            Wire.HEADER_WIRE.output(requestLine);
+//        }
         conn.print(requestLine, getParams().getHttpElementCharset());
     }
 
@@ -2278,7 +2278,7 @@ public abstract class HttpMethodBase implements HttpMethod {
      *         contain a message body
      */
     private static boolean canResponseHaveBody(int status) {
-        LOG.trace("enter HttpMethodBase.canResponseHaveBody(int)");
+        //LOG.trace("enter HttpMethodBase.canResponseHaveBody(int)");
 
         boolean result = true;
 
@@ -2321,7 +2321,7 @@ public abstract class HttpMethodBase implements HttpMethod {
      * @return String The character set.
      */
     protected String getContentCharSet(Header contentheader) {
-        LOG.trace("enter getContentCharSet( Header contentheader )");
+        //LOG.trace("enter getContentCharSet( Header contentheader )");
         String charset = null;
         if (contentheader != null) {
             HeaderElement values[] = contentheader.getElements();
@@ -2338,9 +2338,9 @@ public abstract class HttpMethodBase implements HttpMethod {
         }
         if (charset == null) {
             charset = getParams().getContentCharset();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Default charset used: " + charset);
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Default charset used: " + charset);
+            //}
         }
         return charset;
     }
@@ -2407,13 +2407,13 @@ public abstract class HttpMethodBase implements HttpMethod {
                             getParams().isParameterTrue(HttpMethodParams.WARN_EXTRA_INPUT);
 
                         if(logExtraInput) {
-                            LOG.warn("Extra response data detected - closing connection");
+                            //LOG.warn("Extra response data detected - closing connection");
                         } 
                         responseConnection.close();
                     }
                 }
                 catch (IOException e) {
-                    LOG.warn(e.getMessage());
+                    //LOG.warn(e.getMessage());
                     responseConnection.close();
                 }
             }

@@ -87,4 +87,18 @@
         <item>显示</item>  
         <item>保持上次状态</item>  
     </string-array>  
+    
+      
+    <string-array name="cam_value">
+    	<item>640</item>    
+        <item>800</item>  
+        <item>1024</item>  
+    </string-array>  
+    <string-array name="cam_text">  
+     	<item>小</item>  
+        <item>中</item>  
+        <item>大</item>  
+    </string-array>  
+    
+    
 </resources>

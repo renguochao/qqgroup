@@ -33,7 +33,7 @@ package org.apache.commons.httpclient;
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Establishes a tunneled HTTP connection via the CONNECT method.
@@ -158,8 +158,8 @@ public class ConnectMethod extends HttpMethodBase {
      */
     protected void addRequestHeaders(HttpState state, HttpConnection conn)
         throws IOException, HttpException {
-        LOG.trace("enter ConnectMethod.addRequestHeaders(HttpState, "
-            + "HttpConnection)");
+        //LOG.trace("enter ConnectMethod.addRequestHeaders(HttpState, "
+          //  + "HttpConnection)");
         addUserAgentRequestHeader(state, conn);
         addHostRequestHeader(state, conn);
         addProxyConnectionHeader(state, conn);
@@ -181,11 +181,11 @@ public class ConnectMethod extends HttpMethodBase {
     public int execute(HttpState state, HttpConnection conn) 
     throws IOException, HttpException {
 
-        LOG.trace("enter ConnectMethod.execute(HttpState, HttpConnection)");
+        //LOG.trace("enter ConnectMethod.execute(HttpState, HttpConnection)");
         int code = super.execute(state, conn);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("CONNECT status code " + code);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("CONNECT status code " + code);
+     //   }
         return code;
     }
 
@@ -217,9 +217,9 @@ public class ConnectMethod extends HttpMethodBase {
         buffer.append(getEffectiveVersion()); 
         String line = buffer.toString();
         conn.printLine(line, getParams().getHttpElementCharset());
-        if (Wire.HEADER_WIRE.enabled()) {
-            Wire.HEADER_WIRE.output(line);
-        }
+//        if (Wire.HEADER_WIRE.enabled()) {
+//            Wire.HEADER_WIRE.output(line);
+//        }
     }
 
     /**
@@ -242,10 +242,10 @@ public class ConnectMethod extends HttpMethodBase {
             }
             if (connectionHeader != null) {
                 if (connectionHeader.getValue().equalsIgnoreCase("close")) {
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn("Invalid header encountered '" + connectionHeader.toExternalForm() 
-                        + "' in response " + getStatusLine().toString());
-                    }
+                   // if (LOG.isWarnEnabled()) {
+                        //LOG.warn("Invalid header encountered '" + connectionHeader.toExternalForm() 
+                   //     + "' in response " + getStatusLine().toString());
+                  //  }
                 }
             }
             return false;
@@ -255,6 +255,6 @@ public class ConnectMethod extends HttpMethodBase {
     }
     
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(ConnectMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(ConnectMethod.class);
 
 }

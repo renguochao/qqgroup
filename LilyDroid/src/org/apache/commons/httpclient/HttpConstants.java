@@ -33,7 +33,7 @@ package org.apache.commons.httpclient;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 
 /**
@@ -53,7 +53,7 @@ public class HttpConstants {
     public static final String DEFAULT_CONTENT_CHARSET = "ISO-8859-1";
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpConstants.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpConstants.class);
 
     /**
      * Converts the specified string to a byte array of HTTP element characters.
@@ -72,11 +72,11 @@ public class HttpConstants {
             return data.getBytes(HTTP_ELEMENT_CHARSET);
         } catch (UnsupportedEncodingException e) {
 
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " 
-                    + HTTP_ELEMENT_CHARSET 
-                    + ". System default encoding used");
-            }
+//            if (LOG.isWarnEnabled()) {
+//                //LOG.warn("Unsupported encoding: " 
+//                    + HTTP_ELEMENT_CHARSET 
+//                    + ". System default encoding used");
+//            }
 
             return data.getBytes();
         }
@@ -102,11 +102,11 @@ public class HttpConstants {
             return new String(data, offset, length, HTTP_ELEMENT_CHARSET);
         } catch (UnsupportedEncodingException e) {
 
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " 
-                    + HTTP_ELEMENT_CHARSET 
-                    + ". System default encoding used");
-            }
+//            if (LOG.isWarnEnabled()) {
+//                //LOG.warn("Unsupported encoding: " 
+//                    + HTTP_ELEMENT_CHARSET 
+//                    + ". System default encoding used");
+//            }
 
             return new String(data, offset, length);
         }
@@ -148,21 +148,21 @@ public class HttpConstants {
             return data.getBytes(charset);
         } catch (UnsupportedEncodingException e) {
 
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " 
-                    + charset 
-                    + ". HTTP default encoding used");
-            }
+//            if (LOG.isWarnEnabled()) {
+//                //LOG.warn("Unsupported encoding: " 
+//                    + charset 
+//                    + ". HTTP default encoding used");
+//            }
 
             try {
                 return data.getBytes(DEFAULT_CONTENT_CHARSET);
             } catch (UnsupportedEncodingException e2) {
 
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Unsupported encoding: " 
-                        + DEFAULT_CONTENT_CHARSET 
-                        + ". System encoding used");
-                }
+//                if (LOG.isWarnEnabled()) {
+//                    //LOG.warn("Unsupported encoding: " 
+//                        + DEFAULT_CONTENT_CHARSET 
+//                        + ". System encoding used");
+//                }
 
                 return data.getBytes();
             }
@@ -200,19 +200,19 @@ public class HttpConstants {
             return new String(data, offset, length, charset);
         } catch (UnsupportedEncodingException e) {
 
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " + charset + ". Default HTTP encoding used");
-            }
+//            if (LOG.isWarnEnabled()) {
+//                //LOG.warn("Unsupported encoding: " + charset + ". Default HTTP encoding used");
+//            }
 
             try {
                 return new String(data, offset, length, DEFAULT_CONTENT_CHARSET);
             } catch (UnsupportedEncodingException e2) {
 
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Unsupported encoding: " 
-                        + DEFAULT_CONTENT_CHARSET 
-                        + ". System encoding used");
-                }
+//                if (LOG.isWarnEnabled()) {
+//                    //LOG.warn("Unsupported encoding: " 
+//                        + DEFAULT_CONTENT_CHARSET 
+//                        + ". System encoding used");
+//                }
 
                 return new String(data, offset, length);
             }

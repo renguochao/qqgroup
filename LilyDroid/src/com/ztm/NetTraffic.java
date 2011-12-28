@@ -174,6 +174,10 @@ public class NetTraffic {
 		StringBuffer resultBuffer = new StringBuffer();
 
 		httpClient = getClient();
+		
+		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(20000);
+		httpClient.getHttpConnectionManager().getParams().setSoTimeout(20000);
+		
 		// 创建GET方法的实例
 		PostMethod post = new PostMethod(url);
 		
@@ -197,6 +201,8 @@ public class NetTraffic {
 			
 			post.addRequestHeader("Content-Type", "multipart/form-data");
 			// 执行getMethod
+			
+			
 			int statusCode = httpClient.executeMethod(post);
 			if (statusCode != HttpStatus.SC_OK) {
 				System.err.println("Method failed: " + post.getStatusLine());

@@ -36,7 +36,7 @@ import java.util.Vector;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Implements the HTTP POST method.
@@ -73,7 +73,7 @@ public class PostMethod extends EntityEnclosingMethod {
     // -------------------------------------------------------------- Constants
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(PostMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(PostMethod.class);
 
     /** The Content-Type for www-form-urlencoded. */
     public static final String FORM_URL_ENCODED_CONTENT_TYPE = 
@@ -132,7 +132,7 @@ public class PostMethod extends EntityEnclosingMethod {
      * @since 2.0beta1
      */
     protected boolean hasRequestContent() {
-        LOG.trace("enter PostMethod.hasRequestContent()");
+        //LOG.trace("enter PostMethod.hasRequestContent()");
         if (!this.params.isEmpty()) {
             return true;
         } else {
@@ -149,7 +149,7 @@ public class PostMethod extends EntityEnclosingMethod {
      * @since 2.0beta1
      */
     protected void clearRequestBody() {
-        LOG.trace("enter PostMethod.clearRequestBody()");
+        //LOG.trace("enter PostMethod.clearRequestBody()");
         this.params.clear();
         super.clearRequestBody();
     }
@@ -188,7 +188,7 @@ public class PostMethod extends EntityEnclosingMethod {
      * @since 2.0
      */
     public void setParameter(String parameterName, String parameterValue) {
-        LOG.trace("enter PostMethod.setParameter(String, String)");
+        //LOG.trace("enter PostMethod.setParameter(String, String)");
 
         removeParameter(parameterName);
         addParameter(parameterName, parameterValue);
@@ -207,7 +207,7 @@ public class PostMethod extends EntityEnclosingMethod {
      * 
      */
     public NameValuePair getParameter(String paramName) {
-        LOG.trace("enter PostMethod.getParameter(String)");
+        //LOG.trace("enter PostMethod.getParameter(String)");
 
         if (paramName == null) {
             return null;
@@ -237,7 +237,7 @@ public class PostMethod extends EntityEnclosingMethod {
      * 
      */
     public NameValuePair[] getParameters() {
-        LOG.trace("enter PostMethod.getParameters()");
+        //LOG.trace("enter PostMethod.getParameters()");
 
         int numPairs = this.params.size();
         Object[] objectArr = this.params.toArray();
@@ -262,7 +262,7 @@ public class PostMethod extends EntityEnclosingMethod {
      */
     public void addParameter(String paramName, String paramValue) 
     throws IllegalArgumentException {
-        LOG.trace("enter PostMethod.addParameter(String, String)");
+        //LOG.trace("enter PostMethod.addParameter(String, String)");
 
         if ((paramName == null) || (paramValue == null)) {
             throw new IllegalArgumentException(
@@ -284,7 +284,7 @@ public class PostMethod extends EntityEnclosingMethod {
      */
     public void addParameter(NameValuePair param) 
     throws IllegalArgumentException {
-        LOG.trace("enter PostMethod.addParameter(NameValuePair)");
+        //LOG.trace("enter PostMethod.addParameter(NameValuePair)");
 
         if (param == null) {
             throw new IllegalArgumentException("NameValuePair may not be null");
@@ -301,10 +301,10 @@ public class PostMethod extends EntityEnclosingMethod {
      * @since 2.0
      */
     public void addParameters(NameValuePair[] parameters) {
-        LOG.trace("enter PostMethod.addParameters(NameValuePair[])");
+        //LOG.trace("enter PostMethod.addParameters(NameValuePair[])");
 
         if (parameters == null) {
-            LOG.warn("Attempt to addParameters(null) ignored");
+            //LOG.warn("Attempt to addParameters(null) ignored");
         } else {
             super.clearRequestBody();
             for (int i = 0; i < parameters.length; i++) {
@@ -329,7 +329,7 @@ public class PostMethod extends EntityEnclosingMethod {
      */
     public boolean removeParameter(String paramName) 
     throws IllegalArgumentException {
-        LOG.trace("enter PostMethod.removeParameter(String)");
+        //LOG.trace("enter PostMethod.removeParameter(String)");
 
         if (paramName == null) {
             throw new IllegalArgumentException(
@@ -365,7 +365,7 @@ public class PostMethod extends EntityEnclosingMethod {
      */
     public boolean removeParameter(String paramName, String paramValue) 
     throws IllegalArgumentException {
-        LOG.trace("enter PostMethod.removeParameter(String, String)");
+        //LOG.trace("enter PostMethod.removeParameter(String, String)");
 
         if (paramName == null) {
             throw new IllegalArgumentException("Parameter name may not be null");
@@ -400,7 +400,7 @@ public class PostMethod extends EntityEnclosingMethod {
      */
     public void setRequestBody(NameValuePair[] parametersBody)
     throws IllegalArgumentException {
-        LOG.trace("enter PostMethod.setRequestBody(NameValuePair[])");
+        //LOG.trace("enter PostMethod.setRequestBody(NameValuePair[])");
 
         if (parametersBody == null) {
             throw new IllegalArgumentException("Array of parameters may not be null");

@@ -7,6 +7,7 @@
     
 <PreferenceCategory   
         android:title="阅读设置">   
+
     <ListPreference
         android:dialogTitle="图片显示条件"
         android:defaultValue="1"
@@ -60,10 +61,35 @@
         android:title="文章是否显示IP" >
      
     </CheckBoxPreference>   
+    
+    <ListPreference
+        android:dialogTitle="选择按钮栏显示模式"
+        android:defaultValue="1"
+        android:entries="@array/bar_text"
+        android:entryValues="@array/bar_value"
+        android:key="barStat"
+        android:summary="主题文章界面按钮栏是否显示"
+        android:title="按钮栏显示" >
+    </ListPreference>
+         
+         
  </PreferenceCategory>    
  
     <PreferenceCategory   
         android:title="回复设置">   
+        
+        
+      <!--  
+     <ListPreference
+        android:dialogTitle="照片缩放程度"
+        android:defaultValue="800"
+        android:entries="@array/cam_text"
+        android:entryValues="@array/cam_value"
+        android:key="camwidth"
+        android:summary="照片缩放程度"
+        android:title="上传照片大小" >
+    </ListPreference>
+         -->    
          
     <CheckBoxPreference
         android:defaultValue="true"
@@ -114,7 +140,7 @@
 
         
 <PreferenceCategory   
-        android:title="可视范围相关设置">   
+        android:title="其他相关设置">   
    <ListPreference
         android:dialogTitle="选择显示模式"
         android:defaultValue="1"
@@ -124,18 +150,9 @@
         android:summary="设置标题栏和状态栏是否显示"
         android:title="显示模式(需重启)" >
     </ListPreference>
-    <ListPreference
-        android:dialogTitle="选择按钮栏显示模式"
-        android:defaultValue="1"
-        android:entries="@array/bar_text"
-        android:entryValues="@array/bar_value"
-        android:key="barStat"
-        android:summary="主题文章界面按钮栏是否显示"
-        android:title="按钮栏显示模式" >
-    </ListPreference>
-         
+   
        
-       
+    
        
  </PreferenceCategory>    
     

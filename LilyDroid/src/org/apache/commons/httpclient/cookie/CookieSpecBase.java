@@ -42,7 +42,7 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * 
@@ -64,7 +64,7 @@ import org.apache.commons.logging.LogFactory;
 public class CookieSpecBase implements CookieSpec {
     
     /** Log object */
-    protected static final Log LOG = LogFactory.getLog(CookieSpec.class);
+   //   protected static final Log LOG = LogFactory.getLog(CookieSpec.class);
 
     /** Valid date patterns */
     private Collection datepatterns = null;
@@ -110,8 +110,8 @@ public class CookieSpecBase implements CookieSpec {
         boolean secure, final String header) 
         throws MalformedCookieException {
             
-        LOG.trace("enter CookieSpecBase.parse(" 
-            + "String, port, path, boolean, Header)");
+        //LOG.trace("enter CookieSpecBase.parse(" 
+       //     + "String, port, path, boolean, Header)");
 
         if (host == null) {
             throw new IllegalArgumentException(
@@ -240,8 +240,8 @@ public class CookieSpecBase implements CookieSpec {
         String host, int port, String path, boolean secure, final Header header)
         throws MalformedCookieException {
             
-        LOG.trace("enter CookieSpecBase.parse("
-            + "String, port, path, boolean, String)");
+        //LOG.trace("enter CookieSpecBase.parse("
+          //  + "String, port, path, boolean, String)");
         if (header == null) {
             throw new IllegalArgumentException("Header may not be null.");
         }
@@ -327,16 +327,16 @@ public class CookieSpecBase implements CookieSpec {
             try {
                 cookie.setExpiryDate(DateUtil.parseDate(paramValue, this.datepatterns));
             } catch (DateParseException dpe) {
-                LOG.debug("Error parsing cookie date", dpe);
+               //   LOG.debug("Error parsing cookie date", dpe);
                 throw new MalformedCookieException(
                     "Unable to parse expiration date parameter: " 
                     + paramValue);
             }
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Unrecognized cookie attribute: " 
-                    + attribute.toString());
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Unrecognized cookie attribute: " 
+              //      + attribute.toString());
+           // }
         }
     }
 
@@ -366,8 +366,8 @@ public class CookieSpecBase implements CookieSpec {
         boolean secure, final Cookie cookie) 
         throws MalformedCookieException {
             
-        LOG.trace("enter CookieSpecBase.validate("
-            + "String, port, path, boolean, Cookie)");
+        //LOG.trace("enter CookieSpecBase.validate("
+       //     + "String, port, path, boolean, Cookie)");
         if (host == null) {
             throw new IllegalArgumentException(
                 "Host of origin may not be null");
@@ -450,8 +450,8 @@ public class CookieSpecBase implements CookieSpec {
     public boolean match(String host, int port, String path, 
         boolean secure, final Cookie cookie) {
             
-        LOG.trace("enter CookieSpecBase.match("
-            + "String, int, String, boolean, Cookie");
+        //LOG.trace("enter CookieSpecBase.match("
+         //   + "String, int, String, boolean, Cookie");
             
         if (host == null) {
             throw new IllegalArgumentException(
@@ -476,11 +476,11 @@ public class CookieSpecBase implements CookieSpec {
         }
         host = host.toLowerCase();
         if (cookie.getDomain() == null) {
-            LOG.warn("Invalid cookie state: domain not specified");
+            //LOG.warn("Invalid cookie state: domain not specified");
             return false;
         }
         if (cookie.getPath() == null) {
-            LOG.warn("Invalid cookie state: path not specified");
+            //LOG.warn("Invalid cookie state: path not specified");
             return false;
         }
         
@@ -546,8 +546,8 @@ public class CookieSpecBase implements CookieSpec {
     public Cookie[] match(String host, int port, String path, 
         boolean secure, final Cookie cookies[]) {
             
-        LOG.trace("enter CookieSpecBase.match("
-            + "String, int, String, boolean, Cookie[])");
+        //LOG.trace("enter CookieSpecBase.match("
+          //  + "String, int, String, boolean, Cookie[])");
 
         if (cookies == null) {
             return null;
@@ -589,7 +589,7 @@ public class CookieSpecBase implements CookieSpec {
      * @return a string suitable for sending in a <tt>"Cookie"</tt> header.
      */
     public String formatCookie(Cookie cookie) {
-        LOG.trace("enter CookieSpecBase.formatCookie(Cookie)");
+        //LOG.trace("enter CookieSpecBase.formatCookie(Cookie)");
         if (cookie == null) {
             throw new IllegalArgumentException("Cookie may not be null");
         }
@@ -613,7 +613,7 @@ public class CookieSpecBase implements CookieSpec {
 
     public String formatCookies(Cookie[] cookies)
       throws IllegalArgumentException {
-        LOG.trace("enter CookieSpecBase.formatCookies(Cookie[])");
+        //LOG.trace("enter CookieSpecBase.formatCookies(Cookie[])");
         if (cookies == null) {
             throw new IllegalArgumentException("Cookie array may not be null");
         }
@@ -640,7 +640,7 @@ public class CookieSpecBase implements CookieSpec {
      * @return a <tt>"Cookie"</tt> {@link Header}.
      */
     public Header formatCookieHeader(Cookie[] cookies) {
-        LOG.trace("enter CookieSpecBase.formatCookieHeader(Cookie[])");
+        //LOG.trace("enter CookieSpecBase.formatCookieHeader(Cookie[])");
         return new Header("Cookie", formatCookies(cookies));
     }
 
@@ -652,7 +652,7 @@ public class CookieSpecBase implements CookieSpec {
      * @return a Cookie header.
      */
     public Header formatCookieHeader(Cookie cookie) {
-        LOG.trace("enter CookieSpecBase.formatCookieHeader(Cookie)");
+        //LOG.trace("enter CookieSpecBase.formatCookieHeader(Cookie)");
         return new Header("Cookie", formatCookie(cookie));
     }
 

@@ -37,7 +37,7 @@ import java.io.InputStream;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.httpclient.util.ExceptionUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 
 /**
@@ -84,7 +84,7 @@ public class ChunkedInputStream extends InputStream {
     private HttpMethod method = null;
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(ChunkedInputStream.class);
+   //   private static final Log LOG = LogFactory.getLog(ChunkedInputStream.class);
 
     /**
      * ChunkedInputStream constructor that associates the chunked input stream with a 
@@ -321,7 +321,7 @@ public class ChunkedInputStream extends InputStream {
             }
             footers = HttpParser.parseHeaders(in, charset);
         } catch(HttpException e) {
-            LOG.error("Error parsing trailer headers", e);
+            //LOG.error("Error parsing trailer headers", e);
             IOException ioe = new IOException(e.getMessage());
             ExceptionUtil.initCause(ioe, e); 
             throw ioe;

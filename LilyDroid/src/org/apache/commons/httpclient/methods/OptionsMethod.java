@@ -35,7 +35,7 @@ import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpState;
 
-import org.apache.commons.logging.LogFactory;
+
 import org.apache.commons.logging.Log;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
@@ -71,7 +71,7 @@ public class OptionsMethod
     // --------------------------------------------------------- Class Variables
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(OptionsMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(OptionsMethod.class);
 
     // ----------------------------------------------------------- Constructors
 
@@ -160,7 +160,7 @@ public class OptionsMethod
      * @since 2.0
      */
     protected void processResponseHeaders(HttpState state, HttpConnection conn) {
-        LOG.trace("enter OptionsMethod.processResponseHeaders(HttpState, HttpConnection)");
+        //LOG.trace("enter OptionsMethod.processResponseHeaders(HttpState, HttpConnection)");
 
         Header allowHeader = getResponseHeader("allow");
         if (allowHeader != null) {

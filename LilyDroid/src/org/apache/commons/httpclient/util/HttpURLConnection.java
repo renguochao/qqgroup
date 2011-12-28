@@ -33,7 +33,7 @@ package org.apache.commons.httpclient.util;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.Header;
 
-import org.apache.commons.logging.LogFactory;
+
 import org.apache.commons.logging.Log;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +69,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
     // -------------------------------------------------------- Class Variables
    
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpURLConnection.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpURLConnection.class);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -124,7 +124,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see org.apache.commons.httpclient.HttpMethod#getResponseBodyAsStream()
      */
     public InputStream getInputStream() throws IOException {
-        LOG.trace("enter HttpURLConnection.getInputStream()");
+        //LOG.trace("enter HttpURLConnection.getInputStream()");
         return this.method.getResponseBodyAsStream();
     }
 
@@ -134,7 +134,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getErrorStream()
      */
     public InputStream getErrorStream() {
-        LOG.trace("enter HttpURLConnection.getErrorStream()");
+        //LOG.trace("enter HttpURLConnection.getErrorStream()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -143,7 +143,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#disconnect()
      */
     public void disconnect() {
-        LOG.trace("enter HttpURLConnection.disconnect()");
+        //LOG.trace("enter HttpURLConnection.disconnect()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -153,7 +153,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#connect()
      */
     public void connect() throws IOException {
-        LOG.trace("enter HttpURLConnection.connect()");
+        //LOG.trace("enter HttpURLConnection.connect()");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -164,7 +164,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#usingProxy()
      */
     public boolean usingProxy() {
-        LOG.trace("enter HttpURLConnection.usingProxy()");
+        //LOG.trace("enter HttpURLConnection.usingProxy()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -175,7 +175,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see org.apache.commons.httpclient.HttpMethod#getName()
      */
     public String getRequestMethod() {
-        LOG.trace("enter HttpURLConnection.getRequestMethod()");
+        //LOG.trace("enter HttpURLConnection.getRequestMethod()");
         return this.method.getName();
     }
 
@@ -187,7 +187,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see org.apache.commons.httpclient.HttpMethod#getStatusCode()
      */
     public int getResponseCode() throws IOException {
-        LOG.trace("enter HttpURLConnection.getResponseCode()");
+        //LOG.trace("enter HttpURLConnection.getResponseCode()");
         return this.method.getStatusCode();
     }
 
@@ -199,7 +199,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see org.apache.commons.httpclient.HttpMethod#getStatusText()
      */
     public String getResponseMessage() throws IOException {
-        LOG.trace("enter HttpURLConnection.getResponseMessage()");
+        //LOG.trace("enter HttpURLConnection.getResponseMessage()");
         return this.method.getStatusText();
     }
 
@@ -211,7 +211,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see org.apache.commons.httpclient.HttpMethod#getResponseHeaders()
      */
     public String getHeaderField(String name) {
-        LOG.trace("enter HttpURLConnection.getHeaderField(String)");
+        //LOG.trace("enter HttpURLConnection.getHeaderField(String)");
         // Note: Return the last matching header in the Header[] array, as in
         // the JDK implementation.
         Header[] headers = this.method.getResponseHeaders();
@@ -232,7 +232,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see org.apache.commons.httpclient.HttpMethod#getResponseHeaders()
      */
     public String getHeaderFieldKey(int keyPosition) {
-        LOG.trace("enter HttpURLConnection.getHeaderFieldKey(int)");
+        //LOG.trace("enter HttpURLConnection.getHeaderFieldKey(int)");
 
         // Note: HttpClient does not consider the returned Status Line as
         // a response header. However, getHeaderFieldKey(0) is supposed to 
@@ -261,7 +261,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see org.apache.commons.httpclient.HttpMethod#getResponseHeaders()
      */
     public String getHeaderField(int position) {
-        LOG.trace("enter HttpURLConnection.getHeaderField(int)");
+        //LOG.trace("enter HttpURLConnection.getHeaderField(int)");
 
         // Note: HttpClient does not consider the returned Status Line as
         // a response header. However, getHeaderField(0) is supposed to 
@@ -288,7 +288,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getURL()
      */
     public URL getURL() {
-        LOG.trace("enter HttpURLConnection.getURL()");
+        //LOG.trace("enter HttpURLConnection.getURL()");
         return this.url;
     }
 
@@ -309,7 +309,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * Not available: the data must have already been retrieved.
      */
     public void setInstanceFollowRedirects(boolean isFollowingRedirects) {
-        LOG.trace("enter HttpURLConnection.setInstanceFollowRedirects(boolean)");
+        //LOG.trace("enter HttpURLConnection.setInstanceFollowRedirects(boolean)");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -318,7 +318,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * Not yet implemented.
      */
     public boolean getInstanceFollowRedirects() {
-        LOG.trace("enter HttpURLConnection.getInstanceFollowRedirects()");
+        //LOG.trace("enter HttpURLConnection.getInstanceFollowRedirects()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -327,7 +327,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setRequestMethod(String)
      */
     public void setRequestMethod(String method) throws ProtocolException {
-        LOG.trace("enter HttpURLConnection.setRequestMethod(String)");
+        //LOG.trace("enter HttpURLConnection.setRequestMethod(String)");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -337,7 +337,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getPermission()
      */
     public Permission getPermission() throws IOException {
-        LOG.trace("enter HttpURLConnection.getPermission()");
+        //LOG.trace("enter HttpURLConnection.getPermission()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -346,7 +346,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getContent()
      */
     public Object getContent() throws IOException {
-        LOG.trace("enter HttpURLConnection.getContent()");
+        //LOG.trace("enter HttpURLConnection.getContent()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -354,7 +354,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * Not yet implemented.
      */
     public Object getContent(Class[] classes) throws IOException {
-        LOG.trace("enter HttpURLConnection.getContent(Class[])");
+        //LOG.trace("enter HttpURLConnection.getContent(Class[])");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -362,7 +362,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getOutputStream()
      */
     public OutputStream getOutputStream() throws IOException {
-        LOG.trace("enter HttpURLConnection.getOutputStream()");
+        //LOG.trace("enter HttpURLConnection.getOutputStream()");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -372,7 +372,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setDoInput(boolean)
      */
     public void setDoInput(boolean isInput) {
-        LOG.trace("enter HttpURLConnection.setDoInput()");
+        //LOG.trace("enter HttpURLConnection.setDoInput()");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -382,7 +382,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getDoInput()
      */
     public boolean getDoInput() {
-        LOG.trace("enter HttpURLConnection.getDoInput()");
+        //LOG.trace("enter HttpURLConnection.getDoInput()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -391,7 +391,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setDoOutput(boolean)
      */
     public void setDoOutput(boolean isOutput) {
-        LOG.trace("enter HttpURLConnection.setDoOutput()");
+        //LOG.trace("enter HttpURLConnection.setDoOutput()");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -401,7 +401,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getDoOutput()
      */
     public boolean getDoOutput() {
-        LOG.trace("enter HttpURLConnection.getDoOutput()");
+        //LOG.trace("enter HttpURLConnection.getDoOutput()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -410,7 +410,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setAllowUserInteraction(boolean)
      */
     public void setAllowUserInteraction(boolean isAllowInteraction) {
-        LOG.trace("enter HttpURLConnection.setAllowUserInteraction(boolean)");
+        //LOG.trace("enter HttpURLConnection.setAllowUserInteraction(boolean)");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -420,7 +420,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getAllowUserInteraction()
      */
     public boolean getAllowUserInteraction() {
-        LOG.trace("enter HttpURLConnection.getAllowUserInteraction()");
+        //LOG.trace("enter HttpURLConnection.getAllowUserInteraction()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -429,7 +429,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setUseCaches(boolean)
      */
     public void setUseCaches(boolean isUsingCaches) {
-        LOG.trace("enter HttpURLConnection.setUseCaches(boolean)");
+        //LOG.trace("enter HttpURLConnection.setUseCaches(boolean)");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -439,7 +439,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getUseCaches()
      */
     public boolean getUseCaches() {
-        LOG.trace("enter HttpURLConnection.getUseCaches()");
+        //LOG.trace("enter HttpURLConnection.getUseCaches()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -448,7 +448,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setIfModifiedSince(long)
      */
     public void setIfModifiedSince(long modificationDate) {
-        LOG.trace("enter HttpURLConnection.setIfModifiedSince(long)");
+        //LOG.trace("enter HttpURLConnection.setIfModifiedSince(long)");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -458,7 +458,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getIfModifiedSince()
      */
     public long getIfModifiedSince() {
-        LOG.trace("enter HttpURLConnection.getIfmodifiedSince()");
+        //LOG.trace("enter HttpURLConnection.getIfmodifiedSince()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -467,7 +467,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getDefaultUseCaches()
      */
     public boolean getDefaultUseCaches() {
-        LOG.trace("enter HttpURLConnection.getDefaultUseCaches()");
+        //LOG.trace("enter HttpURLConnection.getDefaultUseCaches()");
         throw new RuntimeException("Not implemented yet");
     }
 
@@ -476,7 +476,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setDefaultUseCaches(boolean)
      */
     public void setDefaultUseCaches(boolean isUsingCaches) {
-        LOG.trace("enter HttpURLConnection.setDefaultUseCaches(boolean)");
+        //LOG.trace("enter HttpURLConnection.setDefaultUseCaches(boolean)");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -486,7 +486,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#setRequestProperty(String,String)
      */
     public void setRequestProperty(String key, String value) {
-        LOG.trace("enter HttpURLConnection.setRequestProperty()");
+        //LOG.trace("enter HttpURLConnection.setRequestProperty()");
         throw new RuntimeException("This class can only be used with already"
             + "retrieved data");
     }
@@ -496,7 +496,7 @@ public class HttpURLConnection extends java.net.HttpURLConnection {
      * @see java.net.HttpURLConnection#getRequestProperty(String)
      */
     public String getRequestProperty(String key) {
-        LOG.trace("enter HttpURLConnection.getRequestProperty()");
+        //LOG.trace("enter HttpURLConnection.getRequestProperty()");
         throw new RuntimeException("Not implemented yet");
     }
 

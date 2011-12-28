@@ -34,7 +34,7 @@ import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /** An implementation of the Microsoft proprietary NTLM authentication scheme.  For a detailed
  * explanation of the NTLM scheme please see <a href="http://davenport.sourceforge.net/ntlm.html">
@@ -52,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
 public class NTLMScheme implements AuthScheme {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(NTLMScheme.class);
+   //   private static final Log LOG = LogFactory.getLog(NTLMScheme.class);
 
     /** NTLM challenge string. */
     private String ntlmchallenge = null;
@@ -217,7 +217,7 @@ public class NTLMScheme implements AuthScheme {
      final NTCredentials credentials, final String challenge) 
       throws AuthenticationException {
 
-        LOG.trace("enter NTLMScheme.authenticate(NTCredentials, String)");
+        //LOG.trace("enter NTLMScheme.authenticate(NTCredentials, String)");
 
         if (credentials == null) {
             throw new IllegalArgumentException("Credentials may not be null");
@@ -251,7 +251,7 @@ public class NTLMScheme implements AuthScheme {
         String charset
     ) throws AuthenticationException {
 
-        LOG.trace("enter NTLMScheme.authenticate(NTCredentials, String)");
+        //LOG.trace("enter NTLMScheme.authenticate(NTCredentials, String)");
 
         if (credentials == null) {
             throw new IllegalArgumentException("Credentials may not be null");
@@ -286,7 +286,7 @@ public class NTLMScheme implements AuthScheme {
      */
     public String authenticate(Credentials credentials, String method, String uri) 
       throws AuthenticationException {
-        LOG.trace("enter NTLMScheme.authenticate(Credentials, String, String)");
+        //LOG.trace("enter NTLMScheme.authenticate(Credentials, String, String)");
 
         NTCredentials ntcredentials = null;
         try {
@@ -319,7 +319,7 @@ public class NTLMScheme implements AuthScheme {
         Credentials credentials, 
         HttpMethod method
     ) throws AuthenticationException {
-        LOG.trace("enter NTLMScheme.authenticate(Credentials, HttpMethod)");
+        //LOG.trace("enter NTLMScheme.authenticate(Credentials, HttpMethod)");
 
         if (this.state == UNINITIATED) {
             throw new IllegalStateException("NTLM authentication process has not been initiated");

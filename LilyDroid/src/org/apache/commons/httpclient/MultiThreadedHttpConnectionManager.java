@@ -50,7 +50,7 @@ import org.apache.commons.httpclient.params.HttpConnectionParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.util.IdleConnectionHandler;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Manages a set of HttpConnections for various HostConfigurations.
@@ -67,7 +67,7 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
     // -------------------------------------------------------- Class Variables
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(MultiThreadedHttpConnectionManager.class);
+   //   private static final Log LOG = LogFactory.getLog(MultiThreadedHttpConnectionManager.class);
 
     /** The default maximum number of connections allowed per host */
     public static final int DEFAULT_MAX_HOST_CONNECTIONS = 2;   // Per RFC 2616 sec 8.1.4
@@ -373,10 +373,10 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
                 // we'll go ahead and log this, but it should never happen. HttpExceptions
                 // are only thrown when the timeout occurs and since we have no timeout
                 // it should never happen.
-                LOG.debug(
-                    "Unexpected exception while waiting for connection",
-                    e
-                );
+               //   LOG.debug(
+                  //  "Unexpected exception while waiting for connection",
+                 //   e
+              //  );
             }
         }
     }
@@ -402,16 +402,16 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
     public HttpConnection getConnectionWithTimeout(HostConfiguration hostConfiguration, 
         long timeout) throws ConnectionPoolTimeoutException {
 
-        LOG.trace("enter HttpConnectionManager.getConnectionWithTimeout(HostConfiguration, long)");
+        //LOG.trace("enter HttpConnectionManager.getConnectionWithTimeout(HostConfiguration, long)");
 
         if (hostConfiguration == null) {
             throw new IllegalArgumentException("hostConfiguration is null");
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("HttpConnectionManager.getConnection:  config = "
-                + hostConfiguration + ", timeout = " + timeout);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("HttpConnectionManager.getConnection:  config = "
+           //     + hostConfiguration + ", timeout = " + timeout);
+        //}
 
         final HttpConnection conn = doGetConnection(hostConfiguration, timeout);
 
@@ -428,7 +428,7 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
     public HttpConnection getConnection(HostConfiguration hostConfiguration, 
         long timeout) throws HttpException {
 
-        LOG.trace("enter HttpConnectionManager.getConnection(HostConfiguration, long)");
+        //LOG.trace("enter HttpConnectionManager.getConnection(HostConfiguration, long)");
         try {
             return getConnectionWithTimeout(hostConfiguration, timeout);
         } catch(ConnectionPoolTimeoutException e) {
@@ -497,9 +497,9 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
                             throw new ConnectionPoolTimeoutException("Timeout waiting for connection");
                         }
                         
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Unable to get a connection, waiting..., hostConfig=" + hostConfiguration);
-                        }
+                       //  if (LOG.isDebugEnabled()) {
+                           //   LOG.debug("Unable to get a connection, waiting..., hostConfig=" + hostConfiguration);
+                        //}
                         
                         if (waitingThread == null) {
                             waitingThread = new WaitingThread();
@@ -518,7 +518,7 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
                         connectionPool.wait(timeToWait);
                     } catch (InterruptedException e) {
                         if (!waitingThread.interruptedByConnectionPool) {
-                            LOG.debug("Interrupted while waiting for connection", e);
+                           //   LOG.debug("Interrupted while waiting for connection", e);
                             throw new IllegalThreadStateException(
                                 "Interrupted while waiting in MultiThreadedHttpConnectionManager");
                         }
@@ -627,7 +627,7 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
      * @param conn the HttpConnection to make available.
      */
     public void releaseConnection(HttpConnection conn) {
-        LOG.trace("enter HttpConnectionManager.releaseConnection(HttpConnection)");
+        //LOG.trace("enter HttpConnectionManager.releaseConnection(HttpConnection)");
 
         if (conn instanceof HttpConnectionAdapter) {
             // connections given out are wrapped in an HttpConnectionAdapter
@@ -756,9 +756,9 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
          */
         public synchronized HttpConnection createConnection(HostConfiguration hostConfiguration) {
             HostConnectionPool hostPool = getHostPool(hostConfiguration, true);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Allocating new connection, hostConfig=" + hostConfiguration);
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Allocating new connection, hostConfig=" + hostConfiguration);
+           // }
             HttpConnectionWithReference connection = new HttpConnectionWithReference(
                     hostConfiguration);
             connection.getParams().setDefaults(MultiThreadedHttpConnectionManager.this.params);
@@ -802,7 +802,7 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
          *         or <code>null</code> if neither found nor created
          */
         public synchronized HostConnectionPool getHostPool(HostConfiguration hostConfiguration, boolean create) {
-            LOG.trace("enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)");
+            //LOG.trace("enter HttpConnectionManager.ConnectionPool.getHostPool(HostConfiguration)");
 
             // Look for a list of connections for the given config
             HostConnectionPool listConnections = (HostConnectionPool) 
@@ -835,16 +835,16 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
                 // store a reference to this connection so that it can be cleaned up
                 // in the event it is not correctly released
                 storeReferenceToConnection(connection, hostConfiguration, this);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Getting free connection, hostConfig=" + hostConfiguration);
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("Getting free connection, hostConfig=" + hostConfiguration);
+                //}
 
                 // remove the connection from the timeout handler
                 idleConnectionHandler.remove(connection);
-            } else if (LOG.isDebugEnabled()) {
-                LOG.debug("There were no free connections to get, hostConfig=" 
-                    + hostConfiguration);
-            }
+            }// else//  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("There were no free connections to get, hostConfig=" 
+            //        + hostConfiguration);
+           // }
             return connection;
         }
         
@@ -885,9 +885,9 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
             
             HostConfiguration connectionConfiguration = configurationForConnection(connection);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Reclaiming connection, hostConfig=" + connectionConfiguration);
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Reclaiming connection, hostConfig=" + connectionConfiguration);
+            //}
 
             connection.close();
 
@@ -915,9 +915,9 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
 
             if (connection != null) {
                 deleteConnection(connection);
-            } else if (LOG.isDebugEnabled()) {
-                LOG.debug("Attempted to reclaim an unused connection but there were none.");
-            }
+            } //selse//  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Attempted to reclaim an unused connection but there were none.");
+            //}
         }
 
         /**
@@ -945,21 +945,21 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
             WaitingThread waitingThread = null;
                 
             if (hostPool.waitingThreads.size() > 0) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Notifying thread waiting on host pool, hostConfig=" 
-                        + hostPool.hostConfiguration);
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("Notifying thread waiting on host pool, hostConfig=" 
+                    //    + hostPool.hostConfiguration);
+                //}
                 waitingThread = (WaitingThread) hostPool.waitingThreads.removeFirst();
                 waitingThreads.remove(waitingThread);
             } else if (waitingThreads.size() > 0) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("No-one waiting on host pool, notifying next waiting thread.");
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("No-one waiting on host pool, notifying next waiting thread.");
+                //}
                 waitingThread = (WaitingThread) waitingThreads.removeFirst();
                 waitingThread.hostConnectionPool.waitingThreads.remove(waitingThread);
-            } else if (LOG.isDebugEnabled()) {
-                LOG.debug("Notifying no-one, there are no waiting threads");
-            }
+            } else//  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Notifying no-one, there are no waiting threads");
+            //}
                 
             if (waitingThread != null) {
                 waitingThread.interruptedByConnectionPool = true;
@@ -975,9 +975,9 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
 
             HostConfiguration connectionConfiguration = configurationForConnection(conn);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Freeing connection, hostConfig=" + connectionConfiguration);
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Freeing connection, hostConfig=" + connectionConfiguration);
+            //}
 
             synchronized (this) {
                 
@@ -994,8 +994,8 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
                 hostPool.freeConnections.add(conn);
                 if (hostPool.numConnections == 0) {
                     // for some reason this connection pool didn't already exist
-                    LOG.error("Host connection pool not found, hostConfig=" 
-                              + connectionConfiguration);
+                    //LOG.error("Host connection pool not found, hostConfig=" 
+                           //   + connectionConfiguration);
                     hostPool.numConnections = 1;
                 }
 
@@ -1005,8 +1005,8 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
                 removeReferenceToConnection((HttpConnectionWithReference) conn);
                 if (numConnections == 0) {
                     // for some reason this connection pool didn't already exist
-                    LOG.error("Host connection pool not found, hostConfig=" 
-                              + connectionConfiguration);
+                    //LOG.error("Host connection pool not found, hostConfig=" 
+                        //      + connectionConfiguration);
                     numConnections = 1;
                 }
 
@@ -1102,11 +1102,11 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
             // only clean up for this reference if it is still associated with 
             // a ConnectionSource
             if (source != null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Connection reclaimed by garbage collector, hostConfig=" 
-                        + source.hostConfiguration);
-                }
+//               //  if (LOG.isDebugEnabled()) {
+//                   //   LOG.debug(
+//                        "Connection reclaimed by garbage collector, hostConfig=" 
+//                        + source.hostConfiguration);
+//                }
                 
                 source.connectionPool.handleLostConnection(source.hostConfiguration);
             }
@@ -1124,7 +1124,7 @@ public class MultiThreadedHttpConnectionManager implements HttpConnectionManager
                         handleReference(ref);
                     }
                 } catch (InterruptedException e) {
-                    LOG.debug("ReferenceQueueThread interrupted", e);
+                   //   LOG.debug("ReferenceQueueThread interrupted", e);
                 }
             }
         }

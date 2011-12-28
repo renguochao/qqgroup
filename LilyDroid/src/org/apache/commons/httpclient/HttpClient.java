@@ -36,7 +36,7 @@ import java.security.Security;
 
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -63,28 +63,28 @@ public class HttpClient {
     // -------------------------------------------------------------- Constants
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpClient.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpClient.class);
 
     static {
         
-        if (LOG.isDebugEnabled()) {
-            try {
-                LOG.debug("Java version: " + System.getProperty("java.version"));
-                LOG.debug("Java vendor: " + System.getProperty("java.vendor"));
-                LOG.debug("Java class path: " + System.getProperty("java.class.path"));
-                LOG.debug("Operating system name: " + System.getProperty("os.name"));
-                LOG.debug("Operating system architecture: " + System.getProperty("os.arch"));
-                LOG.debug("Operating system version: " + System.getProperty("os.version"));
-
-                Provider[] providers = Security.getProviders();
-                for (int i = 0; i < providers.length; i++) {
-                    Provider provider = providers[i];
-                    LOG.debug(provider.getName() + " " + provider.getVersion()
-                       + ": " + provider.getInfo());   
-                }
-            } catch (SecurityException ignore) {
-            }
-        }
+//        // if (LOG.isDebugEnabled()) {
+//            try {
+//               //   LOG.debug("Java version: " + System.getProperty("java.version"));
+//               //   LOG.debug("Java vendor: " + System.getProperty("java.vendor"));
+//               //   LOG.debug("Java class path: " + System.getProperty("java.class.path"));
+//               //   LOG.debug("Operating system name: " + System.getProperty("os.name"));
+//               //   LOG.debug("Operating system architecture: " + System.getProperty("os.arch"));
+//               //   LOG.debug("Operating system version: " + System.getProperty("os.version"));
+//
+////                Provider[] providers = Security.getProviders();
+////                for (int i = 0; i < providers.length; i++) {
+////                    Provider provider = providers[i];
+//                   //   LOG.debug(provider.getName() + " " + provider.getVersion()
+//                      // + ": " + provider.getInfo());   
+//                }
+//            } catch (SecurityException ignore) {
+//            }
+//        }
     }
     // ----------------------------------------------------------- Constructors
 
@@ -119,9 +119,9 @@ public class HttpClient {
             try {
                 this.httpConnectionManager = (HttpConnectionManager) clazz.newInstance();
             } catch (Exception e) {
-                LOG.warn("Error instantiating connection manager class, defaulting to"
-                    + " SimpleHttpConnectionManager", 
-                    e);
+                //LOG.warn("Error instantiating connection manager class, defaulting to"
+                   // + " SimpleHttpConnectionManager", 
+                  //  e);
             }
         }
         if (this.httpConnectionManager == null) {
@@ -318,7 +318,7 @@ public class HttpClient {
     public int executeMethod(HttpMethod method)
         throws IOException, HttpException  {
             
-        LOG.trace("enter HttpClient.executeMethod(HttpMethod)");
+        //LOG.trace("enter HttpClient.executeMethod(HttpMethod)");
         // execute this method and use its host configuration, if it has one
         return executeMethod(null, method, null);
     }
@@ -341,7 +341,7 @@ public class HttpClient {
     public int executeMethod(final HostConfiguration hostConfiguration, final HttpMethod method)
         throws IOException, HttpException {
     
-        LOG.trace("enter HttpClient.executeMethod(HostConfiguration,HttpMethod)");
+        //LOG.trace("enter HttpClient.executeMethod(HostConfiguration,HttpMethod)");
 
         return executeMethod(hostConfiguration, method, null); 
     }
@@ -371,7 +371,7 @@ public class HttpClient {
         final HttpMethod method, final HttpState state)
         throws IOException, HttpException  {
             
-        LOG.trace("enter HttpClient.executeMethod(HostConfiguration,HttpMethod,HttpState)");
+        //LOG.trace("enter HttpClient.executeMethod(HostConfiguration,HttpMethod,HttpState)");
 
         if (method == null) {
             throw new IllegalArgumentException("HttpMethod parameter may not be null");

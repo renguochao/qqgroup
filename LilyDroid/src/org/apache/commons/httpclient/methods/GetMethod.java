@@ -32,7 +32,7 @@ package org.apache.commons.httpclient.methods;
 
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Implements the HTTP GET method.
@@ -65,7 +65,7 @@ public class GetMethod extends HttpMethodBase {
     // -------------------------------------------------------------- Constants
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(GetMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(GetMethod.class);
 
     // ----------------------------------------------------------- Constructors
 
@@ -87,7 +87,7 @@ public class GetMethod extends HttpMethodBase {
      */
     public GetMethod(String uri) {
         super(uri);
-        LOG.trace("enter GetMethod(String)");
+        //LOG.trace("enter GetMethod(String)");
         setFollowRedirects(true);
     }
 
@@ -120,7 +120,7 @@ public class GetMethod extends HttpMethodBase {
      *             version of HttpClient
      */
     public void recycle() {
-        LOG.trace("enter GetMethod.recycle()");
+        //LOG.trace("enter GetMethod.recycle()");
 
         super.recycle();
         setFollowRedirects(true);

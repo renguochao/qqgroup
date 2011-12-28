@@ -35,7 +35,7 @@ import java.util.List;
 
 import org.apache.commons.httpclient.util.ParameterParser;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>One element of an HTTP header's value.</p>
@@ -158,7 +158,7 @@ public class HeaderElement extends NameValuePair {
     // -------------------------------------------------------- Constants
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HeaderElement.class);
+   //   private static final Log LOG = LogFactory.getLog(HeaderElement.class);
 
     // ----------------------------------------------------- Instance Variables
 
@@ -191,7 +191,7 @@ public class HeaderElement extends NameValuePair {
      */
     public static final HeaderElement[] parseElements(char[] headerValue) {
             
-        LOG.trace("enter HeaderElement.parseElements(char[])");
+        //LOG.trace("enter HeaderElement.parseElements(char[])");
 
         if (headerValue == null) {
             return new HeaderElement[] {};
@@ -235,7 +235,7 @@ public class HeaderElement extends NameValuePair {
      */
     public static final HeaderElement[] parseElements(String headerValue) {
             
-        LOG.trace("enter HeaderElement.parseElements(String)");
+        //LOG.trace("enter HeaderElement.parseElements(String)");
 
         if (headerValue == null) {
             return new HeaderElement[] {};
@@ -257,7 +257,7 @@ public class HeaderElement extends NameValuePair {
     public static final HeaderElement[] parse(String headerValue)
         throws HttpException {
             
-        LOG.trace("enter HeaderElement.parse(String)");
+        //LOG.trace("enter HeaderElement.parse(String)");
 
         if (headerValue == null) {
             return new HeaderElement[] {};
@@ -276,7 +276,7 @@ public class HeaderElement extends NameValuePair {
 
     public NameValuePair getParameterByName(String name) {
 
-        LOG.trace("enter HeaderElement.getParameterByName(String)");
+        //LOG.trace("enter HeaderElement.getParameterByName(String)");
 
         if (name == null) {
             throw new IllegalArgumentException("Name may not be null");

@@ -134,8 +134,8 @@ public class RFC2109Spec extends CookieSpecBase {
     public void validate(String host, int port, String path, 
         boolean secure, final Cookie cookie) throws MalformedCookieException {
             
-        LOG.trace("enter RFC2109Spec.validate(String, int, String, "
-            + "boolean, Cookie)");
+        //LOG.trace("enter RFC2109Spec.validate(String, int, String, "
+           // + "boolean, Cookie)");
             
         // Perform generic validation
         super.validate(host, port, path, secure, cookie);
@@ -247,7 +247,7 @@ public class RFC2109Spec extends CookieSpecBase {
      * @return a string suitable for sending in a <tt>"Cookie"</tt> header.
      */
     public String formatCookie(Cookie cookie) {
-        LOG.trace("enter RFC2109Spec.formatCookie(Cookie)");
+        //LOG.trace("enter RFC2109Spec.formatCookie(Cookie)");
         if (cookie == null) {
             throw new IllegalArgumentException("Cookie may not be null");
         }
@@ -269,7 +269,7 @@ public class RFC2109Spec extends CookieSpecBase {
      * @return a string suitable for sending in a Cookie header.
      */
     public String formatCookies(Cookie[] cookies) {
-        LOG.trace("enter RFC2109Spec.formatCookieHeader(Cookie[])");
+        //LOG.trace("enter RFC2109Spec.formatCookieHeader(Cookie[])");
         int version = Integer.MAX_VALUE;
         // Pick the lowerest common denominator
         for (int i = 0; i < cookies.length; i++) {

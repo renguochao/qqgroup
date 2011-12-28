@@ -35,7 +35,7 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.httpclient.HttpClientError;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * The home for utility methods that handle various encoding tasks.
@@ -51,7 +51,7 @@ public class EncodingUtil {
     private static final String DEFAULT_CHARSET = "ISO-8859-1";
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(EncodingUtil.class);
+   //   private static final Log LOG = LogFactory.getLog(EncodingUtil.class);
 
     /**
      * Form-urlencoding routine.
@@ -80,7 +80,7 @@ public class EncodingUtil {
         try {
             return doFormUrlEncode(pairs, charset);
         } catch (UnsupportedEncodingException e) {
-            LOG.error("Encoding not supported: " + charset);
+            //LOG.error("Encoding not supported: " + charset);
             try {
                 return doFormUrlEncode(pairs, DEFAULT_CHARSET);
             } catch (UnsupportedEncodingException fatal) {
@@ -164,9 +164,9 @@ public class EncodingUtil {
             return new String(data, offset, length, charset);
         } catch (UnsupportedEncodingException e) {
 
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " + charset + ". System encoding used");
-            }
+           // if (LOG.isWarnEnabled()) {
+                //LOG.warn("Unsupported encoding: " + charset + ". System encoding used");
+           // }
             return new String(data, offset, length);
         }
     }
@@ -211,9 +211,9 @@ public class EncodingUtil {
             return data.getBytes(charset);
         } catch (UnsupportedEncodingException e) {
 
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Unsupported encoding: " + charset + ". System encoding used.");
-            }
+            //if (LOG.isWarnEnabled()) {
+                //LOG.warn("Unsupported encoding: " + charset + ". System encoding used.");
+            //}
             
             return data.getBytes();
         }

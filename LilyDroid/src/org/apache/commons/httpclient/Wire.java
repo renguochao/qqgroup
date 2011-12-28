@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Logs data to the wire LOG.
@@ -45,9 +45,9 @@ import org.apache.commons.logging.LogFactory;
  */
 class Wire {
 
-    public static Wire HEADER_WIRE = new Wire(LogFactory.getLog("httpclient.wire.header"));
+//    public static Wire HEADER_WIRE = new Wire(LogFactory.getLog("httpclient.wire.header"));
     
-    public static Wire CONTENT_WIRE = new Wire(LogFactory.getLog("httpclient.wire.content"));
+  //  public static Wire CONTENT_WIRE = new Wire(LogFactory.getLog("httpclient.wire.content"));
     
     /** Log for any wire messages. */
     private Log log;
@@ -67,7 +67,7 @@ class Wire {
                     buffer.append("[\\n]\"");
                     buffer.insert(0, "\"");
                     buffer.insert(0, header);
-                    log.debug(buffer.toString());
+                   //   LOG.debug(buffer.toString());
                     buffer.setLength(0);
             } else if ((ch < 32) || (ch > 127)) {
                 buffer.append("[0x");
@@ -81,7 +81,7 @@ class Wire {
             buffer.append("\"");
             buffer.insert(0, "\"");
             buffer.insert(0, header);
-            log.debug(buffer.toString());
+           //   LOG.debug(buffer.toString());
         }
     }
 

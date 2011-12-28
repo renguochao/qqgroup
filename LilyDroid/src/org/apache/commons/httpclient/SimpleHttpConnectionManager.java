@@ -35,7 +35,7 @@ import java.io.InputStream;
 
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * A connection manager that provides access to a single HttpConnection.  This
@@ -52,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleHttpConnectionManager implements HttpConnectionManager {
 
-    private static final Log LOG = LogFactory.getLog(SimpleHttpConnectionManager.class);
+   //   private static final Log LOG = LogFactory.getLog(SimpleHttpConnectionManager.class);
 
     private static final String MISUSE_MESSAGE = 
         "SimpleHttpConnectionManager being used incorrectly.  Be sure that"
@@ -201,7 +201,7 @@ public class SimpleHttpConnectionManager implements HttpConnectionManager {
         // remove the connection from the timeout handler
         idleStartTime = Long.MAX_VALUE;
 
-        if (inUse) LOG.warn(MISUSE_MESSAGE);
+        if (inUse) //LOG.warn(MISUSE_MESSAGE);
         inUse = true;
         
         return httpConnection;

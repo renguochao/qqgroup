@@ -48,7 +48,7 @@ import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 import org.apache.commons.httpclient.util.EncodingUtil;
 import org.apache.commons.httpclient.util.ExceptionUtil;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * An abstraction of an HTTP {@link InputStream} and {@link OutputStream}
@@ -429,7 +429,7 @@ public class HttpConnection {
      */
     public boolean closeIfStale() throws IOException {
         if (isOpen && isStale()) {
-            LOG.debug("Connection is stale, closing...");
+           //   LOG.debug("Connection is stale, closing...");
             close();
             return true;
         }
@@ -522,10 +522,10 @@ public class HttpConnection {
                 // aha - the connection is NOT stale - continue on!
             } catch (IOException e) {
                 // oops - the connection is stale, the read or soTimeout failed.
-                LOG.debug(
-                    "An error occurred while reading from the socket, is appears to be stale",
-                    e
-                );
+               //   LOG.debug(
+                  //  "An error occurred while reading from the socket, is appears to be stale",
+                 //   e
+              //  );
                 isStale = true;
             }
         }
@@ -682,15 +682,15 @@ public class HttpConnection {
      *   I/O error.
      */
     public void open() throws IOException {
-        LOG.trace("enter HttpConnection.open()");
+        //LOG.trace("enter HttpConnection.open()");
 
         final String host = (proxyHostName == null) ? hostName : proxyHostName;
         final int port = (proxyHostName == null) ? portNumber : proxyPortNumber;
         assertNotOpen();
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Open connection to " + host + ":" + port);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Open connection to " + host + ":" + port);
+        //}
         
         try {
             if (this.socket == null) {
@@ -764,7 +764,7 @@ public class HttpConnection {
      *   I/O error.
      */
     public void tunnelCreated() throws IllegalStateException, IOException {
-        LOG.trace("enter HttpConnection.tunnelCreated()");
+        //LOG.trace("enter HttpConnection.tunnelCreated()");
 
         if (!isSecure() || !isProxied()) {
             throw new IllegalStateException(
@@ -776,9 +776,9 @@ public class HttpConnection {
             throw new IllegalStateException("Already using a secure socket");
         }
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Secure tunnel to " + this.hostName + ":" + this.portNumber);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Secure tunnel to " + this.hostName + ":" + this.portNumber);
+       // }
 
         SecureProtocolSocketFactory socketFactory =
             (SecureProtocolSocketFactory) protocolInUse.getSocketFactory();
@@ -823,7 +823,7 @@ public class HttpConnection {
      * @throws IOException if an I/O problem occurs
      */
     public void flushRequestOutputStream() throws IOException {
-        LOG.trace("enter HttpConnection.flushRequestOutputStream()");
+        //LOG.trace("enter HttpConnection.flushRequestOutputStream()");
         assertOpen();
         outputStream.flush();
     }
@@ -837,12 +837,12 @@ public class HttpConnection {
      */
     public OutputStream getRequestOutputStream()
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.getRequestOutputStream()");
+        //LOG.trace("enter HttpConnection.getRequestOutputStream()");
         assertOpen();
         OutputStream out = this.outputStream;
-        if (Wire.CONTENT_WIRE.enabled()) {
-            out = new WireLogOutputStream(out, Wire.CONTENT_WIRE);
-        }
+//        if (Wire.CONTENT_WIRE.enabled()) {
+//            out = new WireLogOutputStream(out, Wire.CONTENT_WIRE);
+//        }
         return out;
     }
 
@@ -854,7 +854,7 @@ public class HttpConnection {
      */
     public InputStream getResponseInputStream()
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.getResponseInputStream()");
+        //LOG.trace("enter HttpConnection.getResponseInputStream()");
         assertOpen();
         return inputStream;
     }
@@ -871,7 +871,7 @@ public class HttpConnection {
      */
     public boolean isResponseAvailable() 
         throws IOException {
-        LOG.trace("enter HttpConnection.isResponseAvailable()");
+        //LOG.trace("enter HttpConnection.isResponseAvailable()");
         if (this.isOpen) {
             return this.inputStream.available() > 0;
         } else {
@@ -891,7 +891,7 @@ public class HttpConnection {
      */
     public boolean isResponseAvailable(int timeout) 
         throws IOException {
-        LOG.trace("enter HttpConnection.isResponseAvailable(int)");
+        //LOG.trace("enter HttpConnection.isResponseAvailable(int)");
         assertOpen();
         boolean result = false;
         if (this.inputStream.available() > 0) {
@@ -903,25 +903,25 @@ public class HttpConnection {
                 int byteRead = inputStream.read();
                 if (byteRead != -1) {
                     inputStream.reset();
-                    LOG.debug("Input data available");
+                   //   LOG.debug("Input data available");
                     result = true;
                 } else {
-                    LOG.debug("Input data not available");
+                   //   LOG.debug("Input data not available");
                 }
             } catch (InterruptedIOException e) {
                 if (!ExceptionUtil.isSocketTimeoutException(e)) {
                     throw e;
                 }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Input data not available after " + timeout + " ms");
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("Input data not available after " + timeout + " ms");
+               // }
             } finally {
                 try {
                     socket.setSoTimeout(this.params.getSoTimeout());
                 } catch (IOException ioe) {
-                    LOG.debug("An error ocurred while resetting soTimeout, we will assume that"
-                        + " no response is available.",
-                        ioe);
+                   //   LOG.debug("An error ocurred while resetting soTimeout, we will assume that"
+                     //   + " no response is available.",
+                    //    ioe);
                     result = false;
                 }
             }
@@ -939,7 +939,7 @@ public class HttpConnection {
      */
     public void write(byte[] data)
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.write(byte[])");
+        //LOG.trace("enter HttpConnection.write(byte[])");
         this.write(data, 0, data.length);
     }
 
@@ -960,7 +960,7 @@ public class HttpConnection {
      */
     public void write(byte[] data, int offset, int length)
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.write(byte[], int, int)");
+        //LOG.trace("enter HttpConnection.write(byte[], int, int)");
 
         if (offset < 0) {
             throw new IllegalArgumentException("Array offset may not be negative");
@@ -985,7 +985,7 @@ public class HttpConnection {
      */
     public void writeLine(byte[] data)
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.writeLine(byte[])");
+        //LOG.trace("enter HttpConnection.writeLine(byte[])");
         write(data);
         writeLine();
     }
@@ -998,7 +998,7 @@ public class HttpConnection {
      */
     public void writeLine()
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.writeLine()");
+        //LOG.trace("enter HttpConnection.writeLine()");
         write(CRLF);
     }
 
@@ -1013,7 +1013,7 @@ public class HttpConnection {
      */
     public void print(String data)
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.print(String)");
+        //LOG.trace("enter HttpConnection.print(String)");
         write(EncodingUtil.getBytes(data, "ISO-8859-1"));
     }
 
@@ -1029,7 +1029,7 @@ public class HttpConnection {
      */
     public void print(String data, String charset)
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.print(String)");
+        //LOG.trace("enter HttpConnection.print(String)");
         write(EncodingUtil.getBytes(data, charset));
     }
     
@@ -1045,7 +1045,7 @@ public class HttpConnection {
      */
     public void printLine(String data)
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.printLine(String)");
+        //LOG.trace("enter HttpConnection.printLine(String)");
         writeLine(EncodingUtil.getBytes(data, "ISO-8859-1"));
     }
 
@@ -1062,7 +1062,7 @@ public class HttpConnection {
      */
     public void printLine(String data, String charset)
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.printLine(String)");
+        //LOG.trace("enter HttpConnection.printLine(String)");
         writeLine(EncodingUtil.getBytes(data, charset));
     }    
     
@@ -1074,7 +1074,7 @@ public class HttpConnection {
      */
     public void printLine()
         throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.printLine()");
+        //LOG.trace("enter HttpConnection.printLine()");
         writeLine();
     }
 
@@ -1090,7 +1090,7 @@ public class HttpConnection {
      * @deprecated use #readLine(String)
      */
     public String readLine() throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.readLine()");
+        //LOG.trace("enter HttpConnection.readLine()");
 
         assertOpen();
         return HttpParser.readLine(inputStream);
@@ -1110,7 +1110,7 @@ public class HttpConnection {
      * @since 3.0
      */
     public String readLine(final String charset) throws IOException, IllegalStateException {
-        LOG.trace("enter HttpConnection.readLine()");
+        //LOG.trace("enter HttpConnection.readLine()");
 
         assertOpen();
         return HttpParser.readLine(inputStream, charset);
@@ -1123,7 +1123,7 @@ public class HttpConnection {
      * @deprecated unused
      */
     public void shutdownOutput() {
-        LOG.trace("enter HttpConnection.shutdownOutput()");
+        //LOG.trace("enter HttpConnection.shutdownOutput()");
 
         try {
             // Socket.shutdownOutput is a JDK 1.3
@@ -1135,7 +1135,7 @@ public class HttpConnection {
             Object[] params = new Object[0];
             shutdownOutput.invoke(socket, params);
         } catch (Exception ex) {
-            LOG.debug("Unexpected Exception caught", ex);
+           //   LOG.debug("Unexpected Exception caught", ex);
             // Ignore, and hope everything goes right
         }
         // close output stream?
@@ -1145,7 +1145,7 @@ public class HttpConnection {
      * Closes the socket and streams.
      */
     public void close() {
-        LOG.trace("enter HttpConnection.close()");
+        //LOG.trace("enter HttpConnection.close()");
         closeSocketAndStreams();
     }
 
@@ -1171,14 +1171,14 @@ public class HttpConnection {
      * to call this method multiple times.
      */
     public void releaseConnection() {
-        LOG.trace("enter HttpConnection.releaseConnection()");
+        //LOG.trace("enter HttpConnection.releaseConnection()");
         if (locked) {
-            LOG.debug("Connection is locked.  Call to releaseConnection() ignored.");
+           //   LOG.debug("Connection is locked.  Call to releaseConnection() ignored.");
         } else if (httpConnectionManager != null) {
-            LOG.debug("Releasing connection back to connection manager.");
+           //   LOG.debug("Releasing connection back to connection manager.");
             httpConnectionManager.releaseConnection(this);
         } else {
-            LOG.warn("HttpConnectionManager is null.  Connection cannot be released.");
+            //LOG.warn("HttpConnectionManager is null.  Connection cannot be released.");
         }
     }
 
@@ -1212,7 +1212,7 @@ public class HttpConnection {
      * Closes everything out.
      */
     protected void closeSocketAndStreams() {
-        LOG.trace("enter HttpConnection.closeSockedAndStreams()");
+        //LOG.trace("enter HttpConnection.closeSockedAndStreams()");
 
         isOpen = false;
         
@@ -1225,7 +1225,7 @@ public class HttpConnection {
             try {
                 temp.close();
             } catch (Exception ex) {
-                LOG.debug("Exception caught when closing output", ex);
+               //   LOG.debug("Exception caught when closing output", ex);
                 // ignored
             }
         }
@@ -1236,7 +1236,7 @@ public class HttpConnection {
             try {
                 temp.close();
             } catch (Exception ex) {
-                LOG.debug("Exception caught when closing input", ex);
+               //   LOG.debug("Exception caught when closing input", ex);
                 // ignored
             }
         }
@@ -1247,7 +1247,7 @@ public class HttpConnection {
             try {
                 temp.close();
             } catch (Exception ex) {
-                LOG.debug("Exception caught when closing socket", ex);
+               //   LOG.debug("Exception caught when closing socket", ex);
                 // ignored
             }
         }
@@ -1318,7 +1318,7 @@ public class HttpConnection {
     private static final byte[] CRLF = new byte[] {(byte) 13, (byte) 10};
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpConnection.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpConnection.class);
     
     // ----------------------------------------------------- Instance Variables
     

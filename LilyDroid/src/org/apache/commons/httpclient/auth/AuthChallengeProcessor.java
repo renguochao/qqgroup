@@ -36,7 +36,6 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.params.HttpParams;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class provides utility methods for processing HTTP www and proxy authentication 
@@ -48,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public final class AuthChallengeProcessor {
 
-    private static final Log LOG = LogFactory.getLog(AuthChallengeProcessor.class);
+    //private static final Log LOG = LogFactory.getLog(AuthChallengeProcessor.class);
 
     private HttpParams params = null;
     
@@ -86,10 +85,10 @@ public final class AuthChallengeProcessor {
         if (authPrefs == null || authPrefs.isEmpty()) {
             authPrefs = AuthPolicy.getDefaultAuthPrefs();    
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Supported authentication schemes in the order of preference: " 
-                + authPrefs);
-        }
+//       //  if (LOG.isDebugEnabled()) {
+//           //   LOG.debug("Supported authentication schemes in the order of preference: " 
+//                + authPrefs);
+//        }
         AuthScheme authscheme = null;
         String challenge = null;
         Iterator item = authPrefs.iterator();
@@ -97,9 +96,9 @@ public final class AuthChallengeProcessor {
             String id = (String) item.next();
             challenge = (String) challenges.get(id.toLowerCase()); 
             if (challenge != null) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info(id + " authentication scheme selected");
-                }
+//                if (LOG.isInfoEnabled()) {
+//                    LOG.info(id + " authentication scheme selected");
+//                }
                 try {
                     authscheme = AuthPolicy.getAuthScheme(id);
                 } catch (IllegalStateException e) {
@@ -107,10 +106,10 @@ public final class AuthChallengeProcessor {
                 }
                 break;
             } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Challenge for " + id + " authentication scheme not available");
-                    // Try again
-                }
+//               //  if (LOG.isDebugEnabled()) {
+//                   //   LOG.debug("Challenge for " + id + " authentication scheme not available");
+//                    // Try again
+//                }
             }
         }
         if (authscheme == null) {
@@ -151,16 +150,16 @@ public final class AuthChallengeProcessor {
         }
         AuthScheme authscheme = state.getAuthScheme();
         String id = authscheme.getSchemeName();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Using authentication scheme: " + id);
-        }
+//       //  if (LOG.isDebugEnabled()) {
+//           //   LOG.debug("Using authentication scheme: " + id);
+//        }
         String challenge = (String) challenges.get(id.toLowerCase());
         if (challenge == null) {
             throw new AuthenticationException(id + 
                 " authorization challenge expected, but not found");
         }
         authscheme.processChallenge(challenge);
-        LOG.debug("Authorization challenge processed");
+        //LOG.debug("Authorization challenge processed");
         return authscheme;
     }
 }

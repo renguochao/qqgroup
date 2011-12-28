@@ -193,8 +193,8 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
     public Cookie[] parse(
             String host, int port, String path, boolean secure, final Header header)
             throws MalformedCookieException {
-        LOG.trace("enter RFC2965.parse("
-                  + "String, int, String, boolean, Header)");
+        //LOG.trace("enter RFC2965.parse("
+              //    + "String, int, String, boolean, Header)");
 
         if (header == null) {
             throw new IllegalArgumentException("Header may not be null.");
@@ -222,8 +222,8 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
     public Cookie[] parse(String host, int port, String path,
                           boolean secure, final String header)
             throws MalformedCookieException {
-        LOG.trace("enter RFC2965Spec.parse("
-                  + "String, int, String, boolean, String)");
+        //LOG.trace("enter RFC2965Spec.parse("
+               //   + "String, int, String, boolean, String)");
 
         // before we do anything, lets check validity of arguments
         if (host == null) {
@@ -315,9 +315,9 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
         CookieAttributeHandler handler = findAttribHandler(paramName);
         if (handler == null) {
             // ignore unknown attribute-value pairs
-            if (LOG.isDebugEnabled())
-                LOG.debug("Unrecognized cookie attribute: " +
-                          attribute.toString());
+          //  if (LOG.isDebugEnabled())
+               //   LOG.debug("Unrecognized cookie attribute: " +
+            //              attribute.toString());
         } else {
             handler.parse(cookie, paramValue);
         }
@@ -339,8 +339,8 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
                          boolean secure, final Cookie cookie)
             throws MalformedCookieException {
 
-        LOG.trace("enter RFC2965Spec.validate(String, int, String, "
-                  + "boolean, Cookie)");
+        //LOG.trace("enter RFC2965Spec.validate(String, int, String, "
+             //     + "boolean, Cookie)");
 
         if (cookie instanceof Cookie2) {
             if (cookie.getName().indexOf(' ') != -1) {
@@ -372,8 +372,8 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
     public boolean match(String host, int port, String path,
                          boolean secure, final Cookie cookie) {
 
-        LOG.trace("enter RFC2965.match("
-                  + "String, int, String, boolean, Cookie");
+        //LOG.trace("enter RFC2965.match("
+                //  + "String, int, String, boolean, Cookie");
         if (cookie == null) {
             throw new IllegalArgumentException("Cookie may not be null");
         }
@@ -431,7 +431,7 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
      * @return a string suitable for sending in a <tt>"Cookie"</tt> header.
      */
     public String formatCookie(final Cookie cookie) {
-        LOG.trace("enter RFC2965Spec.formatCookie(Cookie)");
+        //LOG.trace("enter RFC2965Spec.formatCookie(Cookie)");
 
         if (cookie == null) {
             throw new IllegalArgumentException("Cookie may not be null");
@@ -458,7 +458,7 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
      * @return a string suitable for sending in a Cookie header.
      */
     public String formatCookies(final Cookie[] cookies) {
-        LOG.trace("enter RFC2965Spec.formatCookieHeader(Cookie[])");
+        //LOG.trace("enter RFC2965Spec.formatCookieHeader(Cookie[])");
 
         if (cookies == null) {
             throw new IllegalArgumentException("Cookies may not be null");
@@ -676,7 +676,7 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
             }
             String path = origin.getPath();
             if (cookie.getPath() == null) {
-                LOG.warn("Invalid cookie state: path attribute is null.");
+                //LOG.warn("Invalid cookie state: path attribute is null.");
                 return false;
             }
             if (path.trim().equals("")) {
@@ -890,7 +890,7 @@ public class RFC2965Spec extends CookieSpecBase implements CookieVersionSupport 
                 int port = origin.getPort();
                 if (cookie2.isPortAttributeSpecified()) {
                     if (cookie2.getPorts() == null) {
-                        LOG.warn("Invalid cookie state: port not specified");
+                        //LOG.warn("Invalid cookie state: port not specified");
                         return false;
                     }
                     if (!portMatch(port, cookie2.getPorts())) {

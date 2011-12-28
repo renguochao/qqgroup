@@ -44,7 +44,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Implements the HTTP multipart POST method.
@@ -83,7 +83,7 @@ public class MultipartPostMethod extends ExpectContinueMethod {
         "multipart/form-data";
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(MultipartPostMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(MultipartPostMethod.class);
 
     /** The parameters for this method */
     private final List parameters = new ArrayList();
@@ -130,7 +130,7 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      * @param parameterValue The value of the parameter.
      */
     public void addParameter(String parameterName, String parameterValue) {
-        LOG.trace("enter addParameter(String parameterName, String parameterValue)");
+        //LOG.trace("enter addParameter(String parameterName, String parameterValue)");
         Part param = new StringPart(parameterName, parameterValue);
         parameters.add(param);
     }
@@ -144,8 +144,8 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      */
     public void addParameter(String parameterName, File parameterFile) 
     throws FileNotFoundException {
-        LOG.trace("enter MultipartPostMethod.addParameter(String parameterName, "
-            + "File parameterFile)");
+        //LOG.trace("enter MultipartPostMethod.addParameter(String parameterName, "
+           // + "File parameterFile)");
         Part param = new FilePart(parameterName, parameterFile);
         parameters.add(param);
     }
@@ -160,8 +160,8 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      */
     public void addParameter(String parameterName, String fileName, File parameterFile) 
     throws FileNotFoundException {
-        LOG.trace("enter MultipartPostMethod.addParameter(String parameterName, "
-            + "String fileName, File parameterFile)");
+        //LOG.trace("enter MultipartPostMethod.addParameter(String parameterName, "
+        //    + "String fileName, File parameterFile)");
         Part param = new FilePart(parameterName, fileName, parameterFile);
         parameters.add(param);
     }
@@ -172,7 +172,7 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      * @param part The part to add.
      */
     public void addPart (final Part part) {
-        LOG.trace("enter addPart(Part part)");
+        //LOG.trace("enter addPart(Part part)");
         parameters.add(part);
     }
 
@@ -202,8 +202,8 @@ public class MultipartPostMethod extends ExpectContinueMethod {
     protected void addContentLengthRequestHeader(HttpState state,
                                                  HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter EntityEnclosingMethod.addContentLengthRequestHeader("
-                  + "HttpState, HttpConnection)");
+        //LOG.trace("enter EntityEnclosingMethod.addContentLengthRequestHeader("
+           //       + "HttpState, HttpConnection)");
 
         if (getRequestHeader("Content-Length") == null) { 
             long len = getRequestContentLength();
@@ -228,8 +228,8 @@ public class MultipartPostMethod extends ExpectContinueMethod {
     protected void addContentTypeRequestHeader(HttpState state,
                                                  HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter EntityEnclosingMethod.addContentTypeRequestHeader("
-                  + "HttpState, HttpConnection)");
+        //LOG.trace("enter EntityEnclosingMethod.addContentTypeRequestHeader("
+             //     + "HttpState, HttpConnection)");
 
         if (!parameters.isEmpty()) {
             StringBuffer buffer = new StringBuffer(MULTIPART_FORM_CONTENT_TYPE);
@@ -270,8 +270,8 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      */
     protected void addRequestHeaders(HttpState state, HttpConnection conn) 
     throws IOException, HttpException {
-        LOG.trace("enter MultipartPostMethod.addRequestHeaders(HttpState state, "
-            + "HttpConnection conn)");
+        //LOG.trace("enter MultipartPostMethod.addRequestHeaders(HttpState state, "
+          //  + "HttpConnection conn)");
         super.addRequestHeaders(state, conn);
         addContentLengthRequestHeader(state, conn);
         addContentTypeRequestHeader(state, conn);
@@ -293,8 +293,8 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      */
     protected boolean writeRequestBody(HttpState state, HttpConnection conn) 
     throws IOException, HttpException {
-        LOG.trace("enter MultipartPostMethod.writeRequestBody(HttpState state, "
-            + "HttpConnection conn)");
+        //LOG.trace("enter MultipartPostMethod.writeRequestBody(HttpState state, "
+          //  + "HttpConnection conn)");
         OutputStream out = conn.getRequestOutputStream();
         Part.sendParts(out, getParts());
         return true;
@@ -309,7 +309,7 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      * @return The request content length.
      */
     protected long getRequestContentLength() throws IOException {
-        LOG.trace("enter MultipartPostMethod.getRequestContentLength()");
+        //LOG.trace("enter MultipartPostMethod.getRequestContentLength()");
         return Part.getLengthOfParts(getParts());
     }
 
@@ -326,7 +326,7 @@ public class MultipartPostMethod extends ExpectContinueMethod {
      *             version of HttpClient
      */
     public void recycle() {
-        LOG.trace("enter MultipartPostMethod.recycle()");
+        //LOG.trace("enter MultipartPostMethod.recycle()");
         super.recycle();
         parameters.clear();
     }

@@ -104,7 +104,7 @@ public class NetscapeDraftSpec extends CookieSpecBase {
         boolean secure, final String header) 
         throws MalformedCookieException {
             
-        LOG.trace("enter NetscapeDraftSpec.parse(String, port, path, boolean, Header)");
+        //LOG.trace("enter NetscapeDraftSpec.parse(String, port, path, boolean, Header)");
 
         if (host == null) {
             throw new IllegalArgumentException("Host of origin may not be null");
@@ -223,8 +223,8 @@ public class NetscapeDraftSpec extends CookieSpecBase {
         boolean secure, final Cookie cookie) 
         throws MalformedCookieException {
             
-        LOG.trace("enterNetscapeDraftCookieProcessor "
-            + "RCF2109CookieProcessor.validate(Cookie)");
+        //LOG.trace("enterNetscapeDraftCookieProcessor "
+          //  + "RCF2109CookieProcessor.validate(Cookie)");
         // Perform generic validation
         super.validate(host, port, path, secure, cookie);
         // Perform Netscape Cookie draft specific validation

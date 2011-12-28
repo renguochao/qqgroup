@@ -364,40 +364,60 @@ public class StringUtil {
 //		+"<a href='next'>[<font color=#0000EE >下一页</font>]</a>&nbsp;&nbsp;"
 //		+"<a href='huifu'>[<font color=#0000EE >回复</font>]</a>"
 		;
-		return addSmileySpans(ss);
+		return addSmileySpans(ss,null);
 	}
 
 	
 	
-    public static String addSmileySpans(String text) {
-        
+    public static String addSmileySpans(String text,String sign) {
     	//替换表情
-    
         Matcher matcher = mPattern.matcher(text);
-       
         StringBuffer sb = new StringBuffer();
-
         while (matcher.find()) {
         	matcher.appendReplacement(sb, "<img src=\""+matcher.group()+"\">");
         }
-        
         matcher.appendTail(sb);
-        
         //替换字体颜色
         StringBuffer sb2= new StringBuffer();
-       
+        
+        if(sign!=null)
+        {
+        	 int indexOf = sb2.indexOf(sign);
+        	 if(indexOf>0)
+        	 {
+        		 String signColor = sb2.substring(indexOf-7, indexOf) ;
+        		 String sex = "";
+        		 if(signColor.contains("36"))
+        		 {
+        			 sex = "男";
+        		 }
+        		 else  if(signColor.contains("37"))
+        		 {
+        			 sex = "女";
+        		 }
+        		 else
+        		 {
+        			 sex = "未知";
+        		 }
+        		 sb2.insert(indexOf+1, sex);
+        	 }
+        }
+        
+        
         matcher = colorPat.matcher(sb);
-
         while (matcher.find()) {
         	String ss = fFolorAll.get(matcher.group(0));
         	if(ss==null)
         		ss = "";
         	matcher.appendReplacement(sb2,ss );
         }
-        
         matcher.appendTail(sb2);
+       
+        
         return sb2.toString().replaceAll("\\[\\+reset\\]|\\[m|\\[(0|[0-9]{1,2})m", "</font>");
     }
+    
+	
 	
 	
    

@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * This class represents a collection of HTTP protocol parameters. Protocol parameters
@@ -51,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultHttpParams implements HttpParams, Serializable, Cloneable {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(DefaultHttpParams.class);
+   //   private static final Log LOG = LogFactory.getLog(DefaultHttpParams.class);
 
     /** HttpParams class factory. */
     private static HttpParamsFactory httpParamsFactory = new DefaultHttpParamsFactory();
@@ -147,9 +147,9 @@ public class DefaultHttpParams implements HttpParams, Serializable, Cloneable {
             this.parameters = new HashMap();
         }
         this.parameters.put(name, value);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Set parameter " + name + " = " + value);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Set parameter " + name + " = " + value);
+        //}
     }
     
     /**

@@ -33,7 +33,7 @@ import java.io.InterruptedIOException;
 import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * The home for utility methods that handle various exception-related tasks.
@@ -46,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
 public class ExceptionUtil {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(ExceptionUtil.class);
+   //   private static final Log LOG = LogFactory.getLog(ExceptionUtil.class);
 
     /** A reference to Throwable's initCause method, or null if it's not there in this JVM */
     static private final Method INIT_CAUSE_METHOD = getInitCauseMethod();
@@ -97,7 +97,7 @@ public class ExceptionUtil {
             try {
                 INIT_CAUSE_METHOD.invoke(throwable, new Object[] { cause });
             } catch (Exception e) {
-                LOG.warn("Exception invoking Throwable.initCause", e);
+                //LOG.warn("Exception invoking Throwable.initCause", e);
             }
         }
     }

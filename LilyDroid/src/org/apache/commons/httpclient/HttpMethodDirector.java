@@ -53,7 +53,7 @@ import org.apache.commons.httpclient.params.HttpConnectionParams;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.params.HttpParams;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Handles the process of executing a method including authentication, redirection and retries.
@@ -74,7 +74,7 @@ class HttpMethodDirector {
     /** The proxy authenticate response header. */
     public static final String PROXY_AUTH_RESP = "Proxy-Authorization";
 
-    private static final Log LOG = LogFactory.getLog(HttpMethodDirector.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpMethodDirector.class);
 
     private ConnectMethod connectMethod;
     
@@ -158,7 +158,7 @@ class HttpMethodDirector {
                     if (this.params.isAuthenticationPreemptive()
                      || this.state.isAuthenticationPreemptive()) 
                     {
-                        LOG.debug("Preemptively sending default basic credentials");
+                       //   LOG.debug("Preemptively sending default basic credentials");
                         method.getHostAuthState().setPreemptive();
                         method.getHostAuthState().setAuthAttempted(true);
                         if (this.conn.isProxied() && !this.conn.isSecure()) {
@@ -180,18 +180,18 @@ class HttpMethodDirector {
                         retry = true;
                         ++redirectCount;
                         if (redirectCount >= maxRedirects) {
-                            LOG.error("Narrowly avoided an infinite loop in execute");
+                            //LOG.error("Narrowly avoided an infinite loop in execute");
                             throw new RedirectException("Maximum redirects ("
                                 + maxRedirects + ") exceeded");
                         }
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Execute redirect " + redirectCount + " of " + maxRedirects);
-                        }
+                       //  if (LOG.isDebugEnabled()) {
+                           //   LOG.debug("Execute redirect " + redirectCount + " of " + maxRedirects);
+                       // }
                     }
                 }
                 if (isAuthenticationNeeded(method)) {
                     if (processAuthenticationResponse(method)) {
-                        LOG.debug("Retry authentication");
+                       //   LOG.debug("Retry authentication");
                         retry = true;
                     }
                 }
@@ -233,7 +233,7 @@ class HttpMethodDirector {
             }
             authenticateHost(method);
         } catch (AuthenticationException e) {
-            LOG.error(e.getMessage(), e);
+            //LOG.error(e.getMessage(), e);
         }
     }
 
@@ -274,9 +274,9 @@ class HttpMethodDirector {
                 host, port, 
                 authscheme.getRealm(), 
                 authscheme.getSchemeName());  
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Authenticating with " + authscope);
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Authenticating with " + authscope);
+           // }
             Credentials credentials = this.state.getCredentials(authscope);
             if (credentials != null) {
                 String authstring = authscheme.authenticate(credentials, method);
@@ -284,13 +284,13 @@ class HttpMethodDirector {
                     method.addRequestHeader(new Header(WWW_AUTH_RESP, authstring, true));
                 }
             } else {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Required credentials not available for " + authscope);
-                    if (method.getHostAuthState().isPreemptive()) {
-                        LOG.warn("Preemptive authentication requested but no default " +
-                            "credentials available"); 
-                    }
-                }
+//                if (LOG.isWarnEnabled()) {
+//                    //LOG.warn("Required credentials not available for " + authscope);
+//                    if (method.getHostAuthState().isPreemptive()) {
+//                        //LOG.warn("Preemptive authentication requested but no default " +
+//                        //s    "credentials available"); 
+//                    }
+//                }
             }
         }
     }
@@ -312,9 +312,9 @@ class HttpMethodDirector {
                 conn.getProxyHost(), conn.getProxyPort(), 
                 authscheme.getRealm(), 
                 authscheme.getSchemeName());  
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Authenticating with " + authscope);
-            }
+           //  if (LOG.isDebugEnabled()) {
+               //   LOG.debug("Authenticating with " + authscope);
+           // }
             Credentials credentials = this.state.getProxyCredentials(authscope);
             if (credentials != null) {
                 String authstring = authscheme.authenticate(credentials, method);
@@ -322,13 +322,13 @@ class HttpMethodDirector {
                     method.addRequestHeader(new Header(PROXY_AUTH_RESP, authstring, true));
                 }
             } else {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Required proxy credentials not available for " + authscope);
-                    if (method.getProxyAuthState().isPreemptive()) {
-                        LOG.warn("Preemptive authentication requested but no default " +
-                            "proxy credentials available"); 
-                    }
-                }
+//                if (LOG.isWarnEnabled()) {
+//                    //LOG.warn("Required proxy credentials not available for " + authscope);
+//                    if (method.getProxyAuthState().isPreemptive()) {
+//                        //LOG.warn("Preemptive authentication requested but no default " +
+//                            "proxy credentials available"); 
+//                    }
+//                }
             }
         }
     }
@@ -375,9 +375,9 @@ class HttpMethodDirector {
                 execCount++;
                 try {
 
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Attempt number " + execCount + " to process request");
-                    }
+//                    if (LOG.isTraceEnabled()) {
+//                        //LOG.trace("Attempt number " + execCount + " to process request");
+//                    }
                     if (this.conn.getParams().isStaleCheckingEnabled()) {
                         this.conn.closeIfStale();
                     }
@@ -401,7 +401,7 @@ class HttpMethodDirector {
                     // filter out protocol exceptions which cannot be recovered from
                     throw e;
                 } catch (IOException e) {
-                    LOG.debug("Closing the connection.");
+                   //   LOG.debug("Closing the connection.");
                     this.conn.close();
                     // test if this method should be retried
                     // ========================================
@@ -417,8 +417,8 @@ class HttpMethodDirector {
                                     new HttpRecoverableException(e.getMessage()),
                                     execCount, 
                                     method.isRequestSent())) {
-                                LOG.debug("Method retry handler returned false. "
-                                        + "Automatic recovery will not be attempted");
+                               //   LOG.debug("Method retry handler returned false. "
+                                      //  + "Automatic recovery will not be attempted");
                                 throw e;
                             }
                         }
@@ -431,30 +431,30 @@ class HttpMethodDirector {
                         handler = new DefaultHttpMethodRetryHandler();
                     }
                     if (!handler.retryMethod(method, e, execCount)) {
-                        LOG.debug("Method retry handler returned false. "
-                                + "Automatic recovery will not be attempted");
+                       //   LOG.debug("Method retry handler returned false. "
+                            //    + "Automatic recovery will not be attempted");
                         throw e;
                     }
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("I/O exception ("+ e.getClass().getName() +") caught when processing request: "
-                                + e.getMessage());
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(e.getMessage(), e);
-                    }
-                    LOG.info("Retrying request");
+//                    if (LOG.isInfoEnabled()) {
+//                        LOG.info("I/O exception ("+ e.getClass().getName() +") caught when processing request: "
+//                                + e.getMessage());
+//                    }
+                   //  if (LOG.isDebugEnabled()) {
+                       //   LOG.debug(e.getMessage(), e);
+                   // }
+                  //  LOG.info("Retrying request");
                 }
             }
         } catch (IOException e) {
             if (this.conn.isOpen()) {
-                LOG.debug("Closing the connection.");
+               //   LOG.debug("Closing the connection.");
                 this.conn.close();
             }
             releaseConnection = true;
             throw e;
         } catch (RuntimeException e) {
             if (this.conn.isOpen()) {
-                LOG.debug("Closing the connection.");
+               //   LOG.debug("Closing the connection.");
                 this.conn.close();
             }
             releaseConnection = true;
@@ -483,14 +483,14 @@ class HttpMethodDirector {
             }
             if (this.params.isAuthenticationPreemptive()
                     || this.state.isAuthenticationPreemptive()) {
-                LOG.debug("Preemptively sending default basic credentials");
+               //   LOG.debug("Preemptively sending default basic credentials");
                 this.connectMethod.getProxyAuthState().setPreemptive();
                 this.connectMethod.getProxyAuthState().setAuthAttempted(true);
             }
             try {
                 authenticateProxy(this.connectMethod);
             } catch (AuthenticationException e) {
-                LOG.error(e.getMessage(), e);
+                //LOG.error(e.getMessage(), e);
             }
             applyConnectionParams(this.connectMethod);                    
             this.connectMethod.execute(state, this.conn);
@@ -539,7 +539,7 @@ class HttpMethodDirector {
         // object in response to the original request that 
         // contains the correct status line, headers & 
         // response body.
-        LOG.debug("CONNECT failed, fake the response for the original method");
+       //   LOG.debug("CONNECT failed, fake the response for the original method");
         // Pass the status, headers and response stream to the wrapped
         // method.
         // To ensure that the connection is not released more than once
@@ -558,8 +558,8 @@ class HttpMethodDirector {
             this.connectMethod = null;
         } else {
             releaseConnection = true;
-            LOG.warn(
-                "Unable to fake response on method as it is not derived from HttpMethodBase.");
+            //LOG.warn(
+               // "Unable to fake response on method as it is not derived from HttpMethodBase.");
         }
     }
     
@@ -574,14 +574,14 @@ class HttpMethodDirector {
         Header locationHeader = method.getResponseHeader("location");
         if (locationHeader == null) {
             // got a redirect response, but no location header
-            LOG.error("Received redirect response " + method.getStatusCode()
-                    + " but no location header");
+            //LOG.error("Received redirect response " + method.getStatusCode()
+            //        + " but no location header");
             return false;
         }
         String location = locationHeader.getValue();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Redirect requested to location '" + location + "'");
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Redirect requested to location '" + location + "'");
+       // }
         
         //rfc2616 demands the location value be a complete URI
         //Location       = "Location" ":" absoluteURI
@@ -602,11 +602,11 @@ class HttpMethodDirector {
             
             if (redirectUri.isRelativeURI()) {
                 if (this.params.isParameterTrue(HttpClientParams.REJECT_RELATIVE_REDIRECT)) {
-                    LOG.warn("Relative redirect location '" + location + "' not allowed");
+                    //LOG.warn("Relative redirect location '" + location + "' not allowed");
                     return false;
                 } else { 
                     //location is incomplete, use current values for defaults
-                    LOG.debug("Redirect URI is not absolute - parsing as relative");
+                   //   LOG.debug("Redirect URI is not absolute - parsing as relative");
                     redirectUri = new URI(currentUri, redirectUri);
                 }
             } else {
@@ -640,10 +640,10 @@ class HttpMethodDirector {
             }
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Redirecting from '" + currentUri.getEscapedURI()
-                + "' to '" + redirectUri.getEscapedURI());
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Redirecting from '" + currentUri.getEscapedURI()
+             //   + "' to '" + redirectUri.getEscapedURI());
+      //  }
         //And finally invalidate the actual authentication scheme
         method.getHostAuthState().invalidate(); 
         return true;
@@ -659,8 +659,8 @@ class HttpMethodDirector {
      *   and matching credentials have been found), <tt>false</tt> otherwise.
      */
     private boolean processAuthenticationResponse(final HttpMethod method) {
-        LOG.trace("enter HttpMethodBase.processAuthenticationResponse("
-            + "HttpState, HttpConnection)");
+        //LOG.trace("enter HttpMethodBase.processAuthenticationResponse("
+         //   + "HttpState, HttpConnection)");
 
         try {
             switch (method.getStatusCode()) {
@@ -672,9 +672,9 @@ class HttpMethodDirector {
                     return false;
             }
         } catch (Exception e) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error(e.getMessage(), e);
-            }
+//            if (LOG.isErrorEnabled()) {
+//                //LOG.error(e.getMessage(), e);
+//            }
             return false;
         }
     }
@@ -686,16 +686,16 @@ class HttpMethodDirector {
         Map challenges = AuthChallengeParser.parseChallenges(
             method.getResponseHeaders(WWW_AUTH_CHALLENGE));
         if (challenges.isEmpty()) {
-            LOG.debug("Authentication challenge(s) not found");
+           //   LOG.debug("Authentication challenge(s) not found");
             return false; 
         }
         AuthScheme authscheme = null;
         try {
             authscheme = this.authProcessor.processChallenge(authstate, challenges);
         } catch (AuthChallengeException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(e.getMessage());
-            }
+//            if (LOG.isWarnEnabled()) {
+//                //LOG.warn(e.getMessage());
+//            }
         }
         if (authscheme == null) {
             return false;
@@ -710,17 +710,17 @@ class HttpMethodDirector {
             authscheme.getRealm(), 
             authscheme.getSchemeName());
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Authentication scope: " + authscope);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Authentication scope: " + authscope);
+       // }
         if (authstate.isAuthAttempted() && authscheme.isComplete()) {
             // Already tried and failed
             Credentials credentials = promptForCredentials(
                 authscheme, method.getParams(), authscope);
             if (credentials == null) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Failure authenticating with " + authscope);
-                }
+//                if (LOG.isInfoEnabled()) {
+//                    LOG.info("Failure authenticating with " + authscope);
+//                }
                 return false;
             } else {
                 return true;
@@ -733,9 +733,9 @@ class HttpMethodDirector {
                     authscheme, method.getParams(), authscope);
             }
             if (credentials == null) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("No credentials available for " + authscope); 
-                }
+//                if (LOG.isInfoEnabled()) {
+//                    LOG.info("No credentials available for " + authscope); 
+//                }
                 return false;
             } else {
                 return true;
@@ -750,16 +750,16 @@ class HttpMethodDirector {
         Map proxyChallenges = AuthChallengeParser.parseChallenges(
             method.getResponseHeaders(PROXY_AUTH_CHALLENGE));
         if (proxyChallenges.isEmpty()) {
-            LOG.debug("Proxy authentication challenge(s) not found");
+           //   LOG.debug("Proxy authentication challenge(s) not found");
             return false; 
         }
         AuthScheme authscheme = null;
         try {
             authscheme = this.authProcessor.processChallenge(authstate, proxyChallenges);
         } catch (AuthChallengeException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(e.getMessage());
-            }
+//            if (LOG.isWarnEnabled()) {
+//                //LOG.warn(e.getMessage());
+//            }
         }
         if (authscheme == null) {
             return false;
@@ -769,17 +769,17 @@ class HttpMethodDirector {
             authscheme.getRealm(), 
             authscheme.getSchemeName());  
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Proxy authentication scope: " + authscope);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Proxy authentication scope: " + authscope);
+       // }
         if (authstate.isAuthAttempted() && authscheme.isComplete()) {
             // Already tried and failed
             Credentials credentials = promptForProxyCredentials(
                 authscheme, method.getParams(), authscope);
             if (credentials == null) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Failure authenticating with " + authscope);
-                }
+//                if (LOG.isInfoEnabled()) {
+//                    LOG.info("Failure authenticating with " + authscope);
+//                }
                 return false;
             } else {
                 return true;
@@ -792,9 +792,9 @@ class HttpMethodDirector {
                     authscheme, method.getParams(), authscope);
             }
             if (credentials == null) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("No credentials available for " + authscope); 
-                }
+//                if (LOG.isInfoEnabled()) {
+//                    LOG.info("No credentials available for " + authscope); 
+//                }
                 return false;
             } else {
                 return true;
@@ -815,7 +815,7 @@ class HttpMethodDirector {
             case HttpStatus.SC_MOVED_PERMANENTLY:
             case HttpStatus.SC_SEE_OTHER:
             case HttpStatus.SC_TEMPORARY_REDIRECT:
-                LOG.debug("Redirect required");
+               //   LOG.debug("Redirect required");
                 if (method.getFollowRedirects()) {
                     return true;
                 } else {
@@ -840,12 +840,12 @@ class HttpMethodDirector {
                 method.getStatusCode() == HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED);
         if (method.getHostAuthState().isAuthRequested() || 
             method.getProxyAuthState().isAuthRequested()) {
-            LOG.debug("Authorization required");
+           //   LOG.debug("Authorization required");
             if (method.getDoAuthentication()) { //process authentication response
                 return true;
             } else { //let the client handle the authenticaiton
-                LOG.info("Authentication requested but doAuthentication is "
-                        + "disabled");
+//                LOG.info("Authentication requested but doAuthentication is "
+//                        + "disabled");
                 return false;
             }
         } else {
@@ -858,7 +858,7 @@ class HttpMethodDirector {
         final HttpParams params, 
         final AuthScope authscope)
     {
-        LOG.debug("Credentials required");
+       //   LOG.debug("Credentials required");
         Credentials creds = null;
         CredentialsProvider credProvider = 
             (CredentialsProvider)params.getParameter(CredentialsProvider.PROVIDER);
@@ -867,16 +867,16 @@ class HttpMethodDirector {
                 creds = credProvider.getCredentials(
                     authScheme, authscope.getHost(), authscope.getPort(), false);
             } catch (CredentialsNotAvailableException e) {
-                LOG.warn(e.getMessage());
+                //LOG.warn(e.getMessage());
             }
             if (creds != null) {
                 this.state.setCredentials(authscope, creds);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(authscope + " new credentials given");
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug(authscope + " new credentials given");
+                //}
             }
         } else {
-            LOG.debug("Credentials provider not available");
+           //   LOG.debug("Credentials provider not available");
         }
         return creds;
     }
@@ -886,7 +886,7 @@ class HttpMethodDirector {
         final HttpParams params,
         final AuthScope authscope) 
     {
-        LOG.debug("Proxy credentials required");
+       //   LOG.debug("Proxy credentials required");
         Credentials creds = null;
         CredentialsProvider credProvider = 
             (CredentialsProvider)params.getParameter(CredentialsProvider.PROVIDER);
@@ -895,16 +895,16 @@ class HttpMethodDirector {
                 creds = credProvider.getCredentials(
                     authScheme, authscope.getHost(), authscope.getPort(), true);
             } catch (CredentialsNotAvailableException e) {
-                LOG.warn(e.getMessage());
+                //LOG.warn(e.getMessage());
             }
             if (creds != null) {
                 this.state.setProxyCredentials(authscope, creds);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(authscope + " new credentials given");
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug(authscope + " new credentials given");
+               // }
             }
         } else {
-            LOG.debug("Proxy credentials provider not available");
+           //   LOG.debug("Proxy credentials provider not available");
         }
         return creds;
     }

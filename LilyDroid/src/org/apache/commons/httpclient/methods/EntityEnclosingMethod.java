@@ -43,7 +43,7 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * This abstract class serves as a foundation for all HTTP methods 
@@ -74,7 +74,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
     public static final long CONTENT_LENGTH_CHUNKED = -1;
 
     /** LOG object for this class. */
-    private static final Log LOG = LogFactory.getLog(EntityEnclosingMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(EntityEnclosingMethod.class);
 
     /** The unbuffered request body, if any. */
     private InputStream requestStream = null;
@@ -132,7 +132,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * @since 2.0beta1
      */
     protected boolean hasRequestContent() {
-        LOG.trace("enter EntityEnclosingMethod.hasRequestContent()");
+        //LOG.trace("enter EntityEnclosingMethod.hasRequestContent()");
         return (this.requestEntity != null) 
             || (this.requestStream != null) 
             || (this.requestString != null);
@@ -147,7 +147,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * @since 2.0beta1
      */
     protected void clearRequestBody() {
-        LOG.trace("enter EntityEnclosingMethod.clearRequestBody()");
+        //LOG.trace("enter EntityEnclosingMethod.clearRequestBody()");
         this.requestStream = null;
         this.requestString = null;
         this.requestEntity = null;
@@ -165,7 +165,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * @since 2.0beta1
      */
     protected byte[] generateRequestBody() {
-        LOG.trace("enter EntityEnclosingMethod.renerateRequestBody()");
+        //LOG.trace("enter EntityEnclosingMethod.renerateRequestBody()");
         return null;
     }
 
@@ -187,9 +187,9 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
                 this.requestEntity = new StringRequestEntity(
                         requestString, null, charset);
             } catch (UnsupportedEncodingException e) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn(charset + " not supported");
-                }
+                //if (LOG.isWarnEnabled()) {
+                    //LOG.warn(charset + " not supported");
+                //}
                 try {
                     this.requestEntity = new StringRequestEntity(
                             requestString, null, null);
@@ -250,7 +250,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * {@link #setRequestEntity(RequestEntity)}
      */
     public void setRequestContentLength(int length) {
-        LOG.trace("enter EntityEnclosingMethod.setRequestContentLength(int)");
+        //LOG.trace("enter EntityEnclosingMethod.setRequestContentLength(int)");
         this.requestContentLength = length;
     }
 
@@ -301,7 +301,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * {@link #setRequestEntity(RequestEntity)}
      */
     public void setRequestContentLength(long length) {
-        LOG.trace("enter EntityEnclosingMethod.setRequestContentLength(int)");
+        //LOG.trace("enter EntityEnclosingMethod.setRequestContentLength(int)");
         this.requestContentLength = length;
     }
 
@@ -322,7 +322,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * @return number of bytes in the request body
      */
     protected long getRequestContentLength() {
-        LOG.trace("enter EntityEnclosingMethod.getRequestContentLength()");
+        //LOG.trace("enter EntityEnclosingMethod.getRequestContentLength()");
 
         if (!hasRequestContent()) {
             return 0;
@@ -367,8 +367,8 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      */
     protected void addRequestHeaders(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter EntityEnclosingMethod.addRequestHeaders(HttpState, "
-            + "HttpConnection)");
+        //LOG.trace("enter EntityEnclosingMethod.addRequestHeaders(HttpState, "
+          //  + "HttpConnection)");
 
         super.addRequestHeaders(state, conn);
         addContentLengthRequestHeader(state, conn);
@@ -398,8 +398,8 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
     protected void addContentLengthRequestHeader(HttpState state,
                                                  HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter EntityEnclosingMethod.addContentLengthRequestHeader("
-                  + "HttpState, HttpConnection)");
+        //LOG.trace("enter EntityEnclosingMethod.addContentLengthRequestHeader("
+                //  + "HttpState, HttpConnection)");
 
         if ((getRequestHeader("content-length") == null) 
             && (getRequestHeader("Transfer-Encoding") == null)) {
@@ -425,7 +425,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * @deprecated use {@link #setRequestEntity(RequestEntity)}
      */
     public void setRequestBody(InputStream body) {
-        LOG.trace("enter EntityEnclosingMethod.setRequestBody(InputStream)");
+        //LOG.trace("enter EntityEnclosingMethod.setRequestBody(InputStream)");
         clearRequestBody();
         this.requestStream = body;
     }
@@ -445,7 +445,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      * @deprecated use {@link #setRequestEntity(RequestEntity)}
      */
     public void setRequestBody(String body) {
-        LOG.trace("enter EntityEnclosingMethod.setRequestBody(String)");
+        //LOG.trace("enter EntityEnclosingMethod.setRequestBody(String)");
         clearRequestBody();
         this.requestString = body;
     }
@@ -466,18 +466,18 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      */
     protected boolean writeRequestBody(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace(
-            "enter EntityEnclosingMethod.writeRequestBody(HttpState, HttpConnection)");
+        //LOG.trace(
+        //    "enter EntityEnclosingMethod.writeRequestBody(HttpState, HttpConnection)");
         
         if (!hasRequestContent()) {
-            LOG.debug("Request body has not been specified");
+           //   LOG.debug("Request body has not been specified");
             return true;
         }
         if (this.requestEntity == null) {
             this.requestEntity = generateRequestEntity(); 
         }
         if (requestEntity == null) {
-            LOG.debug("Request body is empty");
+           //   LOG.debug("Request body is empty");
             return true;
         }
 
@@ -505,7 +505,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
         
         outstream.flush();
         
-        LOG.debug("Request body sent");
+       //   LOG.debug("Request body sent");
         return true;
     }
 
@@ -521,7 +521,7 @@ public abstract class EntityEnclosingMethod extends ExpectContinueMethod {
      *             version of HttpClient
      */
     public void recycle() {
-        LOG.trace("enter EntityEnclosingMethod.recycle()");
+        //LOG.trace("enter EntityEnclosingMethod.recycle()");
         clearRequestBody();
         this.requestContentLength = InputStreamRequestEntity.CONTENT_LENGTH_AUTO;
         this.repeatCount = 0;

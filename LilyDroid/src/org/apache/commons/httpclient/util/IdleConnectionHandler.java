@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * A helper class for connection managers to track idle connections.
@@ -48,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class IdleConnectionHandler {
     
-    private static final Log LOG = LogFactory.getLog(IdleConnectionHandler.class);
+   //   private static final Log LOG = LogFactory.getLog(IdleConnectionHandler.class);
     
     /** Holds connections and the time they were added. */
     private Map connectionToAdded = new HashMap();
@@ -72,9 +72,9 @@ public class IdleConnectionHandler {
         
         Long timeAdded = new Long(System.currentTimeMillis());
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Adding connection at: " + timeAdded);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Adding connection at: " + timeAdded);
+       // }
         
         connectionToAdded.put(connection, timeAdded);
     }
@@ -104,9 +104,9 @@ public class IdleConnectionHandler {
         // the latest time for which connections will be closed
         long idleTimeout = System.currentTimeMillis() - idleTime;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Checking for connections, idleTimeout: "  + idleTimeout);
-        }
+       //  if (LOG.isDebugEnabled()) {
+           //   LOG.debug("Checking for connections, idleTimeout: "  + idleTimeout);
+       // }
         
         Iterator connectionIter = connectionToAdded.keySet().iterator();
         
@@ -114,9 +114,9 @@ public class IdleConnectionHandler {
             HttpConnection conn = (HttpConnection) connectionIter.next();
             Long connectionTime = (Long) connectionToAdded.get(conn);
             if (connectionTime.longValue() <= idleTimeout) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Closing connection, connection time: "  + connectionTime);
-                }
+               //  if (LOG.isDebugEnabled()) {
+                   //   LOG.debug("Closing connection, connection time: "  + connectionTime);
+               // }
                 connectionIter.remove();
                 conn.close();
             }

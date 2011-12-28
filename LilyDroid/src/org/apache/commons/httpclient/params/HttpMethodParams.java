@@ -33,7 +33,7 @@ package org.apache.commons.httpclient.params;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * This class represents a collection of HTTP protocol parameters applicable to 
@@ -52,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
 public class HttpMethodParams extends DefaultHttpParams {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpMethodParams.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpMethodParams.class);
 
     /**
      * Defines the content of the <tt>User-Agent</tt> header used by  
@@ -316,7 +316,7 @@ public class HttpMethodParams extends DefaultHttpParams {
     public String getHttpElementCharset() {
         String charset = (String) getParameter(HTTP_ELEMENT_CHARSET);
         if (charset == null) {
-            LOG.warn("HTTP element charset not configured, using US-ASCII");
+            //LOG.warn("HTTP element charset not configured, using US-ASCII");
             charset = "US-ASCII";
         }
         return charset;
@@ -338,7 +338,7 @@ public class HttpMethodParams extends DefaultHttpParams {
     public String getContentCharset() {
         String charset = (String) getParameter(HTTP_CONTENT_CHARSET);
         if (charset == null) {
-            LOG.warn("Default content charset not configured, using ISO-8859-1");
+            //LOG.warn("Default content charset not configured, using ISO-8859-1");
             charset = "ISO-8859-1";
         }
         return charset;
@@ -381,7 +381,7 @@ public class HttpMethodParams extends DefaultHttpParams {
     public String getCredentialCharset() {
         String charset = (String) getParameter(CREDENTIAL_CHARSET);
         if (charset == null) {
-            LOG.debug("Credential charset not configured, using HTTP element charset");
+           //   LOG.debug("Credential charset not configured, using HTTP element charset");
             charset = getHttpElementCharset();
         }
         return charset;

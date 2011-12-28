@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Authentication policy class. The Authentication policy provides corresponding
@@ -103,7 +103,7 @@ public abstract class AuthPolicy {
     }
     
     /** Log object. */
-    protected static final Log LOG = LogFactory.getLog(AuthPolicy.class);
+    //protected static final Log LOG = LogFactory.getLog(AuthPolicy.class);
 
     /**
      * Registers a class implementing an {@link AuthScheme authentication scheme} with 
@@ -167,7 +167,7 @@ public abstract class AuthPolicy {
             try {
                 return (AuthScheme)clazz.newInstance();
             } catch (Exception e) {
-                LOG.error("Error initializing authentication scheme: " + id, e);
+                ////LOG.error("Error initializing authentication scheme: " + id, e);
                 throw new IllegalStateException(id + 
                     " authentication scheme implemented by " +
                     clazz.getName() + " could not be initialized");

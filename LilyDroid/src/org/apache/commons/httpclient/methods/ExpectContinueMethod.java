@@ -38,7 +38,7 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -71,7 +71,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class ExpectContinueMethod extends HttpMethodBase {
     
     /** LOG object for this class. */
-    private static final Log LOG = LogFactory.getLog(ExpectContinueMethod.class);
+   //   private static final Log LOG = LogFactory.getLog(ExpectContinueMethod.class);
 
     /**
      * No-arg constructor.
@@ -180,7 +180,7 @@ public abstract class ExpectContinueMethod extends HttpMethodBase {
      */
     protected void addRequestHeaders(HttpState state, HttpConnection conn)
     throws IOException, HttpException {
-        LOG.trace("enter ExpectContinueMethod.addRequestHeaders(HttpState, HttpConnection)");
+        //LOG.trace("enter ExpectContinueMethod.addRequestHeaders(HttpState, HttpConnection)");
         
         super.addRequestHeaders(state, conn);
         // If the request is being retried, the header may already be present

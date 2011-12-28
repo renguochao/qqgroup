@@ -37,7 +37,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * A RequestEntity that contains an InputStream.
@@ -52,7 +52,7 @@ public class InputStreamRequestEntity implements RequestEntity {
      */
     public static final int CONTENT_LENGTH_AUTO = -2;
     
-    private static final Log LOG = LogFactory.getLog(InputStreamRequestEntity.class);
+   //   private static final Log LOG = LogFactory.getLog(InputStreamRequestEntity.class);
     
     private long contentLength;
     
@@ -140,7 +140,7 @@ public class InputStreamRequestEntity implements RequestEntity {
                 this.content = null;
                 this.contentLength = buffer.length;
             } catch (IOException e) {
-                LOG.error(e.getMessage(), e);
+                //LOG.error(e.getMessage(), e);
                 this.buffer = null;
                 this.content = null;
                 this.contentLength = 0;

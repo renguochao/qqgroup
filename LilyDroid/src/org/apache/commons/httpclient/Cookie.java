@@ -38,7 +38,7 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.cookie.CookieSpec;
 import org.apache.commons.httpclient.util.LangUtils;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -104,7 +104,7 @@ public class Cookie extends NameValuePair implements Serializable, Comparator {
         String path, Date expires, boolean secure) {
             
         super(name, value);
-        LOG.trace("enter Cookie(String, String, String, String, Date, boolean)");
+        //LOG.trace("enter Cookie(String, String, String, String, Date, boolean)");
         if (name == null) {
             throw new IllegalArgumentException("Cookie name may not be null");
         }
@@ -453,7 +453,7 @@ public class Cookie extends NameValuePair implements Serializable, Comparator {
      * @return See {@link java.util.Comparator#compare(Object,Object)}
      */
     public int compare(Object o1, Object o2) {
-        LOG.trace("enter Cookie.compare(Object, Object)");
+        //LOG.trace("enter Cookie.compare(Object, Object)");
 
         if (!(o1 instanceof Cookie)) {
             throw new ClassCastException(o1.getClass().getName());
@@ -530,7 +530,7 @@ public class Cookie extends NameValuePair implements Serializable, Comparator {
    // -------------------------------------------------------------- Constants
 
    /** Log object for this class */
-   private static final Log LOG = LogFactory.getLog(Cookie.class);
+  //   private static final Log LOG = LogFactory.getLog(Cookie.class);
 
 }
 

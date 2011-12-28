@@ -40,7 +40,7 @@ import org.apache.commons.httpclient.cookie.CookieSpec;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.auth.AuthScope; 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -100,7 +100,7 @@ public class HttpState {
     public static final String PREEMPTIVE_DEFAULT = "false";
     
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(HttpState.class);
+   //   private static final Log LOG = LogFactory.getLog(HttpState.class);
 
     /**
      * Default constructor.
@@ -122,7 +122,7 @@ public class HttpState {
      * 
      */
     public synchronized void addCookie(Cookie cookie) {
-        LOG.trace("enter HttpState.addCookie(Cookie)");
+        //LOG.trace("enter HttpState.addCookie(Cookie)");
 
         if (cookie != null) {
             // first remove any old cookie that is equivalent
@@ -151,7 +151,7 @@ public class HttpState {
      * 
      */
     public synchronized void addCookies(Cookie[] cookies) {
-        LOG.trace("enter HttpState.addCookies(Cookie[])");
+        //LOG.trace("enter HttpState.addCookies(Cookie[])");
 
         if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
@@ -170,7 +170,7 @@ public class HttpState {
      * 
      */
     public synchronized Cookie[] getCookies() {
-        LOG.trace("enter HttpState.getCookies()");
+        //LOG.trace("enter HttpState.getCookies()");
         return (Cookie[]) (cookies.toArray(new Cookie[cookies.size()]));
     }
 
@@ -195,7 +195,7 @@ public class HttpState {
         String path, 
         boolean secure
     ) {
-        LOG.trace("enter HttpState.getCookies(String, int, String, boolean)");
+        //LOG.trace("enter HttpState.getCookies(String, int, String, boolean)");
 
         CookieSpec matcher = CookiePolicy.getDefaultSpec();
         ArrayList list = new ArrayList(cookies.size());
@@ -216,7 +216,7 @@ public class HttpState {
      * 
      */
     public synchronized boolean purgeExpiredCookies() {
-        LOG.trace("enter HttpState.purgeExpiredCookies()");
+        //LOG.trace("enter HttpState.purgeExpiredCookies()");
         return purgeExpiredCookies(new Date());
     }
 
@@ -233,7 +233,7 @@ public class HttpState {
      * @see #purgeExpiredCookies()
      */
     public synchronized boolean purgeExpiredCookies(Date date) {
-        LOG.trace("enter HttpState.purgeExpiredCookies(Date)");
+        //LOG.trace("enter HttpState.purgeExpiredCookies(Date)");
         boolean removed = false;
         Iterator it = cookies.iterator();
         while (it.hasNext()) {
@@ -335,7 +335,7 @@ public class HttpState {
      */
     
     public synchronized void setCredentials(String realm, String host, Credentials credentials) {
-        LOG.trace("enter HttpState.setCredentials(String, String, Credentials)");
+        //LOG.trace("enter HttpState.setCredentials(String, String, Credentials)");
         credMap.put(new AuthScope(host, AuthScope.ANY_PORT, realm, AuthScope.ANY_SCHEME), credentials);
     }
 
@@ -356,7 +356,7 @@ public class HttpState {
         if (authscope == null) {
             throw new IllegalArgumentException("Authentication scope may not be null");
         }
-        LOG.trace("enter HttpState.setCredentials(AuthScope, Credentials)");
+        //LOG.trace("enter HttpState.setCredentials(AuthScope, Credentials)");
         credMap.put(authscope, credentials);
     }
 
@@ -414,7 +414,7 @@ public class HttpState {
      */
     
     public synchronized Credentials getCredentials(String realm, String host) {
-        LOG.trace("enter HttpState.getCredentials(String, String");
+        //LOG.trace("enter HttpState.getCredentials(String, String");
         return matchCredentials(this.credMap, 
             new AuthScope(host, AuthScope.ANY_PORT, realm, AuthScope.ANY_SCHEME));
     }
@@ -433,7 +433,7 @@ public class HttpState {
         if (authscope == null) {
             throw new IllegalArgumentException("Authentication scope may not be null");
         }
-        LOG.trace("enter HttpState.getCredentials(AuthScope)");
+        //LOG.trace("enter HttpState.getCredentials(AuthScope)");
         return matchCredentials(this.credMap, authscope);
     }
 
@@ -462,7 +462,7 @@ public class HttpState {
         String proxyHost, 
         Credentials credentials
     ) {
-        LOG.trace("enter HttpState.setProxyCredentials(String, String, Credentials");
+        //LOG.trace("enter HttpState.setProxyCredentials(String, String, Credentials");
         proxyCred.put(new AuthScope(proxyHost, AuthScope.ANY_PORT, realm, AuthScope.ANY_SCHEME), credentials);
     }
 
@@ -485,7 +485,7 @@ public class HttpState {
         if (authscope == null) {
             throw new IllegalArgumentException("Authentication scope may not be null");
         }
-        LOG.trace("enter HttpState.setProxyCredentials(AuthScope, Credentials)");
+        //LOG.trace("enter HttpState.setProxyCredentials(AuthScope, Credentials)");
         proxyCred.put(authscope, credentials);
     }
 
@@ -509,7 +509,7 @@ public class HttpState {
      * @deprecated use #getProxyCredentials(AuthScope)
      */
     public synchronized Credentials getProxyCredentials(String realm, String proxyHost) {
-       LOG.trace("enter HttpState.getCredentials(String, String");
+       //LOG.trace("enter HttpState.getCredentials(String, String");
         return matchCredentials(this.proxyCred, 
             new AuthScope(proxyHost, AuthScope.ANY_PORT, realm, AuthScope.ANY_SCHEME));
     }
@@ -528,7 +528,7 @@ public class HttpState {
         if (authscope == null) {
             throw new IllegalArgumentException("Authentication scope may not be null");
         }
-        LOG.trace("enter HttpState.getProxyCredentials(AuthScope)");
+        //LOG.trace("enter HttpState.getProxyCredentials(AuthScope)");
         return matchCredentials(this.proxyCred, authscope);
     }
 
