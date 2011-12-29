@@ -38,6 +38,7 @@ import com.ztm.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
@@ -92,6 +93,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.GestureDetector.OnGestureListener;
@@ -105,6 +107,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -2130,8 +2133,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			btnlog.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View arg0) {
-					displayMsg("smily");
+					
+					
+					getSmilyGrid();
+					
 				}
+
+				
 
 			});
 			
@@ -2162,6 +2170,48 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			dlg.show();
 
 		}
+	}
+	
+	private void getSmilyGrid() {
+		// TODO Auto-generated method stub
+		
+		   Dialog dialog = new Dialog(TestAndroidActivity.this);  
+		   dialog.setContentView(R.layout.smilydlg);  
+		   GridView   findViewById =(GridView ) dialog.findViewById(R.id.updater_faceGrid);
+		   Set<String> keySet = smilyAll.keySet();
+		   ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();  
+           
+		   for (String string : keySet) {
+			   HashMap<String, Object> map = new HashMap<String, Object>();  
+			   map.put("ItemImage", smilyAll.get(string));//添加图像资源的ID    
+			   lstImageItem.add(map);
+		   }
+
+           //生成适配器的ImageItem <====> 动态数组的元素，两者一一对应    
+             MyGridAdapter saImageItems = new MyGridAdapter(this,   
+                                                       lstImageItem,//数据来源     
+                                                       R.layout.gridview_emotion_item,  
+                                                           
+                                                       //动态数组与ImageItem对应的子项            
+                                                       new String[] {"ItemImage"},     
+                                                           
+                                                       //ImageItem的XML文件里面的一个ImageView  
+                                                       new int[] {R.id.imageview_iv});    
+               
+             findViewById.setAdapter(saImageItems);    
+             
+             findViewById.setOnItemClickListener(new OnItemClickListener() {  
+                 public void onItemClick(AdapterView<?> parent, View view,  
+                         int position, long id) {  
+                     // TODO Auto-generated method stub  
+                     displayMsg(position+"");
+                   
+                 }  
+             });  
+             
+             dialog.show();  
+		   
+		
 	}
 	
 	private void doPickPhotoAction() {
