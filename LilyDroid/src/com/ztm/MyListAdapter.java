@@ -23,7 +23,7 @@ public class MyListAdapter  extends BaseAdapter{
 		private int[] to;
 		private int layoutid;
 		private HashMap info;
-		LayoutInflater myInflater;
+		LayoutInflater myInflater  = LayoutInflater.from(context);;
 		HashMap item; 
 
 		public MyListAdapter(Context context, List list, int layoutid, String[] from,int[] to)
@@ -49,9 +49,8 @@ public class MyListAdapter  extends BaseAdapter{
 			
 			return position;
 		}
-
 		public View getView(int position, View convertView, ViewGroup parent) {
-				myInflater = LayoutInflater.from(context);
+				
 
 				item = (HashMap) list.get(position);
 				convertView = myInflater.inflate(layoutid, null);
