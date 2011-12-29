@@ -10,8 +10,8 @@
         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_back"
             style="@style/normalBtn"
-            android:icon="@drawable/board"
-            android:text="所在版面" >
+            android:icon="@drawable/tag"
+            android:text="操 作" >
         </com.sonyericsson.zoom.ImageTextButton>
 
          <com.sonyericsson.zoom.ImageTextButton
@@ -34,7 +34,7 @@
             android:icon="@drawable/huifu"
             android:text="@string/huifu" >
         </com.sonyericsson.zoom.ImageTextButton>
-    </LinearLayout>
+    </LinearLayout>z
 
     <ScrollView
         android:id="@+id/scrollView"

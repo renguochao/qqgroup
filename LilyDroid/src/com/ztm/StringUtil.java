@@ -26,7 +26,8 @@ public class StringUtil {
 	static boolean isNext;
 	static String curAreaName;
 	static boolean topicWithImg = false;
-	
+	static int pageNum;
+	static String actitle;
 	
 
 	static Pattern mPattern = Pattern.compile("\\[(;|:).{1,4}\\]");
@@ -122,8 +123,21 @@ public class StringUtil {
 		        	reList.add(matcher.group());
 		        	
 		        }
-
-		
+		        
+		        pageNum = -1;
+		int lastIndexOf = data.lastIndexOf(" 篇文章.");
+		if(lastIndexOf>0)
+		{
+			String substring = data.substring(lastIndexOf-5, lastIndexOf);
+			int indexOf = substring.indexOf(" ");
+			if (indexOf>0)
+			{
+				String Num = substring.substring(indexOf+1);
+				pageNum = Integer.parseInt(Num);
+			}
+		}
+		        
+		        
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("textarea");
 //		if(tds.size()>reList.size())
@@ -138,6 +152,7 @@ public class StringUtil {
 			String userId ="";
 			content = text;
 			String nowP = "";
+			if(nowPos<0) nowPos=0;
 			{
 				nowP = (nowPos + k) + "";
 				if (k == 0) {
@@ -242,8 +257,22 @@ public class StringUtil {
 							
 							continue;
 						}
-						if (j == 2 && k != 1)
+						if (j == 2)
+						{
+							if(k != 1)
 							continue;
+							else
+							{
+								if(sconA.startsWith("标")) 
+								 {
+									 actitle = sconA.substring(5).toString();
+								 }
+								else
+								{
+									 actitle = "";
+								}
+							}
+						}
 						 if(j==3)
 						 {
 							 if(!sconA.startsWith("发信站:")) 
@@ -378,31 +407,31 @@ public class StringUtil {
         }
         matcher.appendTail(sb);
         //替换字体颜色
-        StringBuffer sb2= new StringBuffer();
+       
         
         if(sign!=null)
         {
-        	 int indexOf = sb2.indexOf(sign);
+        	 int indexOf = sb.indexOf(sign);
         	 if(indexOf>0)
         	 {
-        		 String signColor = sb2.substring(indexOf-7, indexOf) ;
+        		 String signColor = sb.substring(indexOf-7, indexOf) ;
         		 String sex = "";
         		 if(signColor.contains("36"))
         		 {
-        			 sex = "男";
+        			 sex = " - 男生";
         		 }
-        		 else  if(signColor.contains("37"))
+        		 else  if(signColor.contains("35"))
         		 {
-        			 sex = "女";
+        			 sex = " - 女生";
         		 }
         		 else
         		 {
-        			 sex = "未知";
+        			 sex = " - 未知";
         		 }
-        		 sb2.insert(indexOf+1, sex);
+        		 sb.insert(indexOf+1, sex);
         	 }
         }
-        
+        StringBuffer sb2= new StringBuffer();
         
         matcher = colorPat.matcher(sb);
         while (matcher.find()) {
@@ -414,7 +443,7 @@ public class StringUtil {
         matcher.appendTail(sb2);
        
         
-        return sb2.toString().replaceAll("\\[\\+reset\\]|\\[m|\\[(0|[0-9]{1,2})m", "</font>");
+        return sb2.toString().replaceAll("\\[\\+reset\\]|\\[m|\\[([0-9]{1,2};)*[0-9]{1,2}m", "</font>");
     }
     
 	

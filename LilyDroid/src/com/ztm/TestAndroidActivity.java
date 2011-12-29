@@ -220,7 +220,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private int datamsg = -1;
 	NameValuePair[] nvpCont = null;
 	Thread imageTrd;
-	
+	int pageNum;
+	String actitle;
 
 	// 拍照的照片存储位置
 	private static final File PHOTO_DIR = new File(Environment
@@ -239,7 +240,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mGestureDetector = new GestureDetector(this);
-		
+		this.setPersistent(true);
 		Resources res = getResources();
 		String color = res.getString(R.string.listColor);
 		listColorSpan = new ForegroundColorSpan(Color.parseColor(color));
@@ -875,6 +876,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		return btnBarVis;
 			
 	}
+	
+	
 
 	/**
 	 * 捕获按键事件
@@ -1028,6 +1031,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					break;
 				case Const.MSGAREA:
 					//讨论区
+					//getAreaCount();最近常去
 					chaToArea(data);
 					break;
 
@@ -2118,10 +2122,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				public void onClick(View arg0) {
 					doPickPhotoAction();
-					//displayMsg("我拍~");
 				}
 
 			});
+			
+			btnlog = (ImageButton) acdlgView.findViewById(R.id.btn_smy);
+			btnlog.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View arg0) {
+					displayMsg("smily");
+				}
+
+			});
+			
 			
 			
 			
@@ -2216,23 +2229,21 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	public  Intent getTakePickIntent(String ss) {
 		
-		 File imageDirectory = PHOTO_DIR;
-         String path = imageDirectory.toString().toLowerCase();
-          String name = imageDirectory.getName().toLowerCase();
+		File imageDirectory = PHOTO_DIR;
+		String path = imageDirectory.toString().toLowerCase();
+		String name = imageDirectory.getName().toLowerCase();
+		ContentValues values = new ContentValues();
+		values.put(Media.TITLE, "Image");
+		values.put(Images.Media.BUCKET_ID, path.hashCode());
+		values.put(Images.Media.BUCKET_DISPLAY_NAME, name);
 
-
-           ContentValues values = new ContentValues(); 
-           values.put(Media.TITLE, "Image"); 
-           values.put(Images.Media.BUCKET_ID, path.hashCode());
-           values.put(Images.Media.BUCKET_DISPLAY_NAME,name);
-
-           values.put(Images.Media.MIME_TYPE, "image/jpeg");
-           values.put(Media.DESCRIPTION, "Image capture by camera");
-          values.put("_data",mCurrentPhotoFile);
-          Uri uri = getContentResolver().insert( Media.EXTERNAL_CONTENT_URI , values);
-           Intent it = new Intent("android.media.action.IMAGE_CAPTURE"); 
-           it.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-	
+		values.put(Images.Media.MIME_TYPE, "image/jpeg");
+		values.put(Media.DESCRIPTION, "Image capture by camera");
+		values.put("_data", mCurrentPhotoFile);
+		Uri uri = getContentResolver().insert(Media.EXTERNAL_CONTENT_URI,
+				values);
+		Intent it = new Intent("android.media.action.IMAGE_CAPTURE");
+		it.putExtra(MediaStore.EXTRA_OUTPUT, uri);
 		return it;
 	}
 	
@@ -3035,6 +3046,90 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		return style;
 	}
+	
+	
+	
+	private void doTopicJump() {
+		String[] choices;
+		choices = new String[3];
+		choices[0] = "访问该讨论区";
+		choices[1] = "查看本主题全部";
+		choices[2] = "跳转到本主题某一页";
+		final ListAdapter adapter = new ArrayAdapter<String>( TestAndroidActivity.this,
+				android.R.layout.simple_dropdown_item_1line, choices);
+
+		final AlertDialog.Builder builder = new AlertDialog.Builder(
+				 TestAndroidActivity.this);
+		
+		builder.setSingleChoiceItems(adapter, -1,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						switch (which) {
+						case 0:{
+							getToAreaWithName( curAreaName);
+							break;
+						}
+						case 1:{
+							nowPos = -1;
+							isNext = false;
+							getUrlHtml(topicUrl + "&start=-1",
+									Const.MSGTOPICNEXT);
+							break;
+						}
+						case 2:{
+							int no = pageNum/30+1;
+							if(no>1)
+							{
+								String[] choices;
+								choices = new String[no];
+								for (int i=0;i<no;i++) {
+									choices[i] = "第 "+(i+1)+" 页";
+								}
+								final ListAdapter adapter = new ArrayAdapter<String>( TestAndroidActivity.this,
+										android.R.layout.simple_dropdown_item_1line, choices);
+
+								final AlertDialog.Builder builder = new AlertDialog.Builder(
+										 TestAndroidActivity.this);
+								
+								builder.setSingleChoiceItems(adapter, -1,
+										new DialogInterface.OnClickListener() {
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
+												nowPos = 30*(which);
+												getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICNEXT);
+											}});
+								
+								builder.setNegativeButton("返回", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int which) {
+										
+									}
+								});
+								builder.create().show();
+								
+							}
+							else
+							{
+								displayMsg("该主题就一页~");
+							}
+							
+							
+							
+							break;
+						}
+						}
+					}
+				});
+		builder.setNegativeButton("返回", new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int which) {
+			
+			}
+
+			
+		});
+		builder.create().show();
+	}
 
 	/**
 	 * 跳转到某个话题界面
@@ -3052,6 +3147,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		textView.setTextSize(txtFonts);
 		textView.setMovementMethod(LinkMovementMethod.getInstance());
 
+		if(actitle!=null&&actitle.length()>1)
+		{
+			setTitle(curAreaName+" - "+actitle);
+		}
 		textView.getBackground().setAlpha(backAlpha);
 		if (isTouch) {
 			textView.setOnTouchListener(this);
@@ -3074,28 +3173,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
 		mLoadingLayout.setVisibility(btnBarVis);
+		
+
 
 		Button btnBack = (Button) findViewById(R.id.btn_back);
 		btnBack.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				//
-				// if (curStatus == 1) {
-				// chaToMain();
-				// if (top10TopicList != null) {
-				// convtTopics();
-				// }
-				// } else if (curStatus == 2) {
-				// chaToArea(null);
-				// }
-				// else if (curStatus == 3) {
-				// chaToHot(null);
-				// }
-
-				urlString = "http://bbs.nju.edu.cn/bbstdoc?board="
-						+ curAreaName;
-				getUrlHtml(urlString, Const.MSGAREA);
-
+				doTopicJump();
+				
 			}
 		});
 
@@ -3128,7 +3214,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 			public void onClick(View v) {
 
-				if (isNext) {
+				if (isNext&&nowPos!=-1) {
 					nowPos = nowPos + 30;
 					getUrlHtml(topicUrl + "&start=" + nowPos,
 							Const.MSGTOPICNEXT);
@@ -3215,7 +3301,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 								curAreaName = string;
 						}
 						topicWithImg = StringUtil.topicWithImg;
+						pageNum = StringUtil.pageNum;
 
+						actitle = StringUtil.actitle;
 						topicData = Html.fromHtml(topicDataInfo,
 								new Html.ImageGetter() {
 									public Drawable getDrawable(String source) {

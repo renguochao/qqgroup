@@ -20,5 +20,5 @@
         <item name="android:textSize">10dip</item>
         <item name="android:background">@drawable/btnback</item>
     </style>
-
+   
 </resources>
