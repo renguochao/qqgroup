@@ -28,6 +28,7 @@ public class StringUtil {
 	static boolean topicWithImg = false;
 	static int pageNum;
 	static String actitle;
+	static HashMap<String,String> picTempFiles;
 	
 
 	static Pattern mPattern = Pattern.compile("\\[(;|:).{1,4}\\]");
@@ -39,6 +40,7 @@ public class StringUtil {
 	public static void initAll()
 	{
 		fFolorAll = BBSAll.getFColorAll();
+		picTempFiles = new HashMap<String,String>();
 	}
 	
 	public static String[] getArray(HashMap<String, String> bbsAll2) {
@@ -97,9 +99,7 @@ public class StringUtil {
 		string = allSb.toString();
 		return string;
 	}
-	
-	
-	
+
 	/**
 	 * 解析获取的页面 处理某个特定的话题
 	 * 
@@ -199,8 +199,26 @@ public class StringUtil {
 				}
 				else
 				{
-				content = content.substring(4, content.indexOf("发信站:"))
-						+ "<br><br>(以下省略)<br>";
+					
+				int indexOf2 = content.indexOf("发信人:");
+				
+				
+				
+				if(indexOf2>-1)
+				{
+					content = content.substring(4, content.indexOf("发信站:"))
+					+ "<br><br>(以下省略)<br>";
+				String sconA = content.substring(indexOf2+4);
+				int ind = sconA.indexOf(" (");
+				userId = sconA.substring(1, ind);
+				lz = " "+userId;
+				}
+				else
+				{
+					content = content.substring(0, content.indexOf("发信站:"))
+					+ "<br><br>(以下省略)<br>";
+				}
+				
 				}
 			} else {
 				/** * 处理硬回车 */

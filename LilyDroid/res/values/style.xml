@@ -20,5 +20,10 @@
         <item name="android:textSize">10dip</item>
         <item name="android:background">@drawable/btnback</item>
     </style>
+    
+        <style name="FullHeightDialog"
+    parent="android:style/Theme.Dialog">
+    <item name="android:windowNoTitle">true</item>
+  </style>
    
 </resources>

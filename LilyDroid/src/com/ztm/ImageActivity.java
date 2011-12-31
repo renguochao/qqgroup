@@ -2,6 +2,7 @@ package com.ztm;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -156,13 +157,72 @@ public class ImageActivity extends Activity {
         return super.onMenuItemSelected(featureId, item);  
     }  
 
-	
+    public static byte[] getFile(String path) throws Exception {  
+        byte[] b = null;  
+        File file = new File(path);  
+  
+        FileInputStream fis = null;  
+        ByteArrayOutputStream ops = null;  
+        try {  
+  
+            if (!file.exists()) {  
+               
+                return null;
+            }  
+            if (file.isDirectory()) {  
+            	   return null;
+            }  
+  
+            byte[] temp = new byte[2048];  
+  
+            fis = new FileInputStream(file);  
+            ops = new ByteArrayOutputStream(2048);  
+  
+            int n;  
+            while ((n = fis.read(temp)) != -1) {  
+                ops.write(temp, 0, n);  
+            }  
+            b = ops.toByteArray();  
+        } catch (Exception e) {  
+        	b=null;
+            throw new Exception();  
+        } finally {  
+            if (ops != null) {  
+                ops.close();  
+            }  
+            if (fis != null) {  
+                fis.close();  
+            }  
+        }  
+        return b;  
+    }  
 
 	public Drawable fetchDrawable(String source) {
 
 		Drawable drawable = null;
 		if (source.startsWith("http")) {
-			drawable = zoomDrawable(source);
+			
+			String  path =StringUtil.picTempFiles.get(source);
+			if(path==null) drawable = zoomDrawable(source);
+			else
+			{
+			byte[] file=null;
+			try {
+				file = getFile(path);
+			} catch (Exception e) {
+				
+			}
+			if(file!=null)
+			{
+				drawable = getDrawFromByte(file);
+			}
+			else
+			{
+				drawable = zoomDrawable(source);
+			}
+			}
+		
+			
 		} else {
 			return null;
 		}
@@ -250,9 +310,20 @@ public class ImageActivity extends Activity {
 	 */
 	public Drawable zoomDrawable(String urlPath) {
 
-		Bitmap bitmaps;
+		
 
 		byte[] imageByte = getImageFromURL(urlPath.trim());
+
+		// 以下是把图片转化为缩略图再加载
+		
+		return getDrawFromByte(imageByte);
+
+	}
+	
+
+	public Drawable getDrawFromByte(byte[] imageByte )
+	{
+		Bitmap bitmaps;
 
 		// 以下是把图片转化为缩略图再加载
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -260,8 +331,8 @@ public class ImageActivity extends Activity {
 		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
 				options);
 		return new BitmapDrawable(this.getResources(), bitmaps);
-
 	}
+	
 
 	public String getSDPath() {
 

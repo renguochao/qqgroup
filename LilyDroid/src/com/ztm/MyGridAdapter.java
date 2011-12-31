@@ -56,17 +56,21 @@ public class MyGridAdapter  extends BaseAdapter{
 
 				item = (HashMap) list.get(position);
 				convertView = myInflater.inflate(layoutid, null);
-				convertView.setTag(item);
+				//convertView.setTag(item);
 			
+				
 				int k=0;
 			for (int i : to) {
-				
 					ImageView number_tv = (ImageView) convertView.findViewById(i);
-				
 					int number_temp = (Integer)item.get(from[k]);
 					number_tv.setImageResource(number_temp);
-				
-				k++;
+					
+					k++;
+					
+					String s = (String)item.get(from[k]);
+					if(s.equals("[:]"))
+						s = "[:$]";
+					convertView.setTag(s);
 			}
 			
 			return convertView;

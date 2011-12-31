@@ -1,5 +1,6 @@
 package com.ztm;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -231,6 +232,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			.getExternalStorageDirectory()
 			+ "/lilyDroid/Photos");
 	
+	// 临时文件位置
+	private static final File TEMP_DIR = new File(Environment
+			.getExternalStorageDirectory()
+			+ "/lilyDroid/Temp");
+	
 	 String TMStr;
 	// TODO:定义全局变量
 	 
@@ -243,7 +249,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mGestureDetector = new GestureDetector(this);
-		this.setPersistent(true);
+		//this.setPersistent(true);
 		Resources res = getResources();
 		String color = res.getString(R.string.listColor);
 		listColorSpan = new ForegroundColorSpan(Color.parseColor(color));
@@ -278,6 +284,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				android.R.layout.simple_dropdown_item_1line, bbsAllArray);
 		initPhoneState();
 		initAllParams();
+		
+		if(!TEMP_DIR.exists())
+			TEMP_DIR.mkdirs();
+		
 		
 		if(isFull.equals("2"))
 		{
@@ -2134,19 +2144,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				public void onClick(View arg0) {
 					
-					
 					getSmilyGrid();
-					
 				}
-
-				
-
 			});
-			
-			
-			
-			
-
 			if (extraRecont.length() < 4) {
 
 				cb.setChecked(false);
@@ -2171,41 +2171,50 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		}
 	}
-	
+	MyGridAdapter saImageItems;
 	private void getSmilyGrid() {
 		// TODO Auto-generated method stub
 		
-		   Dialog dialog = new Dialog(TestAndroidActivity.this);  
+		   final Dialog dialog = new Dialog(TestAndroidActivity.this, R.style.FullHeightDialog);  
 		   dialog.setContentView(R.layout.smilydlg);  
+		   
 		   GridView   findViewById =(GridView ) dialog.findViewById(R.id.updater_faceGrid);
+		   if(saImageItems==null)
+		   {
 		   Set<String> keySet = smilyAll.keySet();
 		   ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();  
            
 		   for (String string : keySet) {
 			   HashMap<String, Object> map = new HashMap<String, Object>();  
 			   map.put("ItemImage", smilyAll.get(string));//添加图像资源的ID    
+			   map.put("ItemText", string);//添加图像资源的ID    
 			   lstImageItem.add(map);
 		   }
 
            //生成适配器的ImageItem <====> 动态数组的元素，两者一一对应    
-             MyGridAdapter saImageItems = new MyGridAdapter(this,   
+             saImageItems = new MyGridAdapter(this,   
                                                        lstImageItem,//数据来源     
                                                        R.layout.gridview_emotion_item,  
-                                                           
                                                        //动态数组与ImageItem对应的子项            
-                                                       new String[] {"ItemImage"},     
+                                                       new String[] {"ItemImage","ItemText"},     
                                                            
                                                        //ImageItem的XML文件里面的一个ImageView  
                                                        new int[] {R.id.imageview_iv});    
+		   }
                
              findViewById.setAdapter(saImageItems);    
-             
              findViewById.setOnItemClickListener(new OnItemClickListener() {  
                  public void onItemClick(AdapterView<?> parent, View view,  
                          int position, long id) {  
                      // TODO Auto-generated method stub  
-                     displayMsg(position+"");
-                   
+                	 
+                     EditText titleEdit = (EditText) acdlgView
+						.findViewById(R.id.edt_cont);
+                     if(titleEdit!=null)
+                     {
+                    	 titleEdit.append(view.getTag().toString());
+                     }
+                     dialog.dismiss();
                  }  
              });  
              
@@ -2810,9 +2819,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 			allChildList.add(childList);
 		}
-
-		
-
 	}
 
 	boolean isNext = true;
@@ -3472,7 +3478,27 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			} else
 				return null;
 		} else if (source.startsWith("http")) {
+			//先尝试从磁盘读取
+			
+			String  path =StringUtil.picTempFiles.get(source);
+			if(path==null) drawable = zoomDrawable(source);
+			else
+			{
+			byte[] file=null;
+			try {
+				file = getFile(path);
+			} catch (Exception e) {
+				
+			}
+			if(file!=null)
+			{
+				drawable = getDrawFromByte(file);
+			}
+			else
+			{
 			drawable = zoomDrawable(source);
+			}
+			}
 		} else {
 			return null;
 		}
@@ -3557,6 +3583,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		return data;
 	}
 
+	int fileNamei=0;
+	
+	
 	/**
 	 * 根据网络图片地址集批量获取网络图片
 	 * 
@@ -3566,9 +3595,93 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	 */
 	public Drawable zoomDrawable(String urlPath) {
 
+		
+		byte[] imageByte = getImageFromURL(urlPath.trim());
+		
+		
+		String filePath = TEMP_DIR+File.separator+"TEMP"+fileNamei;
+		fileNamei++;
+		StringUtil.picTempFiles.put(urlPath, filePath);
+		
+		try {
+			saveFile(imageByte,filePath);
+		} catch (Exception e) {
+			
+		}
+		return getDrawFromByte(imageByte);
+	}
+	
+	
+	public static byte[] getFile(String path) throws Exception {  
+        byte[] b = null;  
+        File file = new File(path);  
+  
+        FileInputStream fis = null;  
+        ByteArrayOutputStream ops = null;  
+        try {  
+  
+            if (!file.exists()) {  
+               
+                return null;
+            }  
+            if (file.isDirectory()) {  
+            	   return null;
+            }  
+  
+            byte[] temp = new byte[2048];  
+  
+            fis = new FileInputStream(file);  
+            ops = new ByteArrayOutputStream(2048);  
+  
+            int n;  
+            while ((n = fis.read(temp)) != -1) {  
+                ops.write(temp, 0, n);  
+            }  
+            b = ops.toByteArray();  
+        } catch (Exception e) {  
+        	b=null;
+            throw new Exception();  
+        } finally {  
+            if (ops != null) {  
+                ops.close();  
+            }  
+            if (fis != null) {  
+                fis.close();  
+            }  
+        }  
+        return b;  
+    }  
+	
+
+	public static void saveFile(byte[] b, String path) throws Exception {
+		File file = new File(path);
+		//file.createNewFile();
+		FileOutputStream fis = null;
+		BufferedOutputStream bos = null;
+		try {
+			fis = new FileOutputStream(file);
+			bos = new BufferedOutputStream(fis);
+			bos.write(b);
+		} catch (Exception e) {
+			System.out.println("asdsd");
+			throw new Exception(e);
+		} finally {
+			if (bos != null) {
+				bos.close();
+			}
+			if (fis != null) {
+				fis.close();
+			}
+		}
+	}
+	
+	
+	
+	
+	public Drawable getDrawFromByte(byte[] imageByte )
+	{
 		Bitmap bitmaps;
 
-		byte[] imageByte = getImageFromURL(urlPath.trim());
 
 		// 以下是把图片转化为缩略图再加载
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -3600,7 +3713,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		return new BitmapDrawable(null, bitmaps);
 		else
 			return new BitmapDrawable(this.getResources(), bitmaps);
-
 	}
 
 	private void exitPro() {
