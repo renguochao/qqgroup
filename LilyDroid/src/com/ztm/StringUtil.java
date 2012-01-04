@@ -465,7 +465,55 @@ public class StringUtil {
     }
     
 	
+    public static String getBetterTopic(String infoView)
+	{
+		String nbs = "<br>";
+		String content="";
+		String[] split = infoView.split(nbs);
+		StringBuffer sb = new StringBuffer();
+		int tempBr=0;
+		for (String sconA : split) {
+			if (sconA.length() < 1) {
+				if (tempBr == 0) {
+					tempBr = 1;
+					sb.append(sconA).append(nbs);
+				}
+				continue;
+			}
+			
+			sconA = sconA.trim();
+			
+			if (sconA.contains("À´Ô´:£®")||sconA.contains("ÐÞ¸Ä:£®")
+					|| sconA.equals("--"))
+			{
+				continue;
+			}
+			
+			
+
+			tempBr = 0;
+			String scon = "";
+			try {
+				scon = new String(sconA.getBytes("gb2312"),
+						"iso-8859-1");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			if (scon.length() < 71 || scon.length() > 89) {
+				sb.append(sconA + nbs);
+			} else {
+				sb.append(sconA);
+			}
+
+		}
+		
+		if(sb.length()>0)
+			content = sb.toString();
+
 	
+		return content;
+		
+	}
 	
    
 

@@ -257,6 +257,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		Drawable drawable = res.getDrawable(R.drawable.bkcolor);
 
+		this.getWindow().setBackgroundDrawable(drawable);
 		Drawable d = getResources().getDrawable(R.drawable.hottopcic);
 		d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 
@@ -275,7 +276,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		sLength = metric.heightPixels - 40; // 屏幕宽度（像素）
 		sdensity =(int) metric.density;
 
-		this.getWindow().setBackgroundDrawable(drawable);
 		bbsAll = BBSAll.getBBSAll();
 		bbsAllName = BBSAll.getBBSRightName();
 		smilyAll = BBSAll.getSmilyAll();
@@ -1150,7 +1150,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		getUrlHtml(mailURL + "?start=" + startPage, Const.MSGMAIL);
 
 	}
-	
+	/*
 	private String getBetterTopic(String infoView)
 	{
 		String nbs = "<br>";
@@ -1206,7 +1206,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		return content;
 		
 	}
-
+*/
 	private void chaToMailTopic() {
 		char s = 10;
 		String backS = s + "";
@@ -1222,7 +1222,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			Element textArea = scs.get(0);
 			String infoView = nbs + textArea.text();
 			
-			infoView = getBetterTopic(infoView);
+			infoView = StringUtil.getBetterTopic(infoView);
 
 			String withSmile = StringUtil.addSmileySpans(infoView,null);
 			setContentView(R.layout.mailtopic);
@@ -2703,14 +2703,46 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						
 						Map<String, Object> childMap = allChildList.get(
 								groupPosition).get(childPosition);
-						String name = (String) childMap.get("TITLE");
-						if (name == null || name.length() < 1||name.contains("※"))
-							return false;
-						int indexOf = name.indexOf('(');
-						if (indexOf > 0) {
-							name = name.substring(0, indexOf);
+						
+						Map<String, Object> parentMap = parentList.get(groupPosition);
+						String pareName = (String) parentMap.get("TITLE");
+						if(pareName.equals("博客浏览"))
+						{
+							String name = (String) childMap.get("TITLE");
+							String blogName = "";
+							if(name.equals("我的博客"))
+							{
+								if(isLogin)
+								{
+									blogName = loginId;
+								}
+								else
+								{
+									displayMsg("你还没有登录~");
+								}
+							}
+							else
+								blogName = name;
+							
+							getToBlogWithName(blogName);
+							
 						}
-						getToAreaWithName(name);
+						else
+						{
+						
+						
+							String name = (String) childMap.get("TITLE");
+							if (name == null || name.length() < 1||name.contains("※"))
+								return false;
+							int indexOf = name.indexOf('(');
+							if (indexOf > 0) {
+								name = name.substring(0, indexOf);
+							}
+							getToAreaWithName(name);
+						
+						}
+						
+						
 						lastPar = groupPosition;
 						lastChd=childPosition;
 						return false;
@@ -2750,6 +2782,25 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		curAreaName = "" + areaText;
 		getUrlHtml(urlString, Const.MSGAREA);
 	}
+	
+	private void getToBlogWithName(String name) {
+		if (name == null || name.length() < 1)
+			return;
+		name = name.trim();
+		
+		Intent intent = new Intent(TestAndroidActivity.this,
+				BlogActivity.class);
+		intent.putExtra("name", name);
+
+		startActivity(intent);
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	List<String> top20List;
 	List<String> forumList;
@@ -2819,6 +2870,25 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 			allChildList.add(childList);
 		}
+		
+		//blog
+		if (true) {
+			parentData = new HashMap<String, Object>();
+			parentData.put("TITLE", "博客浏览");
+			parentList.add(parentData);
+
+			// convtTOP20Area(data);
+
+			childList = new ArrayList<Map<String, Object>>();
+			
+				Map<String, Object> childData = new HashMap<String, Object>();
+				childData.put("TITLE","我的博客");
+				childList.add(childData);
+			
+			allChildList.add(childList);
+		}
+		
+		
 	}
 
 	boolean isNext = true;

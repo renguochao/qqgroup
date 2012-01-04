@@ -18,9 +18,56 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.Toast;
+
 public class NetTraffic {
 	
 	public static Cookie[] cookies = null;
+	public static String dataUrl = "";
+	public static int datamsg = -1;
+	public static int runningTasks = 0;
+	public static String data;
+	public static ProgressDialog progressDialog = null;
+	public static Handler myhandler;
+	
+	public static void getUrlHtml(Activity ac,String url, int msg,Handler handler) {
+		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
+			progressDialog = ProgressDialog.show(ac,
+					"请稍等...", "抓取网页信息中...", true);
+		}
+		runningTasks++;
+		myhandler = handler;
+		dataUrl = url;
+		datamsg = msg;
+		new Thread() {
+
+			@Override
+			public void run() {
+				// 需要花时间计算的方法
+				try {
+					data = NetTraffic.getHtmlContent(dataUrl);
+				} catch (Exception e) {
+					data = "error";
+				}
+				sendMsg(myhandler,datamsg);
+			}
+		}.start();
+
+	}
+	
+	public static void sendMsg(Handler handler,int meg) {
+		Message msg = new Message();
+		msg.what = meg;
+		handler.sendMessage(msg);
+	}
+	
+	
+	
+
 	
 	
 	
