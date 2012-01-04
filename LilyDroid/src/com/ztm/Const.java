@@ -45,6 +45,7 @@ public class Const {
 	public static final int MSGPSTFILE = 0x000018;
 	public static final int BLOGAREA = 0x000019;
 	public static final int BLOGTOPIC  = 0x000020;
+	public static final int BLOGCOMT = 0x000021;
 	
 	
 

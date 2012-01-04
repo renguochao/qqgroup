@@ -77,23 +77,32 @@ public class BlogTopicActivity extends Activity {
 		String result = intent.getStringExtra("withSmile");
 		String topicUrl = intent.getStringExtra("topicUrl");
 		
-		final String blogcocon = topicUrl.replace("blogcon", "blogcocon");
-		final String blogcomment = topicUrl.replace("blogcon", "blogcomment");
 		//http://bbs.nju.edu.cn/blogcocon?userid=Shelly&file=1315018855
 		//http://bbs.nju.edu.cn/blogcomment?userid=Shelly&file=1315018855
 		//http://bbs.nju.edu.cn/blogcon?userid=Shelly&file=1315018855
 		setContentView(R.layout.blogtopic);
 		TextView textView = (TextView) findViewById(R.id.label);
-		textView.setText(Html.fromHtml(result));
+		textView.setText(StringUtil.getSmilyStr(result,getResources()));
 		textView.setTextSize(18);
 		
+		if(topicUrl!=null)
+		{
+		final String blogcocon = topicUrl.replace("blogcon", "blogcocon");
+		final String blogcomment = topicUrl.replace("blogcon", "blogcomment");
 		Button btnPre = (Button) findViewById(R.id.btn_read);
 		btnPre.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				NetTraffic.getUrlHtml(BlogTopicActivity.this,blogcomment, Const.MSGREMAIL,handler);
+				NetTraffic.getUrlHtml(BlogTopicActivity.this,blogcocon, Const.BLOGCOMT,handler);
 			}
 		});
+		}
+		else
+		{
+			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+			
+			mLoadingLayout.setVisibility( View.GONE);
+		}
 		
 		
 		
@@ -107,10 +116,10 @@ public class BlogTopicActivity extends Activity {
 		public void handleMessage(Message msg) {
 			NetTraffic.runningTasks--;
 			if (msg.what != Const.MSGPSTNEW && NetTraffic.data.equals("error")) {
-				//NetTraffic.displayMsg("你的网络貌似有点小问题~");
+				displayMsg("你的网络貌似有点小问题~");
 			} else {
 				switch (msg.what) {
-				case Const.BLOGAREA:
+				case Const.BLOGCOMT:
 					chaToComment(NetTraffic.data);
 					break;
 				default:
@@ -125,6 +134,11 @@ public class BlogTopicActivity extends Activity {
 		}
 	};
 	
+	private void displayMsg(String msg) {
+		Toast.makeText(BlogTopicActivity.this, msg, Toast.LENGTH_SHORT)
+				.show();
+	}
+	
 	private void chaToComment(String topicData) {
 		char s = 10;
 		String backS = s + "";
@@ -133,10 +147,15 @@ public class BlogTopicActivity extends Activity {
 		Document doc = Jsoup.parse(topicData);
 		Elements scs = doc.getElementsByTag("textarea");
 		if (scs.size() != 1) {
-			//NetTraffic.displayMsg("获取博客内容失败!");
+			displayMsg("没有评论!");
 		} else {
 			Element textArea = scs.get(0);
+			
+			
 			String infoView = nbs + textArea.text();
+			
+			if(infoView.length()>5)
+			{
 			
 			infoView = StringUtil.getBetterTopic(infoView);
 
@@ -145,8 +164,13 @@ public class BlogTopicActivity extends Activity {
 			Intent intent = new Intent(BlogTopicActivity.this,
 					BlogTopicActivity.class);
 			
-			
+			intent.putExtra("withSmile", withSmile);
 			startActivity(intent);
+			}
+			else
+			{
+				displayMsg("没有评论!");
+			}
 		}
 
 	}

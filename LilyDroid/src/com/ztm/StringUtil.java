@@ -15,6 +15,9 @@ import org.jsoup.select.Elements;
 
 import com.ztm.TestAndroidActivity.MyURLSpan;
 
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -29,6 +32,7 @@ public class StringUtil {
 	static int pageNum;
 	static String actitle;
 	static HashMap<String,String> picTempFiles;
+	static HashMap<String, Integer> smilyAll;
 	
 
 	static Pattern mPattern = Pattern.compile("\\[(;|:).{1,4}\\]");
@@ -41,6 +45,7 @@ public class StringUtil {
 	{
 		fFolorAll = BBSAll.getFColorAll();
 		picTempFiles = new HashMap<String,String>();
+		smilyAll = BBSAll.getSmilyAll();
 	}
 	
 	public static String[] getArray(HashMap<String, String> bbsAll2) {
@@ -63,7 +68,42 @@ public class StringUtil {
 		} else
 			return false;
 	}
+	
+	public static Spanned getSmilyStr(String string,Resources res ) {
+		final Resources resou = res;
+		 return Html.fromHtml(string,
+					new Html.ImageGetter() {
+						public Drawable getDrawable(String source) {
 
+							Drawable drawable = null;
+							if (source.startsWith("[")) {
+								try {
+									
+									Integer i = smilyAll.get(source);
+									if (i != null) {
+										drawable = resou.getDrawable(i);
+									} 
+								} catch (Exception e) {
+									return null;
+								}
+								if (drawable == null)
+									return null;
+								int iw = drawable
+										.getIntrinsicWidth();
+								drawable
+										.setBounds(
+												0,
+												0,
+												iw,
+												drawable
+														.getIntrinsicHeight());
+							}
+							return drawable;
+
+						}
+					}, null);
+		}
+	
 	
 	public static String getStrBetter(String string) {
 

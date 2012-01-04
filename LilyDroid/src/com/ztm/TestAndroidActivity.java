@@ -1228,7 +1228,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			setContentView(R.layout.mailtopic);
 
 			textView = (TextView) findViewById(R.id.label);
-			textView.setText(Html.fromHtml(withSmile));
+			textView.setText(getSmilyStr(withSmile));
 			textView.setTextSize(txtFonts);
 			textView.getBackground().setAlpha(backAlpha);
 			
@@ -3430,36 +3430,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						pageNum = StringUtil.pageNum;
 
 						actitle = StringUtil.actitle;
-						topicData = Html.fromHtml(topicDataInfo,
-								new Html.ImageGetter() {
-									public Drawable getDrawable(String source) {
-
-										Drawable drawable = null;
-										if ("xian".equals(source)) {
-											drawable = xianDraw;
-											drawable.setBounds(0, 0, sWidth, 2);
-										} else if (source.startsWith("[")) {
-											try {
-												drawable = fetchDrawable(source);
-											} catch (Exception e) {
-												return null;
-											}
-											if (drawable == null)
-												return null;
-											int iw = drawable
-													.getIntrinsicWidth();
-											drawable
-													.setBounds(
-															0,
-															0,
-															iw,
-															drawable
-																	.getIntrinsicHeight());
-										}
-										return drawable;
-
-									}
-								}, null);
+						topicData =getSmilyStr(topicDataInfo);
 						if (topicWithImg) {
 
 							imageTrd = new Thread(topicDataInfo) {
@@ -3529,6 +3500,40 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 
 	HashMap<String, SoftReference<Drawable>> drawableMap = new HashMap<String, SoftReference<Drawable>>();
+	
+
+	public Spanned getSmilyStr(String string) {
+		 return Html.fromHtml(string,
+					new Html.ImageGetter() {
+						public Drawable getDrawable(String source) {
+
+							Drawable drawable = null;
+							if (source.startsWith("[")) {
+								try {
+									drawable = fetchDrawable(source);
+								} catch (Exception e) {
+									return null;
+								}
+								if (drawable == null)
+									return null;
+								int iw = drawable
+										.getIntrinsicWidth();
+								drawable
+										.setBounds(
+												0,
+												0,
+												iw,
+												drawable
+														.getIntrinsicHeight());
+							}
+							return drawable;
+
+						}
+					}, null);
+		}
+	
+	
+	
 
 	public Drawable fetchDrawable(String source) {
 		SoftReference<Drawable> drawableRef = drawableMap.get(source);
