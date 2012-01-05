@@ -64,10 +64,10 @@
     
     <ListPreference
         android:dialogTitle="选择按钮栏显示模式"
-        android:defaultValue="1"
+        android:defaultValue="2"
         android:entries="@array/bar_text"
         android:entryValues="@array/bar_value"
-        android:key="barStat"
+        android:key="barStatNew"
         android:summary="主题文章界面按钮栏是否显示"
         android:title="按钮栏显示" >
     </ListPreference>

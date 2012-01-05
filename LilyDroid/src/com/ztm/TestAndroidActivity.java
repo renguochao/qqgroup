@@ -972,7 +972,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				Context.MODE_PRIVATE);
 		isPic = sp.getString("picDS", "1");
 		isFull = sp.getString("isFull", "1");
-		barStat = sp.getString("barStat", "1");
+		barStat = sp.getString("barStatNew", "2");
 		
 		isTouch = sp.getBoolean("isTouch", true);
 		isBackWord = sp.getBoolean("isBackWord", true);
@@ -1124,6 +1124,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					//上传文件
 					checkRst(data);
 					break;
+					
+				case Const.BLOGAREA:
+					chaToBlog(data);
+					break;
 				default:
 					break;
 				}
@@ -1135,10 +1139,40 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		}
 
+	
 		
 
 	};
+	String blogUserName = "";
+	private void chaToBlog(String data) {
+		
+		if(data.contains("尚未建立blog"))
+		{
+			displayMsg("该用户尚未建立blog");
+			return;
+		}
+		else
+			if(data.contains("目前无法访问"))
+			{
+				displayMsg("该用户的blog目前无法访问");
+				return;
+			}
+			
+		else
+		{
+			Intent intent = new Intent(TestAndroidActivity.this,
+			BlogActivity.class);
+			intent.putExtra("data", data);
+			intent.putExtra("blogUserName", blogUserName);
+			runningTasks = 0;
+			progressDialog.dismiss();
 
+			startActivity(intent);
+		}
+		
+	}
+
+	
 	/**
 	 * 邮件界面翻页
 	 */
@@ -1296,6 +1330,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			Map<String, Object> map = new HashMap<String, Object>();
 
 			String title = topicInfo.getTitle();
+			
+			
+			int indexOf = title.indexOf('(');
+			if(indexOf>-1)
+			{
+				title = title.substring(0,indexOf);
+			}
+			
+			
 			SpannableString ss = null;
 
 			if (topicInfo.getMark().length() > 0) {
@@ -1621,12 +1664,17 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					.from(TestAndroidActivity.this);
 			final View info = factory.inflate(R.layout.infodlg, null);
 			Builder dlg = new AlertDialog.Builder(TestAndroidActivity.this)
-					.setTitle("用户信息查询").setView(info).setNegativeButton("确定",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int whichButton) {
-								}
-							});
+					.setTitle("用户信息查询").setView(info).setNegativeButton("博客",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							String to = infoView.substring(0, infoView
+									.indexOf(" ("));
+							getToBlogWithName(to);
+						}
+					});
+
+			
 
 			if (isLogin) {
 				dlg.setPositiveButton("写信",
@@ -1639,7 +1687,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 							}
 						});
-
+				
+				
 			}
 
 			AlertDialog ad = dlg.create();
@@ -2680,7 +2729,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				getToAreaWithName(inputPwd);
 			}
 		});
-		if (parentList == null || parentList.size() < 2)
+		if (parentList == null || parentList.size() < 3)
 			initAllAreas();
 
 		android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
@@ -2788,15 +2837,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			return;
 		name = name.trim();
 		
-		Intent intent = new Intent(TestAndroidActivity.this,
-				BlogActivity.class);
-		intent.putExtra("name", name);
-
-		startActivity(intent);
+//		Intent intent = new Intent(TestAndroidActivity.this,
+//				BlogActivity.class);
+//		intent.putExtra("name", name);
+//
+//		startActivity(intent);
+		
+		String url = blogUrl+name;
+		blogUserName = name;
+		getUrlHtml(url, Const.BLOGAREA);
 	}
 	
 	
-	
+	String blogUrl = "http://bbs.nju.edu.cn/vd59879/blogdoc?userid=";
 	
 	
 	
@@ -3502,13 +3555,17 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	HashMap<String, SoftReference<Drawable>> drawableMap = new HashMap<String, SoftReference<Drawable>>();
 	
 
+	
 	public Spanned getSmilyStr(String string) {
 		 return Html.fromHtml(string,
 					new Html.ImageGetter() {
 						public Drawable getDrawable(String source) {
 
 							Drawable drawable = null;
-							if (source.startsWith("[")) {
+							if ("xian".equals(source)) {
+								drawable = xianDraw;
+								drawable.setBounds(0, 0, sWidth, 2);
+							} else	if (source.startsWith("[")) {
 								try {
 									drawable = fetchDrawable(source);
 								} catch (Exception e) {

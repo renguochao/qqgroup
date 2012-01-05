@@ -85,9 +85,22 @@ public class BlogActivity extends Activity {
 		//setContentView(R.layout.blogarea);
 		Intent intent = getIntent();
 		String result = intent.getStringExtra("name");
+		if(result!=null)
+		{
 		setTitle(result+"的博客");
 		String url = blogUrl+result;
 		getUrlHtml(url, Const.BLOGAREA);
+		}
+		else
+		{
+			String blogUserName = intent.getStringExtra("blogUserName");
+			
+			setTitle(blogUserName+"的博客");
+			String data = intent.getStringExtra("data");
+			
+			chaToArea(data);
+		}
+		
 		
 	}
 	
@@ -181,14 +194,15 @@ public class BlogActivity extends Activity {
 	 */
 	private List<TopicInfo> getAreaTopic(String data) {
 		List<TopicInfo> tiList = new ArrayList<TopicInfo>();
-		
+		//尚未建立blog
 		
 			Document doc = Jsoup.parse(data);
 			Elements tds = doc.getElementsByTag("td");
 			int curPos = 0;
+			int line = 4;
 			int getTopicNo = 0;
 			boolean isOK = false;
-			while (curPos < tds.size()) {
+			while (curPos < tds.size()-3) {
 				 	if(!isOK)
 				 	{
 				 		String text = tds.get(curPos).text();
@@ -225,8 +239,14 @@ public class BlogActivity extends Activity {
 							areaNowTopic = Integer.parseInt(notext);
 							getTopicNo = 1;
 						}
+						
+						String del = tds.get(curPos+4).text();
+						if (del!=null&&del != "" && !Character.isDigit(del.charAt(0))) {
+							line = 5;
+						}
+						
 					}
-				curPos += 5;
+				curPos += line;
 			}											
 		Collections.reverse(tiList);
 		return tiList;
@@ -250,9 +270,15 @@ public class BlogActivity extends Activity {
 
 			String title = topicInfo.getTitle();
 			
+			int indexOf = title.indexOf('(');
+			if(indexOf>-1)
+			{
+				title = title.substring(0,indexOf);
+			}
+			
 			map.put("topictitle", title);
 
-			map.put("topicau", "人气:" + topicInfo.getHot());
+			map.put("topicau", topicInfo.getNums()+" 人气:" + topicInfo.getHot());
 			map.put("topicother", topicInfo.getPubDate());
 
 			list.add(map);

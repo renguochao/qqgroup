@@ -9,13 +9,13 @@
         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_read"
             style="@style/normalBtn"
-            android:icon="@drawable/mailback"
+            android:icon="@drawable/commt"
             android:text="查看评论" >
         </com.sonyericsson.zoom.ImageTextButton>
          <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_huifu"
             style="@style/normalBtn"
-            android:icon="@drawable/mailback"
+            android:icon="@drawable/pen"
             android:text="我来评论" >
         </com.sonyericsson.zoom.ImageTextButton>
     </LinearLayout>

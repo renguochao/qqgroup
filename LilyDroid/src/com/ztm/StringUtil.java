@@ -150,7 +150,7 @@ public class StringUtil {
 		StringBuffer tiList = new StringBuffer("<br>");
 		char s = 10;
 		String backS = s + "";
-		
+		topicWithImg = false;
 		data = data.replaceAll(backS, "<br>");
 		
 		//分析回复本文   功能<a href='bbspst?board=Pictures&file=M.1323243608.A'>回复本文</a>
@@ -244,14 +244,14 @@ public class StringUtil {
 				
 				
 				
-				if(indexOf2>-1)
+				if(indexOf2==0)
 				{
 					content = content.substring(4, content.indexOf("发信站:"))
 					+ "<br><br>(以下省略)<br>";
-				String sconA = content.substring(indexOf2+4);
-				int ind = sconA.indexOf(" (");
-				userId = sconA.substring(1, ind);
-				lz = " "+userId;
+				
+					int ind = content.indexOf(" (");
+					userId = content.substring(1, ind);
+					lz = " "+userId;
 				}
 				else
 				{
@@ -523,12 +523,18 @@ public class StringUtil {
 			
 			sconA = sconA.trim();
 			
-			if (sconA.contains("来源:．")||sconA.contains("修改:．")
+			
+			
+			if (sconA.contains("来源:．")||sconA.contains("修改:．")||sconA.contains("作  者:")
 					|| sconA.equals("--"))
 			{
 				continue;
 			}
-			
+			if(sconA.startsWith("[Head]"))
+			{
+				sb.append("[1;34m"+sconA.substring(6)+"[m"+ nbs);
+				continue;
+			}
 			
 
 			tempBr = 0;
