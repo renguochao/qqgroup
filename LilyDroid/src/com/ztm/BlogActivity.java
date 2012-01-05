@@ -185,6 +185,12 @@ public class BlogActivity extends Activity {
 				case Const.BLOGTOPIC:
 					chaToTopic(data);
 					break;
+					
+					
+				case Const.BLOGPAGE:
+					chaToPage(data);
+					break;
+					
 				default:
 					break;
 				}
@@ -195,7 +201,38 @@ public class BlogActivity extends Activity {
 			}
 
 		}
+
+		
 	};
+	
+	private void chaToPage(String data) {
+		// TODO Auto-generated method stub
+		
+		 List<TopicInfo> areaTopicNew = getAreaTopic(data);
+		 
+		 TopicInfo topicInfo2 = areaTopic.get(areaTopic.size()-1);
+		 int s = Integer.parseInt(topicInfo2.getNums());
+		 for (TopicInfo topicInfo : areaTopicNew) {
+			 int n = Integer.parseInt(topicInfo.getNums());
+			if(s>n)
+			{
+				areaTopic.add(topicInfo);
+			}
+		}
+		 while(areaTopic.size()>200)
+		 {
+			 for(int i=0;i<20;i++)
+			 {
+				 areaTopic.remove(0);
+			 }
+			 scrollY-=20;
+		 }
+		 //areaTopic.re
+		
+		 chaToArea(null);
+		
+		
+	}
 	
 	String curAreaName;
 	/**
@@ -240,19 +277,35 @@ public class BlogActivity extends Activity {
 		});
 		
 		listView = (ListView) findViewById(R.id.topicList);
-		addPageMore();
+		
+		 
+		if(moreTextView==null)
+		
+			{
+			addPageMore();
+			}
+		
 		
 		if (AreaData != null) {
 			areaTopic = getAreaTopic(AreaData);
 		}
 		convtAreaTopics();
 		
+		if(moreTextView!=null)
+		{
+			 moreTextView.setVisibility(View.VISIBLE);
+	         loadProgressBar.setVisibility(View.GONE);
+	         listView.setSelection(scrollY);
+	         System.out.println(""+scrollY);
+		}
+		
+		
 		
 		
 
 	}
-	
-	TextView moreTextView;
+	int scrollY;
+	TextView moreTextView=null;
 	LinearLayout loadProgressBar;
 	/**
      * 在ListView中添加"加载更多"
@@ -266,9 +319,23 @@ public class BlogActivity extends Activity {
           
             public void onClick(View v) {
                 //隐藏"加载更多"
+            	System.out.println(areaNowTopic+"");
+            	if(areaNowTopic<2)
+            	{
+            		displayMsg("该博客没有更多内容");
+            		return;
+            	}
+            	//userid=tiztm&start=4
+            	
+            	String url = blogUrl+curAreaName+"&start="+(areaNowTopic-21);
+            	getUrlHtml(url, Const.BLOGPAGE);
+            	
+            	scrollY = listView.getFirstVisiblePosition();
                 moreTextView.setVisibility(View.GONE);
                 //显示进度条
                 loadProgressBar.setVisibility(View.VISIBLE);
+                
+                
                
             }
         });
@@ -306,7 +373,29 @@ public class BlogActivity extends Activity {
 			Element textArea = scs.get(0);
 			String infoView = nbs + textArea.text();
 			
+			int indexOf = topicData.indexOf(">现有评论");
+			String comt="";
+			if(indexOf>0)
+			{
+				String substring = topicData.substring(indexOf+5);
+				int indexOf2 = substring.indexOf("条<");
+				if(indexOf2>0)
+				{
+					comt=substring.substring(0,indexOf2);
+				}
+				else
+				{
+					comt="0";
+				}
+			}
+			else
+			{
+				comt="0";
+			}
+			
 			infoView = StringUtil.getBetterTopic(infoView);
+			
+			infoView+=nbs+"-"+nbs+"[1;34m(现有评论  "+comt+" 条)[m "+nbs;
 
 			String withSmile = StringUtil.addSmileySpans(infoView,null);
 			
@@ -314,6 +403,7 @@ public class BlogActivity extends Activity {
 					BlogTopicActivity.class);
 			intent.putExtra("withSmile", withSmile);
 			intent.putExtra("topicUrl", topicUrl);
+			//intent.putExtra("comt", topicUrl);
 			
 			
 			startActivity(intent);
@@ -439,6 +529,7 @@ public class BlogActivity extends Activity {
 				public void onItemClick(AdapterView<?> arg0, View arg1,
 						int arg2, long arg3) {
 
+					if(arg2>=LinkAdr.size()) return;
 					topicUrl = LinkAdr.get(arg2);
 
 					if (topicUrl == null)
