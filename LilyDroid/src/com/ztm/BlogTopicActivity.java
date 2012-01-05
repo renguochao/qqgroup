@@ -47,6 +47,7 @@ import android.os.Message;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,37 +77,95 @@ public class BlogTopicActivity extends Activity {
 		Intent intent = getIntent();
 		String result = intent.getStringExtra("withSmile");
 		String topicUrl = intent.getStringExtra("topicUrl");
+
 		
-		//http://bbs.nju.edu.cn/blogcocon?userid=Shelly&file=1315018855
-		//http://bbs.nju.edu.cn/blogcomment?userid=Shelly&file=1315018855
-		//http://bbs.nju.edu.cn/blogcon?userid=Shelly&file=1315018855
+		
 		setContentView(R.layout.blogtopic);
+		
+		LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+		
+		
+		
 		TextView textView = (TextView) findViewById(R.id.label);
 		textView.setText(StringUtil.getSmilyStr(result,getResources()));
 		textView.setTextSize(18);
 		
 		if(topicUrl!=null)
 		{
-		final String blogcocon = topicUrl.replace("blogcon", "blogcocon");
-		final String blogcomment = topicUrl.replace("blogcon", "blogcomment");
-		Button btnPre = (Button) findViewById(R.id.btn_read);
-		btnPre.setOnClickListener(new OnClickListener() {
+			final String blogcocon = topicUrl.replace("blogcon", "blogcocon");
+			final String blogcomment = topicUrl.replace("blogcon", "blogcomment");
+			Button btnPre = (Button) findViewById(R.id.btn_read);
+			btnPre.setOnClickListener(new OnClickListener() {
+	
+				public void onClick(View v) {
+					NetTraffic.getUrlHtml(BlogTopicActivity.this,blogcocon, Const.BLOGCOMT,handler);
+				}
+			});
 
-			public void onClick(View v) {
-				NetTraffic.getUrlHtml(BlogTopicActivity.this,blogcocon, Const.BLOGCOMT,handler);
-			}
-		});
+			mLoadingLayout.setVisibility(btnBarVis);
 		}
 		else
 		{
-			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
-			
-			mLoadingLayout.setVisibility( View.GONE);
+			//LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+			mLoadingLayout.setVisibility(btnBarVis);
+			isNoBar = true;
 		}
 		
 		
 		
 	}
+	
+	
+	boolean isNoBar = false;
+	int btnBarVis = View.GONE;
+	private int getBtnRevtVis()
+	{
+		if(btnBarVis ==  View.VISIBLE)
+		{
+			btnBarVis = View.GONE;
+			
+		}
+		else
+		{
+			btnBarVis = View.VISIBLE;
+		}
+		return btnBarVis;
+			
+	}
+	
+	/**
+	 * 捕获按键事件
+	 */
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// 如果是返回键,直接返回到桌面
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			if(btnBarVis == View.VISIBLE)
+			{
+				LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+				mLoadingLayout.setVisibility(getBtnRevtVis());
+				return true;
+			}
+			
+
+		} 
+		
+		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+			if(mLoadingLayout!=null&&!isNoBar)
+			{
+				mLoadingLayout.setVisibility(getBtnRevtVis());
+				return true;
+			}
+			else
+			{
+				return super.onKeyDown(keyCode, event);
+			}
+		}
+		
+			return super.onKeyDown(keyCode, event);
+		
+	}
+	
 	
 	/**
 	 *  消息控制器，用来更新界面，因为在普通线程是无法用来更新界面的

@@ -2,11 +2,26 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
+    
+    
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        style="@style/normalTab" >
+        <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn_like"
+            style="@style/normalBtn"
+            android:icon="@drawable/fav"
+            >
+        </com.sonyericsson.zoom.ImageTextButton>
+
+    </LinearLayout>
+    
 
     <ListView
         android:id="@+id/topicList"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+          android:layout_above="@id/linearLayout1"
         android:cacheColorHint="#00000000"
         android:divider="#D3D3D3"
         android:dividerHeight="1dp"

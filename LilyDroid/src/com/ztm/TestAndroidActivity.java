@@ -944,7 +944,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		sharedPreferences = getSharedPreferences("LilyDroid",
 				Context.MODE_PRIVATE);
 		String name = sharedPreferences.getString("areaName", "");
+		String blogName = sharedPreferences.getString("blogName", "");
+
 		areaNamList = new ArrayList<String>();
+		ConstParam.blogNamList = new ArrayList<String>();
+		
 		isRem = sharedPreferences.getString("isRem", "false");
 		loginId = sharedPreferences.getString("loginId", "");
 		loginPwd = sharedPreferences.getString("loginPwd", "");
@@ -955,8 +959,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		if (mWiFiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
 			isWifi = true;
 		}
-		if (name == null || name.length() < 1)
-			return;
+		
+		//收藏的讨论区
+		if (name != null &&name.length() > 1)
+		{
 		String[] split = name.split(",");
 		for (String string : split) {
 			String string2 = bbsAllName.get(string.toLowerCase());
@@ -965,14 +971,29 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			else
 				areaNamList.add(string2);
 		}
+		}
+		
+		
+		//收藏的BLOG
+		if (blogName != null  && blogName.length() > 1)
+		{
+			String[] split = blogName.split(",");
+			for (String string : split) {
+				ConstParam.blogNamList.add(string);
+			}
+		}
+		
+		
 	}
+	
+	
 
 	private void myParams() {
 		SharedPreferences sp = getSharedPreferences("com.ztm_preferences",
 				Context.MODE_PRIVATE);
 		isPic = sp.getString("picDS", "1");
 		isFull = sp.getString("isFull", "1");
-		barStat = sp.getString("barStatNew", "2");
+		barStat = sp.getString("barStat", "1");
 		
 		isTouch = sp.getBoolean("isTouch", true);
 		isBackWord = sp.getBoolean("isBackWord", true);
@@ -1104,7 +1125,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				case Const.MSGRECBRD:
 					//所有热门讨论区
 					convtRecbrd(data);
-					initAllAreas();
+					//initAllAreas();
 					chaToAreaToGo();
 					break;
 				case Const.MSGMAIL:
@@ -1158,6 +1179,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				return;
 			}
 			
+			else
+				if(data.contains("错误的用户"))
+				{
+					displayMsg("错误的用户");
+					return;
+				}
+				
 		else
 		{
 			Intent intent = new Intent(TestAndroidActivity.this,
@@ -2726,10 +2754,24 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			public void onClick(View v) {
 				EditText secondPwd = (EditText) findViewById(R.id.area_edit);
 				String inputPwd = secondPwd.getText().toString();
-				getToAreaWithName(inputPwd);
+				//判断b 开头就去blog   g 开头就去讨论区
+				if(inputPwd.startsWith("b "))
+				{
+					getToBlogWithName(inputPwd.substring(2));
+				}
+				else if(inputPwd.startsWith("g "))
+				{
+					getToAreaWithName(inputPwd.substring(2));
+				}
+				else
+				{
+					getToAreaORBlogWithName(inputPwd);
+				}
+				
+				//getToAreaWithName(inputPwd);
 			}
 		});
-		if (parentList == null || parentList.size() < 3)
+		//if (parentList == null || parentList.size() < 3)
 			initAllAreas();
 
 		android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
@@ -2755,7 +2797,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						
 						Map<String, Object> parentMap = parentList.get(groupPosition);
 						String pareName = (String) parentMap.get("TITLE");
-						if(pareName.equals("博客浏览"))
+						if(pareName.equals("博客收藏"))
 						{
 							String name = (String) childMap.get("TITLE");
 							String blogName = "";
@@ -2811,6 +2853,31 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 
 	}
+	
+	
+	private void getToAreaORBlogWithName(String name) {
+		if (name == null || name.length() < 1)
+			return;
+		name = name.trim();
+		String areaText = bbsAll.get(name);
+		if(areaText == null)
+		{
+			areaText = name;
+			areaText = areaText.toLowerCase();
+			String string = bbsAllName.get(areaText);
+			if(string !=null)
+				areaText = string;
+			else
+			{
+				getToBlogWithName(areaText);
+				return;
+			}
+		}
+		
+		urlString = getResources().getString(R.string.areaStr) + areaText;
+		curAreaName = "" + areaText;
+		getUrlHtml(urlString, Const.MSGAREA);
+	}
 
 	private void getToAreaWithName(String name) {
 		if (name == null || name.length() < 1)
@@ -2837,12 +2904,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			return;
 		name = name.trim();
 		
-//		Intent intent = new Intent(TestAndroidActivity.this,
-//				BlogActivity.class);
-//		intent.putExtra("name", name);
-//
-//		startActivity(intent);
-		
 		String url = blogUrl+name;
 		blogUserName = name;
 		getUrlHtml(url, Const.BLOGAREA);
@@ -2862,15 +2923,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void initAllAreas() {
 		parentList = new ArrayList<Map<String, Object>>();
 		allChildList = new ArrayList<List<Map<String, Object>>>();
-
+		Map<String, Object> childData ;
 		Map<String, Object> parentData = new HashMap<String, Object>();
-		parentData.put("TITLE", "我的收藏");
+		parentData.put("TITLE", "版面收藏");
 		parentList.add(parentData);
 
 		List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
 
 		for (String s : areaNamList) {
-			Map<String, Object> childData = new HashMap<String, Object>();
+			 childData = new HashMap<String, Object>();
 			childData.put("TITLE", s);
 			childList.add(childData);
 		}
@@ -2881,11 +2942,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			parentData.put("TITLE", "今日热门");
 			parentList.add(parentData);
 
-			// convtTOP20Area(data);
-
 			childList = new ArrayList<Map<String, Object>>();
 			for (String topicInfo : top20List) {
-				Map<String, Object> childData = new HashMap<String, Object>();
+				 childData = new HashMap<String, Object>();
 				childData.put("TITLE",topicInfo);
 				childList.add(childData);
 			}
@@ -2897,11 +2956,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			parentData.put("TITLE", "分类精彩");
 			parentList.add(parentData);
 
-			// convtTOP20Area(data);
-
 			childList = new ArrayList<Map<String, Object>>();
 			for (String topicInfo : forumList) {
-				Map<String, Object> childData = new HashMap<String, Object>();
+				childData = new HashMap<String, Object>();
 				childData.put("TITLE",topicInfo);
 				childList.add(childData);
 			}
@@ -2913,33 +2970,28 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			parentData.put("TITLE", "首页推荐");
 			parentList.add(parentData);
 
-			// convtTOP20Area(data);
-
 			childList = new ArrayList<Map<String, Object>>();
 			for (String topicInfo : recbrdList) {
-				Map<String, Object> childData = new HashMap<String, Object>();
+				childData = new HashMap<String, Object>();
 				childData.put("TITLE",topicInfo);
 				childList.add(childData);
 			}
 			allChildList.add(childList);
 		}
 		
-		//blog
-		if (true) {
-			parentData = new HashMap<String, Object>();
-			parentData.put("TITLE", "博客浏览");
-			parentList.add(parentData);
+		
+		parentData = new HashMap<String, Object>();
+		parentData.put("TITLE", "博客收藏");
+		parentList.add(parentData);
 
-			// convtTOP20Area(data);
-
-			childList = new ArrayList<Map<String, Object>>();
-			
-				Map<String, Object> childData = new HashMap<String, Object>();
-				childData.put("TITLE","我的博客");
-				childList.add(childData);
-			
-			allChildList.add(childList);
+		childList = new ArrayList<Map<String, Object>>();
+		for (String s : ConstParam.blogNamList) {
+			childData = new HashMap<String, Object>();
+			childData.put("TITLE", s);
+			childList.add(childData);
 		}
+		allChildList.add(childList);
+		
 		
 		
 	}
@@ -3071,7 +3123,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		editor.putString("areaName", areaName);
 		editor.commit();
 
-		initAllAreas();
+		//initAllAreas();
 	}
 
 	/**

@@ -525,7 +525,7 @@ public class StringUtil {
 			
 			
 			
-			if (sconA.contains("来源:．")||sconA.contains("修改:．")||sconA.contains("作  者:")
+			if (sconA.contains("来源:．")||sconA.contains("修改:．")||sconA.contains("者:")
 					|| sconA.equals("--"))
 			{
 				continue;

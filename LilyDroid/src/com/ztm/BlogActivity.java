@@ -34,7 +34,10 @@ import com.sonyericsson.zoom.SimpleZoomListener.ControlType;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -47,6 +50,8 @@ import android.os.Message;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +59,7 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -78,31 +84,86 @@ public class BlogActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
+		
 		Resources res = getResources();
 		Drawable drawable = res.getDrawable(R.drawable.bkcolor);
 		this.getWindow().setBackgroundDrawable(drawable);
 		
-		//setContentView(R.layout.blogarea);
+		setContentView(R.layout.blogarea);
+		
+		LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.linearLayout1);
+		
+		mLoadingLayout.setVisibility(btnBarVis);
+		
 		Intent intent = getIntent();
 		String result = intent.getStringExtra("name");
 		if(result!=null)
 		{
-		setTitle(result+"的博客");
-		String url = blogUrl+result;
-		getUrlHtml(url, Const.BLOGAREA);
+			setTitle(result+"的博客");
+			curAreaName = result;
+			String url = blogUrl+result;
+			getUrlHtml(url, Const.BLOGAREA);
 		}
 		else
 		{
 			String blogUserName = intent.getStringExtra("blogUserName");
-			
+			curAreaName = blogUserName;
 			setTitle(blogUserName+"的博客");
 			String data = intent.getStringExtra("data");
-			
 			chaToArea(data);
 		}
+	}
+	
+	
+	int btnBarVis = View.GONE;
+	private int getBtnRevtVis()
+	{
+		if(btnBarVis ==  View.VISIBLE)
+		{
+			btnBarVis = View.GONE;
+			
+		}
+		else
+		{
+			btnBarVis = View.VISIBLE;
+		}
+		return btnBarVis;
+			
+	}
+	
+	/**
+	 * 捕获按键事件
+	 */
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			if(btnBarVis == View.VISIBLE)
+			{
+				LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.linearLayout1);
+				mLoadingLayout.setVisibility(getBtnRevtVis());
+				return true;
+			}
+		} 
+		
+		
+		// 如果是返回键,直接返回到桌面
+		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.linearLayout1);
+			if(mLoadingLayout!=null)
+			{
+				mLoadingLayout.setVisibility(getBtnRevtVis());
+				return true;
+			}
+			else
+			{
+				return super.onKeyDown(keyCode, event);
+			}
+		}
+		
+			return super.onKeyDown(keyCode, event);
 		
 	}
+	
 	
 	
 	/**
@@ -136,23 +197,101 @@ public class BlogActivity extends Activity {
 		}
 	};
 	
-	
+	String curAreaName;
 	/**
 	 * 跳转到讨论区界面
 	 * 
 	 * @param AreaData
 	 */
 	private void chaToArea(String AreaData) {
+		
+		
+		ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
+		
+		if (ConstParam.blogNamList.contains(curAreaName)) {
+			// btnLike.setBackgroundDrawable(drawableDis);
+			btnLike.setText("退 订");
+			btnLike.setIcon(R.drawable.fav);
+		} else {
+			// btnLike.setBackgroundDrawable(drawableFav);
+			btnLike.setText("收 藏");
+			btnLike.setIcon(R.drawable.unfav);
+			
+		}
+		btnLike.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
+				if (ConstParam.blogNamList.contains(curAreaName)) {
+					ConstParam.blogNamList.remove(curAreaName);
+					// btnLike.setBackgroundDrawable(drawableFav);
+					btnLike.setText("收 藏");
+					btnLike.setIcon(R.drawable.unfav);
+					
 
-		setContentView(R.layout.blogarea);
+				} else {
+					ConstParam.blogNamList.add(curAreaName);
+					// btnLike.setBackgroundDrawable(drawableDis);
+					btnLike.setText("退 订");
+					btnLike.setIcon(R.drawable.fav);
+				}
+				storeAreaName();
+			}
+
+		});
+		
 		listView = (ListView) findViewById(R.id.topicList);
+		addPageMore();
 		
 		if (AreaData != null) {
 			areaTopic = getAreaTopic(AreaData);
 		}
 		convtAreaTopics();
+		
+		
+		
 
 	}
+	
+	TextView moreTextView;
+	LinearLayout loadProgressBar;
+	/**
+     * 在ListView中添加"加载更多"
+     */
+    private void addPageMore(){
+        View view=LayoutInflater.from(this).inflate(R.layout.list_page_load, null);
+        moreTextView=(TextView)view.findViewById(R.id.more_id);
+        loadProgressBar=(LinearLayout)view.findViewById(R.id.load_id);
+        
+        moreTextView.setOnClickListener(new OnClickListener() {
+          
+            public void onClick(View v) {
+                //隐藏"加载更多"
+                moreTextView.setVisibility(View.GONE);
+                //显示进度条
+                loadProgressBar.setVisibility(View.VISIBLE);
+               
+            }
+        });
+        listView.addFooterView(view);
+    }
+	
+	
+	
+	private void storeAreaName() {
+		String areaName = "";
+		for (String name : ConstParam.blogNamList) {
+			areaName += name + ",";
+		}
+		if (areaName.length() > 1) {
+			areaName = areaName.substring(0, areaName.length() - 1);
+		}
+		SharedPreferences sharedPreferences = getSharedPreferences("LilyDroid",
+				Context.MODE_PRIVATE);
+		Editor editor = sharedPreferences.edit();// 获取编辑器
+		editor.putString("blogName", areaName);
+		editor.commit();
+	}
+	
 	
 	private void chaToTopic(String topicData) {
 		char s = 10;
@@ -239,10 +378,12 @@ public class BlogActivity extends Activity {
 							areaNowTopic = Integer.parseInt(notext);
 							getTopicNo = 1;
 						}
-						
+						if(curPos < tds.size()-4)
+						{
 						String del = tds.get(curPos+4).text();
 						if (del!=null&&del != "" && !Character.isDigit(del.charAt(0))) {
 							line = 5;
+						}
 						}
 						
 					}

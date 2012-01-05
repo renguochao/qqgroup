@@ -51,25 +51,17 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal" >
 
-     <TextView
-        android:id="@+id/area_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="2dp"
-        android:text="版名: "
-        android:textColor="#000000"
-        android:textSize="20dp" />
+    
     
     
     <AutoCompleteTextView
         android:id="@+id/area_edit"
          android:layout_marginTop="18dp"
-        android:layout_width="180dp"
+         android:hint="讨论版名或博客作者ID"
+        android:layout_width="220dp"
          android:layout_centerVertical="true"
         android:layout_height="wrap_content"
-       android:layout_toRightOf="@id/area_tv" />
+        android:layout_marginLeft="5dp" />
 
     <Button
         android:id="@+id/btn_go"
