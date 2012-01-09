@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -73,11 +74,11 @@ public class BlogActivity extends Activity {
 
 
 	String blogUrl = "http://bbs.nju.edu.cn/vd59879/blogdoc?userid=";
-	private String dataUrl = "";
-	private int datamsg = -1;
-	int runningTasks = 0;
-	private String data;
-	private ProgressDialog progressDialog = null;
+//	private String dataUrl = "";
+//	private int datamsg = -1;
+//	int runningTasks = 0;
+//	private String data;
+//	private ProgressDialog progressDialog = null;
 	private ListView listView;
 	
 	@Override
@@ -90,6 +91,10 @@ public class BlogActivity extends Activity {
 		this.getWindow().setBackgroundDrawable(drawable);
 		
 		setContentView(R.layout.blogarea);
+		if(ConstParam.isChange)
+		{
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
 		
 		LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.linearLayout1);
 		
@@ -102,7 +107,7 @@ public class BlogActivity extends Activity {
 			setTitle(result+"的博客");
 			curAreaName = result;
 			String url = blogUrl+result;
-			getUrlHtml(url, Const.BLOGAREA);
+			NetTraffic.getUrlHtml(BlogActivity.this,url, Const.BLOGAREA,handler);
 		}
 		else
 		{
@@ -172,32 +177,40 @@ public class BlogActivity extends Activity {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			runningTasks--;
-			if (msg.what != Const.MSGPSTNEW && data.equals("error")) {
+			NetTraffic.runningTasks--;
+			if (msg.what != Const.MSGPSTNEW && NetTraffic.data.equals("error")) {
 				displayMsg("你的网络貌似有点小问题~");
 			} else {
 				switch (msg.what) {
 				case Const.BLOGAREA:
-					chaToArea(data);
+					chaToArea(NetTraffic.data);
 					break;
 					
 					
 				case Const.BLOGTOPIC:
-					chaToTopic(data);
+					chaToTopic(NetTraffic.data);
 					break;
 					
 					
 				case Const.BLOGPAGE:
-					chaToPage(data);
+					chaToPage(NetTraffic.data);
+					break;
+					
+				case 12345:
+					if(moreTextView!=null)
+					{
+					 moreTextView.setVisibility(View.VISIBLE);
+			         loadProgressBar.setVisibility(View.GONE);
+					}
 					break;
 					
 				default:
 					break;
 				}
 			}
-			if (runningTasks < 1) {
-				runningTasks = 0;
-				progressDialog.dismiss();
+			if (NetTraffic.runningTasks < 1) {
+				NetTraffic.runningTasks = 0;
+				NetTraffic.progressDialog.dismiss();
 			}
 
 		}
@@ -245,7 +258,7 @@ public class BlogActivity extends Activity {
 		
 		ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 		
-		if (ConstParam.blogNamList.contains(curAreaName)) {
+		if (ConstParam.blogNamList!=null&&ConstParam.blogNamList.contains(curAreaName)) {
 			// btnLike.setBackgroundDrawable(drawableDis);
 			btnLike.setText("退 订");
 			btnLike.setIcon(R.drawable.fav);
@@ -296,7 +309,7 @@ public class BlogActivity extends Activity {
 			 moreTextView.setVisibility(View.VISIBLE);
 	         loadProgressBar.setVisibility(View.GONE);
 	         listView.setSelection(scrollY);
-	         System.out.println(""+scrollY);
+	       
 		}
 		
 		
@@ -328,9 +341,9 @@ public class BlogActivity extends Activity {
             	//userid=tiztm&start=4
             	
             	String url = blogUrl+curAreaName+"&start="+(areaNowTopic-21);
-            	getUrlHtml(url, Const.BLOGPAGE);
+            	NetTraffic.getUrlHtml(BlogActivity.this,url, Const.BLOGPAGE,handler);
             	
-            	scrollY = listView.getFirstVisiblePosition();
+            	scrollY = listView.getFirstVisiblePosition()+1;
                 moreTextView.setVisibility(View.GONE);
                 //显示进度条
                 loadProgressBar.setVisibility(View.VISIBLE);
@@ -536,7 +549,7 @@ public class BlogActivity extends Activity {
 						return;
 
 					
-					getUrlHtml(topicUrl, Const.BLOGTOPIC);
+					NetTraffic.getUrlHtml(BlogActivity.this,topicUrl, Const.BLOGTOPIC,handler);
 
 				}
 			});
@@ -553,36 +566,7 @@ public class BlogActivity extends Activity {
 				.show();
 	}
 	
-	private void getUrlHtml(String url, int msg) {
-		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
-			progressDialog = ProgressDialog.show(BlogActivity.this,
-					"请稍等...", "抓取网页信息中...", true);
-		}
-		runningTasks++;
 
-		dataUrl = url;
-		datamsg = msg;
-		new Thread() {
-
-			@Override
-			public void run() {
-				// 需要花时间计算的方法
-				try {
-					data = NetTraffic.getHtmlContent(dataUrl);
-				} catch (Exception e) {
-					data = "error";
-				}
-				sendMsg(datamsg);
-			}
-		}.start();
-
-	}
-	
-	private void sendMsg(int meg) {
-		Message msg = new Message();
-		msg.what = meg;
-		handler.sendMessage(msg);
-	}
 	
 
 }

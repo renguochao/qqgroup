@@ -151,6 +151,23 @@
         android:title="显示模式(需重启)" >
     </ListPreference>
    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="isChange"
+        android:summaryOff="随重力方向改变屏幕方向"
+        android:summaryOn="一直竖屏"
+        android:title="保持竖屏(需重启)" >
+    </CheckBoxPreference>   
+    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="isAuto"
+        android:summaryOff="关闭"
+        android:summaryOn="打开"
+        android:title="自动检查更新" >
+    </CheckBoxPreference>   
+       
+       
        
     
        

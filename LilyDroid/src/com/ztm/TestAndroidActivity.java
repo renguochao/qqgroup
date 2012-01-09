@@ -50,7 +50,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -157,9 +159,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String isFull;
 	String barStat;
 	
-	String signColor;
+	
 	String isRem = "false";
-	boolean isTouch;
+	
+	boolean isAuto;
 	boolean isIP;
 	boolean isMoreFast;
 	String loginId = "";
@@ -168,8 +171,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String androidmanufacturer;
 	String androidmodel;
 
-	String backWords = "";//
-	boolean isBackWord = true;
+	
+	
 
 	int runningTasks = 0;
 
@@ -186,7 +189,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	Drawable drawableDis;
 	boolean isLogin = false;
 	String nowLoginId = "";
-	int txtFonts;
+	
 	int backAlpha;
 	Spanned topicData;
 	int scrollY = 0;
@@ -203,6 +206,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String recbrdUrl ="http://bbs.nju.edu.cn/cache/t_recbrd.js";
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
 	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
+	String upUrl = "http://lilydroid.co.cc/manage/1.txt";
+	
+	
 	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
 	HashMap<String, String> fbNameAll = new HashMap<String, String>();
 	String bbsHotString = "http://bbs.nju.edu.cn/bbstopall";
@@ -211,8 +217,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	ImageSpan hotTopicSpan;
 	ImageSpan mailSpan;
 	Drawable xianDraw;
-	int sWidth = 480;
-	int sLength = 800;
+	
 	int sdensity;
 	
 	ForegroundColorSpan listColorSpan;
@@ -224,6 +229,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private int datamsg = -1;
 	NameValuePair[] nvpCont = null;
 	Thread imageTrd;
+	Thread acTrd;
 	int pageNum;
 	String actitle;
 
@@ -272,8 +278,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		xianDraw = res.getDrawable(R.drawable.xian);
 		DisplayMetrics metric = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
-		sWidth = metric.widthPixels - 30; // ÆÁÄ»¿í¶È£¨ÏñËØ£©
-		sLength = metric.heightPixels - 40; // ÆÁÄ»¿í¶È£¨ÏñËØ£©
+		ConstParam.sWidth = metric.widthPixels - 30; // ÆÁÄ»¿í¶È£¨ÏñËØ£©
+		ConstParam.sLength = metric.heightPixels - 40; // ÆÁÄ»¿í¶È£¨ÏñËØ£©
 		sdensity =(int) metric.density;
 
 		bbsAll = BBSAll.getBBSAll();
@@ -284,6 +290,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				android.R.layout.simple_dropdown_item_1line, bbsAllArray);
 		initPhoneState();
 		initAllParams();
+		
+		
+		if(ConstParam.isChange)
+		{
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+		
 		
 		if(!TEMP_DIR.exists())
 			TEMP_DIR.mkdirs();
@@ -317,6 +330,31 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		chaToLogin();
 		
+		if(isAuto)
+		{
+		getUpdateInfo(upUrl);
+		}
+		
+		
+	}
+
+	private void getUpdateInfo(String upUrl2) {
+		final String url = upUrl2;
+			acTrd = new Thread() {
+
+				@Override
+				public void run() {
+					// ÐèÒª»¨Ê±¼ä¼ÆËãµÄ·½·¨
+					try {
+						data = NetTraffic.getHtmlContent(url);
+					} catch (Exception e) {
+						data = "error";
+					}
+					sendMsg(Const.MSGUPDATE);
+					
+				}
+			};
+			acTrd.start();
 	}
 
 	private void InitMain() {
@@ -385,6 +423,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	private void chaToLogin() {
 		setContentView(R.layout.login);
+		isLogin = false;
+		nowLoginId = null;
 		setTitle("Ð¡°ÙºÏ");
 		curStatus = 0;
 		Button btnlog = (Button) findViewById(R.id.btn_login);
@@ -498,7 +538,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				public void onClick(View arg0) {
 					// ¿ÉÒÔ´ò¿ªÒ»¸öÐÂÏß³ÌÀ´¶ÁÈ¡£¬¼ÓÈë¹ö¶¯ÌõµÈ
-					if (parentList == null || parentList.size() < 2) {
+					if (parentList == null || parentList.size() < 3) {
 						String url = "http://bbs.nju.edu.cn/bbstopb10";
 						getUrlHtml(url, Const.TOP20BOARD);
 					} else
@@ -577,8 +617,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		case menuLogout:
 			// ×ªµ½µÇÂ¼½çÃæ
 			getUrlHtml(loginoutURL, 123);
-			isLogin = false;
-			nowLoginId = null;
 			chaToLogin();
 			break;
 
@@ -598,7 +636,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			if (isLogin) {
 
 				String cont = "\n\n\nÎÒµÄ»úÐÍ£º" + androidmodel + "\nÆÁÄ»¿í¸ß±È£º"
-						+ (sWidth + 30) + "x" + (sLength + 40);
+						+ (ConstParam.sWidth + 30) + "x" + (ConstParam.sLength + 40);
 
 				beginMail("tiztm", "Android°æÐ¡°ÙºÏÒâ¼û·´À¡", cont, null);
 			} else {
@@ -753,6 +791,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
 	    byte imageByte[]=getBytes(is);
+		@SuppressWarnings("unused")
 		Bitmap bitmap = BitmapFactory.decodeByteArray(imageByte, 0,
 				imageByte.length, options);
 		options.inJustDecodeBounds = false;
@@ -770,7 +809,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		if(options.inSampleSize <2)
 		{
-			//TODO:´ý²âÊÔ
 			uploadFileBBS(filePath);
 		}
 		else
@@ -860,7 +898,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			titleEdit = (EditText) acdlgView.findViewById(R.id.edt_cont);
 			titleEdit.setText(cont);
 		}
-		if (sLength < 300) {
+		if (ConstParam.sLength < 300) {
 			titleEdit = (EditText) acdlgView.findViewById(R.id.edt_cont);
 
 			LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) titleEdit
@@ -921,6 +959,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	
 	private void retBtn()
 	{
+	
+		
 		if (curStatus == 1) {
 			chaToMain();
 			if (top10TopicList != null) {
@@ -995,21 +1035,25 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		isFull = sp.getString("isFull", "1");
 		barStat = sp.getString("barStat", "1");
 		
-		isTouch = sp.getBoolean("isTouch", true);
-		isBackWord = sp.getBoolean("isBackWord", true);
-		backWords = sp
+		ConstParam.isTouch = sp.getBoolean("isTouch", true);
+		ConstParam.isBackWord = sp.getBoolean("isBackWord", true);
+		ConstParam.isChange = sp.getBoolean("isChange", true);
+		isAuto  = sp.getBoolean("isAuto", true);
+		
+		
+		ConstParam.backWords = sp
 				.getString("backWords", "·¢ËÍ×Ô ÎÒµÄÐ¡°ÙºÏAndroid¿Í»§¶Ë by ${model}");
 		isIP = sp.getBoolean("isIP", false);
-		signColor = sp.getString("signColor", "[1;32m");
+		ConstParam.signColor = sp.getString("signColor", "[1;32m");
 		camwidth =  sp.getString("camwidth", "800");
 		backAlpha = sp.getInt("backAlpha", 20);
 
 		backAlpha = (int) ((int) (100 - backAlpha) * 2.55);
-		backWords = backWords.replaceAll(TMStr, "");
-		backWords = backWords.replaceAll("\\$\\{model\\}", androidmodel+TMStr)
+		ConstParam.backWords = ConstParam.backWords.replaceAll(TMStr, "");
+		ConstParam.backWords = ConstParam.backWords.replaceAll("\\$\\{model\\}", androidmodel+TMStr)
 				.replaceAll("\\$\\{manufa\\}", androidmanufacturer);
 		isMoreFast = sp.getBoolean("isMoreMoreFast", false);
-		txtFonts = sp.getInt("txtFonts", 18);
+		ConstParam.txtFonts = sp.getInt("txtFonts", 18);
 
 		String fastRe = sp.getString("fastRe", "É³·¢");
 		if (fastRe.length() < 1) {
@@ -1032,8 +1076,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-
+			
+			if(msg.what != Const.MSGUPDATE &&!ConstParam.isLoading)
+			{
+				return;
+			}
+			if(msg.what != Const.MSGUPDATE)
+			{
 			runningTasks--;
+			}
 
 			if (msg.what != Const.MSGPSTNEW && data.equals("error")) {
 				displayMsg("ÄãµÄÍøÂçÃ²ËÆÓÐµãÐ¡ÎÊÌâ~");
@@ -1149,21 +1200,90 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				case Const.BLOGAREA:
 					chaToBlog(data);
 					break;
+					
+				case Const.MSGUPDATE:
+					checkUpdate(data);
+					
+					break;
 				default:
 					break;
 				}
 			}
-			if (runningTasks < 1) {
+			if (msg.what != Const.MSGUPDATE && runningTasks < 1) {
 				runningTasks = 0;
 				progressDialog.dismiss();
 			}
 
 		}
 
+		
 	
 		
 
 	};
+	
+	private void checkUpdate(String data) {
+		// TODO Auto-generated method stub
+		
+		/*»ñÈ¡µ±Ç°Ó¦ÓÃµÄ°æ±¾ºÅ*/
+
+		int vc = 99999;
+		try {
+			vc = TestAndroidActivity.this.getPackageManager().getPackageInfo(TestAndroidActivity.this.getPackageName(), 0).versionCode;
+		} catch (Exception e) {
+
+
+		e.printStackTrace();
+
+		}
+		int newvc = 0;
+		
+		final String[] split = data.replaceAll("\n", "").split("##");
+		if(split==null||split.length!=2)
+		{
+			return;
+		}
+		
+		try {
+			newvc = Integer.parseInt(split[0]);
+		} catch (Exception e) {
+
+		}
+		
+		if(vc<newvc)
+		{
+			
+			new AlertDialog.Builder(TestAndroidActivity.this).setTitle("ÌáÊ¾")
+			.setMessage("·¢ÏÖÐÂ°æ±¾£¡ÐèÒª¸üÐÂÂð£¿").setPositiveButton("È·¶¨",
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,
+								int which) {
+							
+							Uri uri = Uri.parse(split[1]); 
+
+							Intent intent =new Intent(Intent.ACTION_VIEW, uri);
+							
+							startActivity(intent);
+							
+						}
+
+					}).setNegativeButton("È¡Ïû",
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,
+								int which) {
+
+						}
+					}).show();
+			
+		}
+		
+		
+	}
+
+	
+	
 	String blogUserName = "";
 	private void chaToBlog(String data) {
 		
@@ -1291,7 +1411,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 			textView = (TextView) findViewById(R.id.label);
 			textView.setText(getSmilyStr(withSmile));
-			textView.setTextSize(txtFonts);
+			textView.setTextSize(ConstParam.txtFonts);
 			textView.getBackground().setAlpha(backAlpha);
 			
 			if(barStat.equals("1"))
@@ -1852,6 +1972,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			if (areaNamList.size() < 1) {
 				getUrlHtml(synUrl, Const.MSGSYNFIRST);
 			} else {
+				//getUrlHtml(upUrl, Const.MSGUPDATE);
 				InitMain();
 			}
 			// progressDialog.dismiss();
@@ -1864,6 +1985,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				Toast.makeText(TestAndroidActivity.this, "´ËÕÊºÅ±¾ÈÕlogin´ÎÊý¹ý¶à£¡",
 						Toast.LENGTH_SHORT).show();
 			}
+			else if (data.contains("Á½´ÎµÇÂ¼¼ä¸ô¹ýÃÜ")) {
+				Toast.makeText(TestAndroidActivity.this, "Á½´ÎµÇÂ¼¼ä¸ô¹ýÃÜ!!£¡",
+						Toast.LENGTH_SHORT).show();
+			}
+			
+			
+			
 
 			else {
 				Toast.makeText(TestAndroidActivity.this, "µÇÂ½Ê§°Ü£¡",
@@ -1920,7 +2048,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			if (formData.contains("´Ò´Ò¹ý¿Í")) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						TestAndroidActivity.this);
-				builder.setMessage("´Ò´Ò¹ý¿Í²»ÄÜÐ´ÐÅ~ÖØÐÂµÇÂ¼?").setCancelable(false)
+				builder.setMessage("´Ò´Ò¹ý¿Í²»ÄÜÐ´ÐÅ~ÖØÐÂµÇÂ¼?")
 						.setPositiveButton("µÇÂ¼",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
@@ -1988,7 +2116,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				if (formData.contains("´Ò´Ò¹ý¿Í")) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							TestAndroidActivity.this);
-					builder.setMessage("Äã»¹Ã»µÇÂ½ÄØ~ÖØÐÂµÇÂ¼?").setCancelable(false)
+					builder.setMessage("Äã»¹Ã»µÇÂ½ÄØ~ÖØÐÂµÇÂ¼?")
 							.setPositiveButton("µÇÂ¼",
 									new DialogInterface.OnClickListener() {
 										public void onClick(
@@ -2233,7 +2361,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 			titleEdit.setText(title);
 
-			if (sLength < 300) {
+			if (ConstParam.sLength < 300) {
 				titleEdit = (EditText) acdlgView.findViewById(R.id.edt_cont);
 
 				LinearLayout.LayoutParams linearParams = (LinearLayout.LayoutParams) titleEdit
@@ -2398,12 +2526,23 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 
+		
+		//newConfig.
 		super.onConfigurationChanged(newConfig);
 		
-		int s = sWidth;
-		sWidth = sLength;
 		
-		sLength = s;
+		if(ConstParam.isChange)
+		{
+			
+		}
+		else
+		
+		{
+		int s = ConstParam.sWidth;
+		ConstParam.sWidth = ConstParam.sLength;
+		
+		ConstParam.sLength = s;
+		}
 	}
 
 
@@ -2466,8 +2605,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void sendMail(String to, String title, String cont, String action) {
 		// cont = StringUtil.getStrBetter(cont);
 		// ÊÖ»úÇ©Ãû
-		if (isBackWord && backWords != null && backWords.length() > 0) {
-			cont += "\n-\n" + signColor + backWords + "[m\n";
+		if (ConstParam.isBackWord && ConstParam.backWords != null && ConstParam.backWords.length() > 0) {
+			cont += "\n-\n" + ConstParam.signColor + ConstParam.backWords + "[m\n";
 		}
 
 		try {
@@ -2494,8 +2633,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	private void sendTopic(String title, String cont) {
 		// ÊÖ»úÇ©Ãû
-		if (isBackWord && backWords != null && backWords.length() > 0) {
-			cont += "\n-\n" + signColor + backWords + "[m\n";
+		if (ConstParam.isBackWord && ConstParam.backWords != null && ConstParam.backWords.length() > 0) {
+			cont += "\n-\n" + ConstParam.signColor + ConstParam.backWords + "[m\n";
 		}
 
 		try {
@@ -3368,6 +3507,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	 * @param AreaData
 	 */
 	private void chaToTopic(Spanned topicData) {
+		
+		if(topicData.toString().length()<2)
+		{
+			displayMsg("¸ÃÎÄÕÂÒÑ±»É¾³ý£¡");
+			return;
+		}
 
 		setContentView(R.layout.topic);
 
@@ -3375,7 +3520,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		textView = (TextView) findViewById(R.id.label);
 		textView.setText(urlChanged);
-		textView.setTextSize(txtFonts);
+		textView.setTextSize(ConstParam.txtFonts);
 		textView.setMovementMethod(LinkMovementMethod.getInstance());
 
 		if(actitle!=null&&actitle.length()>1)
@@ -3383,7 +3528,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			setTitle(curAreaName+" - "+actitle);
 		}
 		textView.getBackground().setAlpha(backAlpha);
-		if (isTouch) {
+		if (ConstParam.isTouch) {
 			textView.setOnTouchListener(this);
 			textView.setFocusable(true);
 			textView.setLongClickable(true);
@@ -3452,7 +3597,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							TestAndroidActivity.this);
-					builder.setMessage("ÒÑÊÇ×îºóÒ»Ò³£¬ÊÇ·ñË¢ÐÂµ±Ç°Ò³?").setCancelable(false)
+					builder.setMessage("ÒÑÊÇ×îºóÒ»Ò³£¬ÊÇ·ñË¢ÐÂµ±Ç°Ò³?")
 							.setPositiveButton("Ë¢ÐÂ",
 									new DialogInterface.OnClickListener() {
 										public void onClick(
@@ -3480,15 +3625,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 
 	private void getUrlHtml(String url, int msg) {
-		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
-			progressDialog = ProgressDialog.show(TestAndroidActivity.this,
-					"ÇëÉÔµÈ...", "×¥È¡ÍøÒ³ÐÅÏ¢ÖÐ...", true);
-		}
 		runningTasks++;
-
 		dataUrl = url;
 		datamsg = msg;
-		new Thread() {
+		acTrd = new Thread() {
 
 			@Override
 			public void run() {
@@ -3511,6 +3651,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				} catch (Exception e) {
 					data = "error";
 				}
+				
+				if(!ConstParam.isLoading )
+				{
+					return;
+				}
+				if (this.getName() != null
+						&& this.getName().equals("NoUse")) {
+					return;
+				}
+				
 
 				if (datamsg == Const.MSGTOPIC || datamsg == Const.MSGTOPICNEXT
 						|| datamsg == Const.MSGTOPICREFREASH) {
@@ -3558,7 +3708,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 													if ("xian".equals(source)) {
 														drawable = xianDraw;
 														drawable.setBounds(0,
-																0, sWidth, 2);
+																0, ConstParam.sWidth, 2);
 													}
 
 													else if (source
@@ -3586,8 +3736,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 												}
 											}, null);
-									if (this.getName() != null
-											&& !this.getName().equals("NoUse")) {
+									if (this.getName() == null
+											|| !this.getName().equals("NoUse")) {
 										sendMsg(Const.MSGTOPICREFREASH);
 									}
 
@@ -3600,7 +3750,28 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				}
 				sendMsg(datamsg);
 			}
-		}.start();
+		};
+		
+		
+		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
+			progressDialog = ProgressDialog.show(TestAndroidActivity.this,
+					"ÇëÉÔµÈ...", "×¥È¡ÍøÒ³ÐÅÏ¢ÖÐ...", true);
+			progressDialog.setCancelable(true);
+			 progressDialog.setOnCancelListener(new OnCancelListener(){
+			     public void onCancel(DialogInterface arg0) {
+			    		ConstParam.isLoading = false;
+			    		runningTasks--;
+			    		acTrd.setName("NoUse");
+			      
+			     }});
+			
+			
+			ConstParam.isLoading = true;
+		}
+	
+		
+		acTrd.start();
+
 
 	}
 
@@ -3616,7 +3787,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 							Drawable drawable = null;
 							if ("xian".equals(source)) {
 								drawable = xianDraw;
-								drawable.setBounds(0, 0, sWidth, 2);
+								drawable.setBounds(0, 0, ConstParam.sWidth, 2);
 							} else	if (source.startsWith("[")) {
 								try {
 									drawable = fetchDrawable(source);
@@ -3878,8 +4049,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		options.inInputShareable = true;
 		//options.inDensity = sdensity;
 
-		int widthRatio = (int) Math.ceil(options.outWidth * 1.0 / sWidth);
-		int heightRatio = (int) Math.ceil(options.outHeight * 1.0 / sLength);
+		int widthRatio = (int) Math.ceil(options.outWidth * 1.0 / ConstParam.sWidth);
+		int heightRatio = (int) Math.ceil(options.outHeight * 1.0 / ConstParam.sLength);
 		if (widthRatio > 1 || heightRatio > 1) {
 			if (widthRatio > heightRatio) {
 				options.inSampleSize = widthRatio;
@@ -3887,7 +4058,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				options.inSampleSize = heightRatio;
 			}
 		}
-		if (sWidth < 260)
+		if (ConstParam.sWidth < 260)
 			options.inSampleSize = options.inSampleSize * 2;
 		
 		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
@@ -4010,11 +4181,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		float x = arg0.getRawX();
 		float y = arg0.getRawY();
 		// µã»÷ÉÏ·­ºÍµã»÷ÏÂ·­
-		if (y > sv.getHeight() - sLength / 6 && x > (sWidth * 3 / 4)) {
+		if (y > sv.getHeight() - ConstParam.sLength / 6 && x > (ConstParam.sWidth * 3 / 4)) {
 			sv.scrollBy(0, sv.getHeight() - 20);
 			return true;
 		}
-		if (y < sLength / 3 && x > (sWidth * 3 / 4)) {
+		if (y < ConstParam.sLength / 3 && x > (ConstParam.sWidth * 3 / 4)) {
 			sv.scrollBy(0, 20 - sv.getHeight());
 			return true;
 		}

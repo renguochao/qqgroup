@@ -47,6 +47,10 @@ public class Const {
 	public static final int BLOGTOPIC  = 0x000020;
 	public static final int BLOGCOMT = 0x000021;
 	public static final int BLOGPAGE = 0x000022;
+	public static final int BLOGRE =0x000023;
+	public static final int BLOGDORE = 0x000024;
+	
+	public static final int MSGUPDATE = 0x000025;
 	
 	
 

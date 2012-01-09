@@ -87,6 +87,7 @@ public class BBSAll {
 	 */
 	public static HashMap<String,String> getBBSAll() {
 		HashMap<String,String> hm = new HashMap<String,String>();
+
 		hm.put("南京大屠杀", "1937_12_13");
 		hm.put("第七艺术", "7th_Art");
 		hm.put("飞越重洋", "Abroad");
@@ -468,6 +469,7 @@ public class BBSAll {
 		hm.put("南大学生心理协会", "SPA");
 		hm.put("西班牙语", "Spanish");
 		hm.put("体坛快讯", "SportsNews");
+		hm.put("视觉南大", "StaffPhotography");
 		hm.put("股市风云", "Stock");
 		hm.put("石头城", "StoneCity");
 		hm.put("红楼逸梦", "StoneStory");
@@ -539,6 +541,8 @@ public class BBSAll {
 		hm.put("浙江大学", "ZJU");
 		hm.put("中山大学", "ZSU");
 
+		
+
 
 		return hm;
 
@@ -546,6 +550,7 @@ public class BBSAll {
 	
 	public static HashMap<String,String> getBBSRightName() {
 		HashMap<String,String> hm = new HashMap<String,String>();
+		
 		hm.put("1937_12_13", "1937_12_13");
 		hm.put("7th_art", "7th_Art");
 		hm.put("abroad", "Abroad");
@@ -927,6 +932,7 @@ public class BBSAll {
 		hm.put("spa", "SPA");
 		hm.put("spanish", "Spanish");
 		hm.put("sportsnews", "SportsNews");
+		hm.put("staffphotography", "StaffPhotography");
 		hm.put("stock", "Stock");
 		hm.put("stonecity", "StoneCity");
 		hm.put("stonestory", "StoneStory");
@@ -997,6 +1003,7 @@ public class BBSAll {
 		hm.put("zjl_online", "Zjl_Online");
 		hm.put("zju", "ZJU");
 		hm.put("zsu", "ZSU");
+		
 		return hm;
 	}
 }

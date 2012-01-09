@@ -20,6 +20,8 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
@@ -33,17 +35,15 @@ public class NetTraffic {
 	public static String data;
 	public static ProgressDialog progressDialog = null;
 	public static Handler myhandler;
+	public static Thread acTrd;
 	
 	public static void getUrlHtml(Activity ac,String url, int msg,Handler handler) {
-		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
-			progressDialog = ProgressDialog.show(ac,
-					"请稍等...", "抓取网页信息中...", true);
-		}
+		
 		runningTasks++;
 		myhandler = handler;
 		dataUrl = url;
 		datamsg = msg;
-		new Thread() {
+		acTrd = new Thread() {
 
 			@Override
 			public void run() {
@@ -53,11 +53,63 @@ public class NetTraffic {
 				} catch (Exception e) {
 					data = "error";
 				}
+				if (this.getName() != null
+						&& this.getName().equals("NoUse")) {
+					sendMsg(myhandler,12345);
+					return;
+				}
+				sendMsg(myhandler,datamsg);
+			}
+		};
+		
+		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
+			progressDialog = ProgressDialog.show(ac,
+					"请稍等...", "抓取网页信息中...", true);
+			progressDialog.setCancelable(true);
+			 progressDialog.setOnCancelListener(new OnCancelListener(){
+			     public void onCancel(DialogInterface arg0) {
+			    		ConstParam.isLoading = false;
+			    		runningTasks--;
+			    		acTrd.setName("NoUse");
+			      
+			     }});
+			
+		}
+		
+		acTrd.start();
+
+		
+	}
+	
+	static NameValuePair[] nvpCont;
+	
+	public static void postUrlHtml(Activity ac,String url, NameValuePair[] newVp  ,int msg,Handler handler) {
+		if (msg == 123 || progressDialog == null || !progressDialog.isShowing()) {
+			progressDialog = ProgressDialog.show(ac,
+					"请稍等...", "抓取网页信息中...", true);
+		}
+		runningTasks++;
+		myhandler = handler;
+		dataUrl = url;
+		datamsg = msg;
+		nvpCont = newVp;
+		new Thread() {
+
+			@Override
+			public void run() {
+				// 需要花时间计算的方法
+				try {
+					data = postHtmlContent(dataUrl, nvpCont);
+				} catch (Exception e) {
+					data = "error";
+				}
 				sendMsg(myhandler,datamsg);
 			}
 		}.start();
 
 	}
+	
+	
 	
 	public static void sendMsg(Handler handler,int meg) {
 		Message msg = new Message();
@@ -109,8 +161,8 @@ public class NetTraffic {
 		httpClient.getParams().setParameter(
 				"http.protocol.single-cookie-header", true);
 		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(
-				5000);
-		httpClient.getHttpConnectionManager().getParams().setSoTimeout(10000);
+				10000);
+		httpClient.getHttpConnectionManager().getParams().setSoTimeout(20000);
 
 		return httpClient;
 	}
