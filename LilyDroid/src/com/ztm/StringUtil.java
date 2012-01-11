@@ -111,7 +111,7 @@ public class StringUtil {
 		String[] split = scon.split("\n");
 		StringBuilder allSb = new StringBuilder();
 		for (String sp : split) {
-			if(sp.startsWith(":")||sp.contains("¡ù")) 
+			if(sp.startsWith(":")||sp.contains("¡ù")||sp.startsWith("http://")) 
 			{
 				allSb.append(sp+'\n');
 				continue;

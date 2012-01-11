@@ -4126,7 +4126,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 
 	public boolean onTouch(View arg0, MotionEvent arg1) {
-		return mGestureDetector.onTouchEvent(arg1);
+		try {
+			if(arg1!=null)
+			{
+			return mGestureDetector.onTouchEvent(arg1);
+			}
+			
+		} catch (Exception e) {
+			
+		}
+		
+			return false;
+		
+		
 	}
 
 	public boolean onDown(MotionEvent arg0) {
@@ -4140,7 +4152,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
 
-		
+		System.out.println("y:"+(e1.getY() - e2.getY())+" and x:"+(e2.getX() - e1.getX()));
 		if (Math.abs(e1.getY() - e2.getY()) <= SWIPE_MAX_OFF_PATH) 
 		{ 
 		if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) 
