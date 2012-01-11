@@ -38,6 +38,37 @@ public class ZoomState extends Observable {
      * Zoom level A value of 1.0 means the content fits the view.
      */
     private float mZoom;
+    
+    private float mPicX;
+    
+    private float mRadio;
+    
+    public float getmRadio() {
+		return mRadio;
+	}
+
+	public void setmRadio(float mRadio) {
+		this.mRadio = mRadio;
+	}
+
+	public float getmPicX() {
+		return mPicX;
+	}
+
+	public void setmPicX(float mPicX) {
+		this.mPicX = mPicX;
+	}
+
+	public float getmPicY() {
+		return mPicY;
+	}
+
+	public void setmPicY(float mPicY) {
+		this.mPicY = mPicY;
+	}
+
+	private float mPicY;
+    
 
     /**
      * Pan position x-coordinate X-coordinate of zoom window center position,

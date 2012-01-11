@@ -20,5 +20,7 @@ public class ConstParam {
 	
 	public static  String signColor;
 	
+	public static boolean isWifi = false;
+	
 
 }

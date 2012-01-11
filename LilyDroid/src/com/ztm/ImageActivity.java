@@ -70,18 +70,21 @@ public class ImageActivity extends Activity {
 				: "http://bbs.nju.edu.cn/file/T/tiztm/belldandy.jpg";
 
 		mZoomView = (ImageZoomView) findViewById(R.id.pic);
-
-		Drawable drawable = fetchDrawable(url);
-
-		image = drawableToBitmap(drawable);
-		mZoomView.setImage(image);
-
+		
 		mZoomState = new ZoomState();
 		mZoomView.setZoomState(mZoomState);
 		mZoomListener = new SimpleZoomListener();
 		mZoomListener.setZoomState(mZoomState);
 		mZoomListener.setControlType(ControlType.PAN);
 
+		
+
+		Drawable drawable = fetchDrawable(url);
+
+		image = drawableToBitmap(drawable);
+		mZoomView.setImage(image);
+
+	
 		mZoomView.setOnTouchListener(mZoomListener);
 		resetZoomState();
 
@@ -327,9 +330,39 @@ public class ImageActivity extends Activity {
 
 		// 以下是把图片转化为缩略图再加载
 		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		Bitmap bitmap = BitmapFactory.decodeByteArray(imageByte, 0,
+				imageByte.length, options);
+		
+		options.inJustDecodeBounds = false;
+		options.inPurgeable = true;
+		options.inInputShareable = true;
+		
+		int allByte = options.outWidth*options.outHeight;
+		int radio = allByte/4000000;
+		if(radio>1)
+		{
+			options.inSampleSize = radio+1;
+		}
+		else
+		{
+			options.inSampleSize  =1;
+		}
+		mZoomState.setmPicX(options.outWidth/options.inSampleSize);
+		mZoomState.setmPicY(options.outHeight/options.inSampleSize);
+		
+		
+		mZoomState.setmRadio((float)(options.outWidth*1.0/options.outHeight));
 
-		bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
-				options);
+		try {
+			bitmaps = BitmapFactory.decodeByteArray(imageByte, 0, imageByte.length,
+					options);
+		} catch (Exception e) {
+			Toast.makeText(ImageActivity.this, "原图太大！内存不足！", Toast.LENGTH_SHORT)
+			.show();
+			bitmaps = null;
+		}
+		
 		return new BitmapDrawable(this.getResources(), bitmaps);
 	}
 	

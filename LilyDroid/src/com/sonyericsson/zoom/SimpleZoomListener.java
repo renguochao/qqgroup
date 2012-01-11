@@ -59,8 +59,8 @@ public class SimpleZoomListener implements View.OnTouchListener {
                 break;
 
             case MotionEvent.ACTION_MOVE: {
-                final float dx = (x - mX) / v.getWidth();
-                final float dy = (y - mY) / v.getHeight();
+                final float dx = (x - mX) / (v.getWidth()*mState.getZoom());
+                final float dy = (y - mY) / (mState.getmPicY()*(v.getWidth()/mState.getmPicX())*mState.getZoom());
 
                 if (mControlType == ControlType.ZOOM) {
                     mState.setZoom(mState.getZoom() * (float)Math.pow(20, -dy));

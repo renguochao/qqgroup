@@ -49,6 +49,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences.Editor;
@@ -63,7 +64,9 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
+import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.net.NetworkInfo.State;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -144,7 +147,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	int areaNowTopic = 0;
 
-	boolean isWifi = false;
+	//boolean isWifi = false;
 
 	private int nowPos;
 
@@ -161,7 +164,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	
 	
 	String isRem = "false";
-	
+	int curCode = 0 ;
 	boolean isAuto;
 	boolean isIP;
 	boolean isMoreFast;
@@ -323,7 +326,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
 		}
 	
+		IntentFilter filter = new IntentFilter();  
+
+		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION); 
 		
+		ConnectivityReceiver mNetworkStateReceiver  =  new ConnectivityReceiver();
+
+		registerReceiver(mNetworkStateReceiver, filter); 
+
 		
 		initfbAll();
 		StringUtil.initAll();
@@ -337,8 +347,42 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		
 	}
-
+	int vc;
 	private void getUpdateInfo(String upUrl2) {
+		
+		vc = 99999;
+		try {
+			vc = TestAndroidActivity.this.getPackageManager().getPackageInfo(TestAndroidActivity.this.getPackageName(), 0).versionCode;
+		} catch (Exception e) {
+
+
+		e.printStackTrace();
+
+		}
+		if(vc!=99999)
+		{
+		if(curCode<vc)
+		{
+			
+			new AlertDialog.Builder(TestAndroidActivity.this).setTitle("更新说明：")
+			.setMessage("修正如下bug：\r\n1.上传图片路径过长被截断\r\n2.在4.0系统上浏览主题界面右滑FC").setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,
+								int which) {
+						
+						}
+
+					}).show();
+			
+			
+			
+			Editor editor = sharedPreferences.edit();// 获取编辑器
+			editor.putInt("curCode", vc);
+			editor.commit();
+		}
+		
+		
 		final String url = upUrl2;
 			acTrd = new Thread() {
 
@@ -355,6 +399,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				}
 			};
 			acTrd.start();
+		}
 	}
 
 	private void InitMain() {
@@ -989,16 +1034,29 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		areaNamList = new ArrayList<String>();
 		ConstParam.blogNamList = new ArrayList<String>();
 		
+		
+		curCode = sharedPreferences.getInt("curCode", 0);
 		isRem = sharedPreferences.getString("isRem", "false");
 		loginId = sharedPreferences.getString("loginId", "");
 		loginPwd = sharedPreferences.getString("loginPwd", "");
 
 		myParams();
-		WifiManager mWiFiManager = (WifiManager) this
-				.getSystemService(Context.WIFI_SERVICE);
-		if (mWiFiManager.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
-			isWifi = true;
-		}
+		
+		ConnectivityManager connManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE); 
+
+		// State state = connManager.getActiveNetworkInfo().getState(); 
+
+		State state = connManager.getNetworkInfo( 
+
+		ConnectivityManager.TYPE_WIFI).getState(); // 获取网络连接状态 
+
+		if (State.CONNECTED == state) { // 判断是否正在使用WIFI网络 
+
+			ConstParam.isWifi = true;
+
+		} 
+		
+		
 		
 		//收藏的讨论区
 		if (name != null &&name.length() > 1)
@@ -1227,15 +1285,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		/*获取当前应用的版本号*/
 
-		int vc = 99999;
-		try {
-			vc = TestAndroidActivity.this.getPackageManager().getPackageInfo(TestAndroidActivity.this.getPackageName(), 0).versionCode;
-		} catch (Exception e) {
-
-
-		e.printStackTrace();
-
-		}
+		
+		
 		int newvc = 0;
 		
 		final String[] split = data.replaceAll("\n", "").split("##");
@@ -3670,7 +3721,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					}
 					topicWithImg = false;
 					final String topicDataInfo = StringUtil.getTopicInfo(data,
-							nowPos, isIP, isWifi, isPic, nowLoginId);
+							nowPos, isIP, 	ConstParam.isWifi, isPic, nowLoginId);
 					if (topicDataInfo != null) {
 						isNext = StringUtil.isNext;
 						if (StringUtil.curAreaName != null
