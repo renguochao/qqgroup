@@ -140,7 +140,7 @@ public class BlogActivity extends Activity {
 	 * 捕获按键事件
 	 */
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		
+		/*
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			if(btnBarVis == View.VISIBLE)
 			{
@@ -164,6 +164,7 @@ public class BlogActivity extends Activity {
 				return super.onKeyDown(keyCode, event);
 			}
 		}
+		*/
 		
 			return super.onKeyDown(keyCode, event);
 		
@@ -249,13 +250,13 @@ public class BlogActivity extends Activity {
 	
 	String curAreaName;
 	/**
-	 * 跳转到讨论区界面
+	 * 跳转到blog界面
 	 * 
 	 * @param AreaData
 	 */
 	private void chaToArea(String AreaData) {
 		
-		
+		/*
 		ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 		
 		if (ConstParam.blogNamList!=null&&ConstParam.blogNamList.contains(curAreaName)) {
@@ -288,7 +289,7 @@ public class BlogActivity extends Activity {
 			}
 
 		});
-		
+		*/
 		listView = (ListView) findViewById(R.id.topicList);
 		
 		 

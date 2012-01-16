@@ -40,6 +40,19 @@ public class DateUtil {
 		return ss;
 	}
 	
+	
+	static SimpleDateFormat blogdf = new SimpleDateFormat( 
+	"M‘¬d»’ HH:mm"); 
+	public static String formatDateForBlog(Date newtime)
+	{
+		
+		if(newtime==null) return null;
+		String ss = blogdf.format(newtime);
+		return ss;
+	}
+	
+	
+	
 	static SimpleDateFormat bdf = new SimpleDateFormat( 
 			"EEE MMM d HH:mm:ss yyyy" , Locale.US); 
 	public static Date getDatefromStr(String newtime)

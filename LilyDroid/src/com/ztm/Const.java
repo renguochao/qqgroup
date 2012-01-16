@@ -52,6 +52,9 @@ public class Const {
 	
 	public static final int MSGUPDATE = 0x000025;
 	
+
+	public static final int MSGBLOGFAV = 0x000026;
+	
 	
 
 }

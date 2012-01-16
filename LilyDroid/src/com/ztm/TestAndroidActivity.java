@@ -207,6 +207,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String synUrl = "http://bbs.nju.edu.cn/bbsleft";
 	String forumUrl ="http://bbs.nju.edu.cn/cache/t_forum.js";
 	String recbrdUrl ="http://bbs.nju.edu.cn/cache/t_recbrd.js";
+	String blogfavUrl ="http://bbs.nju.edu.cn/blogfav";
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
 	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
 	String upUrl = "http://lilydroid.co.cc/manage/1.txt";
@@ -583,10 +584,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				public void onClick(View arg0) {
 					// 可以打开一个新线程来读取，加入滚动条等
+					/*
 					if (parentList == null || parentList.size() < 3) {
 						String url = "http://bbs.nju.edu.cn/bbstopb10";
 						getUrlHtml(url, Const.TOP20BOARD);
 					} else
+					*/
 						chaToAreaToGo();
 
 				}
@@ -643,7 +646,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// 建立菜单
 		menu.add(Menu.NONE, menuSettings, 2, "设置").setIcon(R.drawable.set);
-		menu.add(Menu.NONE, menuSyn, 2, "同步收藏").setIcon(R.drawable.syn);
+		//menu.add(Menu.NONE, menuSyn, 2, "同步收藏").setIcon(R.drawable.syn);
 		menu.add(Menu.NONE, menuJump, 2, "快速跳转").setIcon(R.drawable.fast);
 		menu.add(Menu.NONE, menuReport, 2, "意见反馈").setIcon(R.drawable.info);
 		menu.add(Menu.NONE, menuLogout, 2, "注销").setIcon(R.drawable.key);
@@ -668,14 +671,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		case menuJump:
 			getLikeDialog();
 			break;
+			/*
 		case menuSyn:
-			// 转到登录界面
 			if (isLogin)
 				getUrlHtml(synUrl, Const.MSGSYN);
 			else {
 				displayMsg("你还没登陆呐~");
 			}
 			break;
+			*/
 		case menuReport:
 
 			if (isLogin) {
@@ -1028,11 +1032,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void initAllParams() {
 		sharedPreferences = getSharedPreferences("LilyDroid",
 				Context.MODE_PRIVATE);
-		String name = sharedPreferences.getString("areaName", "");
-		String blogName = sharedPreferences.getString("blogName", "");
+		//String name = sharedPreferences.getString("areaName", "");
+		//String blogName = sharedPreferences.getString("blogName", "");
 
 		areaNamList = new ArrayList<String>();
-		ConstParam.blogNamList = new ArrayList<String>();
 		
 		
 		curCode = sharedPreferences.getInt("curCode", 0);
@@ -1044,11 +1047,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		ConnectivityManager connManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE); 
 
-		// State state = connManager.getActiveNetworkInfo().getState(); 
-
-		State state = connManager.getNetworkInfo( 
-
-		ConnectivityManager.TYPE_WIFI).getState(); // 获取网络连接状态 
+		
+		State state = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState(); // 获取网络连接状态 
 
 		if (State.CONNECTED == state) { // 判断是否正在使用WIFI网络 
 
@@ -1056,7 +1056,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		} 
 		
-		
+		/*
 		
 		//收藏的讨论区
 		if (name != null &&name.length() > 1)
@@ -1071,16 +1071,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		}
 		
-		
 		//收藏的BLOG
-		if (blogName != null  && blogName.length() > 1)
+		if(false)// (blogName != null  && blogName.length() > 1)
 		{
 			String[] split = blogName.split(",");
 			for (String string : split) {
 				ConstParam.blogNamList.add(string);
 			}
 		}
-		
+		*/
 		
 	}
 	
@@ -1204,13 +1203,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					//查看用户信息
 					getUserData(data);
 					break;
-
+					/*
 				case Const.MSGSYN:
 					//同步收藏夹
 					checkSyn(data);
 					break;
+					*/
 				case Const.MSGSYNFIRST:
-					//首次登录同步收藏夹
+					//获得收藏夹
 					checkSyn(data);
 					InitMain();
 					break;
@@ -1234,9 +1234,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				case Const.MSGRECBRD:
 					//所有热门讨论区
 					convtRecbrd(data);
-					//initAllAreas();
-					chaToAreaToGo();
+					getUrlHtml(blogfavUrl, Const.MSGBLOGFAV);
 					break;
+					
+				case Const.MSGBLOGFAV:
+					//博客
+					convtBlogFav(data);
+					getUrlHtml(synUrl, Const.MSGSYNFIRST);
+					break;
+					
 				case Const.MSGMAIL:
 					//收邮件
 					getMailCont();
@@ -1275,10 +1281,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 
 		
+
+		
 	
 		
 
 	};
+	
+	
+	
 	
 	private void checkUpdate(String data) {
 		// TODO Auto-generated method stub
@@ -1724,38 +1735,46 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		hotList.size();
 	}
 
-	// 同步收藏夹
+	
 	private void checkSyn(String data) {
 		Document doc = Jsoup.parse(data);
 
 		Elements as = doc.getElementsByTag("a");
-		int ll = areaNamList.size();
+	
 		for (Element aTag : as) {
 			String href = aTag.attr("href");
 			if (href.contains("board?board=")) {
-				String tempAreaName = aTag.text().trim().toLowerCase();
-
-				tempAreaName = tempAreaName.toLowerCase();
-				String string = bbsAllName.get(tempAreaName);
-				if(string !=null)
-					tempAreaName = string;
-				if (areaNamList.contains(tempAreaName)) {
-					continue;
-				}
-				areaNamList.add(tempAreaName);
-
+				areaNamList.add( aTag.text().trim());
 			}
 		}
-		if (ll < areaNamList.size()) {
-			int ii = areaNamList.size() - ll;
-			storeAreaName();
-			// initAllAreas();
-			displayMsg("同步WEB收藏夹成功!更新" + ii + "个已收藏版面");
-		} else {
-			displayMsg("你的本地收藏夹已经是最新的了！");
-		}
-
+		
 	}
+	
+	private void convtBlogFav(String data) {
+		// TODO Auto-generated method stub
+		ConstParam.blogNamList = new ArrayList<String>();
+		Document doc = Jsoup.parse(data);
+
+		Elements as = doc.getElementsByTag("td");
+		if(as.size()<12)
+			return;
+		
+		int begin = 6;
+		while(begin+5<as.size())
+		{
+			
+			String date = DateUtil.formatDateForBlog(DateUtil
+					.getDatefromStrNoWeek(as.get(begin+3).text()));
+			
+			ConstParam.blogNamList.add(as.get(begin).text()+" ("+date+")");
+			begin+=6;
+		}
+	
+		
+	}
+	
+	
+	
 
 	private void convtTOP20Area(String areaData) {
 		Document doc = Jsoup.parse(data);
@@ -2019,13 +2038,20 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 			editor.commit();
 
+			String url = "http://bbs.nju.edu.cn/bbstopb10";
+			getUrlHtml(url, Const.TOP20BOARD);
+			//getUrlHtml(synUrl, Const.MSGSYNFIRST);
 			// 如果收藏夹为空，则去服务器端取得
+			
+			/*
+			
 			if (areaNamList.size() < 1) {
 				getUrlHtml(synUrl, Const.MSGSYNFIRST);
 			} else {
 				//getUrlHtml(upUrl, Const.MSGUPDATE);
 				InitMain();
 			}
+			*/
 			// progressDialog.dismiss();
 
 		} else if (scs.size() == 1) {
@@ -2961,7 +2987,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				//getToAreaWithName(inputPwd);
 			}
 		});
-		//if (parentList == null || parentList.size() < 3)
+		if (parentList == null || parentList.size() < 3)
 			initAllAreas();
 
 		android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
@@ -3004,6 +3030,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 							}
 							else
 								blogName = name;
+							
+							int indexOf = blogName.indexOf(" (");
+							if (indexOf > 0) {
+								blogName = blogName.substring(0, indexOf);
+							}
 							
 							getToBlogWithName(blogName);
 							
@@ -3169,7 +3200,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			allChildList.add(childList);
 		}
 		
-		
+		if (ConstParam.blogNamList != null) {
 		parentData = new HashMap<String, Object>();
 		parentData.put("TITLE", "博客收藏");
 		parentList.add(parentData);
@@ -3181,6 +3212,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			childList.add(childData);
 		}
 		allChildList.add(childList);
+		}
 		
 		
 		
@@ -3261,7 +3293,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		btnLike.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
+				//ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
+				
+				boolean endsWith = urlString.contains("bbstdoc");
+				if(endsWith)
+				{
+					urlString = urlString.replaceAll("bbstdoc", "bbsdoc");
+				}
+				else
+				{
+					urlString = urlString.replaceAll("bbsdoc", "bbstdoc");
+				}
+				getUrlHtml(urlString, Const.MSGAREA);
+				/*
 				if (areaNamList.contains(curAreaName)) {
 					areaNamList.remove(curAreaName);
 					// btnLike.setBackgroundDrawable(drawableFav);
@@ -3276,6 +3320,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					btnLike.setIcon(R.drawable.fav);
 				}
 				storeAreaName();
+				*/
 			}
 
 		});
@@ -3313,7 +3358,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		editor.putString("areaName", areaName);
 		editor.commit();
 
-		//initAllAreas();
 	}
 
 	/**
