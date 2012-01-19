@@ -54,6 +54,8 @@ public class Const {
 	
 
 	public static final int MSGBLOGFAV = 0x000026;
+	public static final int MSGTOPICSINGLE = 0x000027;
+	public static final int MSGTOPICGROUP = 0x000028;
 	
 	
 

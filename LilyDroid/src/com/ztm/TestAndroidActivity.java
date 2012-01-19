@@ -1,7 +1,6 @@
 package com.ztm;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,12 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -24,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.httpclient.NameValuePair;
 
@@ -40,7 +35,6 @@ import com.ztm.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ActivityNotFoundException;
@@ -67,7 +61,6 @@ import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.net.NetworkInfo.State;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -90,8 +83,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -99,7 +90,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.GestureDetector.OnGestureListener;
@@ -112,7 +102,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -123,7 +112,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout.LayoutParams;
 
 public class TestAndroidActivity extends Activity implements OnTouchListener,
 		OnGestureListener {
@@ -159,14 +147,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	String isPic;
 	String camwidth;
-	String isFull;
+	
 	String barStat;
 	
 	
 	String isRem = "false";
 	int curCode = 0 ;
 	boolean isAuto;
-	boolean isIP;
+	
 	boolean isMoreFast;
 	String loginId = "";
 	String loginPwd = "";
@@ -210,7 +198,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String blogfavUrl ="http://bbs.nju.edu.cn/blogfav";
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
 	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
-	String upUrl = "http://lilydroid.co.cc/manage/1.txt";
+	String upUrl = "http://bbs.nju.edu.cn/vd73240/blogcon?userid=tiztm&file=1326295902";
 	
 	
 	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
@@ -235,6 +223,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	Thread imageTrd;
 	Thread acTrd;
 	int pageNum;
+	String allTopicUrl;
 	String actitle;
 
 	// 拍照的照片存储位置
@@ -306,12 +295,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			TEMP_DIR.mkdirs();
 		
 		
-		if(isFull.equals("2"))
+		if(ConstParam.isFull.equals("2"))
 		{
 			//设置无标题  
 	        requestWindowFeature(Window.FEATURE_NO_TITLE);  
 		}
-		else if(isFull.equals("3"))
+		else if(ConstParam.isFull.equals("3"))
 		{
 			//设置无标题  
 	        requestWindowFeature(Window.FEATURE_NO_TITLE);  
@@ -319,7 +308,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
 	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
 		}
-		else if(isFull.equals("4"))
+		else if(ConstParam.isFull.equals("4"))
 		{
 			
 	        //设置全屏  
@@ -343,7 +332,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		if(isAuto)
 		{
-		getUpdateInfo(upUrl);
+			getUpdateInfo(upUrl);
 		}
 		
 		
@@ -365,19 +354,28 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		if(curCode<vc)
 		{
 			
-			new AlertDialog.Builder(TestAndroidActivity.this).setTitle("更新说明：")
-			.setMessage("修正如下bug：\r\n1.上传图片路径过长被截断\r\n2.在4.0系统上浏览主题界面右滑FC").setPositiveButton("确定",
+			LayoutInflater factory = LayoutInflater
+			.from(TestAndroidActivity.this);
+			final View info = factory.inflate(R.layout.infodlg, null);
+			Builder dlg = new AlertDialog.Builder(TestAndroidActivity.this)
+					.setTitle("更新说明").setView(info).setNegativeButton("干得好！",
 					new DialogInterface.OnClickListener() {
-
 						public void onClick(DialogInterface dialog,
-								int which) {
-						
+								int whichButton) {
 						}
-
-					}).show();
+					});
+		
 			
-			
-			
+		
+		
+			dlg.create();
+			// 发彩照功能
+			textView = (TextView) info.findViewById(R.id.tvInfo);
+			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
+			sv.scrollTo(0, 0);
+			textView.setText(Html.fromHtml(BBSAll.getUpdateInfo()));
+		
+			dlg.show();
 			Editor editor = sharedPreferences.edit();// 获取编辑器
 			editor.putInt("curCode", vc);
 			editor.commit();
@@ -389,7 +387,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				@Override
 				public void run() {
-					// 需要花时间计算的方法
+					
 					try {
 						data = NetTraffic.getHtmlContent(url);
 					} catch (Exception e) {
@@ -498,7 +496,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 			public void onClick(View arg0) {
 				isLogin = false;
-				InitMain();
+				String url = "http://bbs.nju.edu.cn/bbstopb10";
+				getUrlHtml(url, Const.TOP20BOARD);
 			}
 
 		});
@@ -606,7 +605,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					if (isLogin)
 						getUrlHtml(mailURL, Const.MSGMAIL);
 					else {
-						displayMsg("你还没登陆呐~");
+						//displayMsg("你还没登陆呐~");
+						getAutoLogin();
 					}
 
 				}
@@ -631,10 +631,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	// 菜单项
 	final private int menuSettings = Menu.FIRST;
 	final private int menuLogout = Menu.FIRST + 2;
-	final private int menuSyn = Menu.FIRST + 1;
 	final private int menuReport = Menu.FIRST + 3;
 	final private int menuJump = Menu.FIRST + 4;
-	private static final int REQ_SYSTEM_SETTINGS = 0;
+	private static final int REQ_SYSTEM_SETTINGS = 3256;
 
 	// 创建菜单
 	@Override
@@ -647,8 +646,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		// 建立菜单
 		menu.add(Menu.NONE, menuSettings, 2, "设置").setIcon(R.drawable.set);
 		//menu.add(Menu.NONE, menuSyn, 2, "同步收藏").setIcon(R.drawable.syn);
-		menu.add(Menu.NONE, menuJump, 2, "快速跳转").setIcon(R.drawable.fast);
+		
 		menu.add(Menu.NONE, menuReport, 2, "意见反馈").setIcon(R.drawable.info);
+		menu.add(Menu.NONE, menuJump, 2, "快速跳转").setIcon(R.drawable.fast);
 		menu.add(Menu.NONE, menuLogout, 2, "注销").setIcon(R.drawable.key);
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -671,15 +671,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		case menuJump:
 			getLikeDialog();
 			break;
-			/*
-		case menuSyn:
-			if (isLogin)
-				getUrlHtml(synUrl, Const.MSGSYN);
-			else {
-				displayMsg("你还没登陆呐~");
-			}
-			break;
-			*/
+
 		case menuReport:
 
 			if (isLogin) {
@@ -689,7 +681,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				beginMail("tiztm", "Android版小百合意见反馈", cont, null);
 			} else {
-				displayMsg("你还没登陆呐~");
+				//displayMsg("你还没登陆呐~");
+				getAutoLogin();
 			}
 			break;
 		default:
@@ -702,7 +695,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode != RESULT_OK)
 		{
-			myParams();
+			if(requestCode ==REQ_SYSTEM_SETTINGS)
+			{
+				myParams();
+			}
 			return;
 		}
 		switch (requestCode) {
@@ -714,10 +710,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			doCropPhoto(mCurrentPhotoFile);
 			break;
 		}
-		//考虑文件上传：uploadFileBBS
-		case REQ_SYSTEM_SETTINGS:
-			myParams();
-			break;
+	
 		
 		}
 	}
@@ -1035,7 +1028,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		//String name = sharedPreferences.getString("areaName", "");
 		//String blogName = sharedPreferences.getString("blogName", "");
 
-		areaNamList = new ArrayList<String>();
+		//areaNamList = new ArrayList<String>();
 		
 		
 		curCode = sharedPreferences.getInt("curCode", 0);
@@ -1056,30 +1049,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		} 
 		
-		/*
 		
-		//收藏的讨论区
-		if (name != null &&name.length() > 1)
-		{
-		String[] split = name.split(",");
-		for (String string : split) {
-			String string2 = bbsAllName.get(string.toLowerCase());
-			if(string2==null)
-				areaNamList.add(string);
-			else
-				areaNamList.add(string2);
-		}
-		}
-		
-		//收藏的BLOG
-		if(false)// (blogName != null  && blogName.length() > 1)
-		{
-			String[] split = blogName.split(",");
-			for (String string : split) {
-				ConstParam.blogNamList.add(string);
-			}
-		}
-		*/
 		
 	}
 	
@@ -1088,8 +1058,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void myParams() {
 		SharedPreferences sp = getSharedPreferences("com.ztm_preferences",
 				Context.MODE_PRIVATE);
-		isPic = sp.getString("picDS", "1");
-		isFull = sp.getString("isFull", "1");
+		ConstParam.isPic = sp.getString("picDS", "1");
+		ConstParam.isFull = sp.getString("isFull", "1");
 		barStat = sp.getString("barStat", "1");
 		
 		ConstParam.isTouch = sp.getBoolean("isTouch", true);
@@ -1100,7 +1070,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		ConstParam.backWords = sp
 				.getString("backWords", "发送自 我的小百合Android客户端 by ${model}");
-		isIP = sp.getBoolean("isIP", false);
+		ConstParam.isIP = sp.getBoolean("isIP", false);
 		ConstParam.signColor = sp.getString("signColor", "[1;32m");
 		camwidth =  sp.getString("camwidth", "800");
 		backAlpha = sp.getInt("backAlpha", 20);
@@ -1265,10 +1235,21 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					chaToBlog(data);
 					break;
 					
+					
+				case Const.MSGTOPICSINGLE:
+					chaToTopicSin(data);
+					break;
+					
 				case Const.MSGUPDATE:
 					checkUpdate(data);
 					
 					break;
+					
+				case Const.MSGTOPICGROUP:
+					checkTopicGroup(data);
+					break;
+					
+					
 				default:
 					break;
 				}
@@ -1281,24 +1262,48 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 
 		
-
-		
 	
 		
 
 	};
 	
+	private void checkTopicGroup(String data) {
+		
+		topicUrl = StringUtil.getSpanedString(data, "content='0; url=", ".A'>",2);
+		if(topicUrl.length()<1) return;
+		
+		topicUrl = "http://bbs.nju.edu.cn/"+topicUrl;
+		huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
+		nowPos = 0;
+		getUrlHtml(topicUrl, Const.MSGTOPIC);
+		
+	}
+
+	
+
 	
 	
 	
 	private void checkUpdate(String data) {
-		// TODO Auto-generated method stub
-		
+	
 		/*获取当前应用的版本号*/
 
 		
 		
 		int newvc = 0;
+		
+		int indexOf = data.indexOf("LILYDROID");
+		if(indexOf<0)
+		{
+			return;
+		}
+		data = data.substring(indexOf+9);
+		indexOf = data.indexOf("LILYDROID");
+		if(indexOf<0)
+		{
+			return;
+		}
+		data = data.substring(0,indexOf);
 		
 		final String[] split = data.replaceAll("\n", "").split("##");
 		if(split==null||split.length!=2)
@@ -1344,6 +1349,76 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 	}
 
+	private void chaToTopicSin(String data) {
+		if(data.contains("文章不存在!"))
+		{
+			displayMsg("文章不存在!");
+			return;
+		}
+		else
+		{
+//			Intent intent = new Intent(TestAndroidActivity.this,
+//			SingleTopicActivity.class);
+//			intent.putExtra("data", data);
+//			runningTasks = 0;
+//			progressDialog.dismiss();
+//
+//			startActivity(intent);
+			setTitle("文章浏览");
+			
+			
+			
+			
+
+			setContentView(R.layout.singletopic);
+			
+		
+			
+			
+
+			SpannableStringBuilder urlChanged = getURLChanged(topicData);
+
+			textView = (TextView) findViewById(R.id.label);
+			textView.setText(urlChanged);
+			textView.setTextSize(ConstParam.txtFonts);
+			textView.setMovementMethod(LinkMovementMethod.getInstance());
+			
+			
+			if (ConstParam.isTouch) {
+			textView.setOnTouchListener(this);
+			textView.setFocusable(true);
+			textView.setLongClickable(true);
+			}
+			btnBarVis = View.GONE;
+			
+			Button btnHuifu = (Button) findViewById(R.id.btn_huifu);
+			btnHuifu.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View v) {
+					getUrlHtml(huifuUrl, Const.MSGPST);
+				}
+			});
+			
+			 btnHuifu = (Button) findViewById(R.id.btn_alltopic);
+				btnHuifu.setOnClickListener(new OnClickListener() {
+
+					public void onClick(View v) {
+						if(allTopicUrl!=null&&allTopicUrl.length()>1)
+						{
+							getUrlHtml("http://bbs.nju.edu.cn/"+allTopicUrl, Const.MSGTOPICGROUP);
+						}
+					}
+				});
+			
+			
+			
+			
+			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+			mLoadingLayout.setVisibility(btnBarVis);
+		}
+		
+	}
+	
 	
 	
 	String blogUserName = "";
@@ -1518,6 +1593,23 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					});
 
 				}
+				
+				if (element.text().equals("删除")) {
+					String ss = (element.getElementsByTag("a")).get(0).attr(
+							"href");
+					
+					final String attr = bbsURL + ss;
+
+					Button btnPre = (Button) findViewById(R.id.btn_del);
+					btnPre.setOnClickListener(new OnClickListener() {
+
+						public void onClick(View v) {
+							getUrlHtml(attr, Const.MSGPSTNEW);
+						}
+					});
+
+				}
+				
 			}
 
 		}
@@ -1592,7 +1684,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					if (topicUrl == null)
 						return;
 
-					// huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
 					curStatus = 5;
 
 					scrollY = listView.getFirstVisiblePosition() + 1;
@@ -1626,7 +1717,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				beginMail(null, null, null, null);
 			}
 		});
-
+		btnMail = (Button) findViewById(R.id.btn_search);
+		
+		btnMail.setVisibility(View.GONE);
 		if (place != null) {
 			listView.setSelection(mailList.size() - 1);
 		} else {
@@ -1737,6 +1830,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	
 	private void checkSyn(String data) {
+		areaNamList = new ArrayList<String>();
 		Document doc = Jsoup.parse(data);
 
 		Elements as = doc.getElementsByTag("a");
@@ -1751,7 +1845,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 	
 	private void convtBlogFav(String data) {
-		// TODO Auto-generated method stub
+		
 		ConstParam.blogNamList = new ArrayList<String>();
 		Document doc = Jsoup.parse(data);
 
@@ -1909,7 +2003,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				
 			}
 
-			AlertDialog ad = dlg.create();
+			dlg.create();
 			// 发彩照功能
 			textView = (TextView) info.findViewById(R.id.tvInfo);
 			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
@@ -1926,15 +2020,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	 * 检查发文结果
 	 */
 	private void checkRst(String data) {
-		//System.out.print(data);
+		System.out.print(data);
 		if (data.contains("信件已寄给")) {
 			displayMsg("发送信件成功！");
-		} else if (data.contains("错误的收信人帐号")) {
+		} 
+		else if (data.contains("错误的收信人帐号")) {
 			displayMsg("错误的收信人帐号! ");
-		} else if (data.contains("http-equiv='Refresh'")) {
+		} 
+		else if (data.contains("http-equiv='Refresh'")) {
 
 			if (data.contains("bbsupload2")) {
-
 				int indexOf = data.indexOf("bbsupload2");
 				String substring = data.substring(indexOf, data.length()-3);
 				String replaceAll = substring.replaceAll("\n", "");
@@ -1942,26 +2037,41 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				getUrlHtml(url, Const.MSGPSTFILE);
 			}
 			else if (data.contains("bbsfexp")) {
-
 				int indexOf = data.indexOf("bbsfexp");
 				String substring = data.substring(indexOf, data.length()-3);
 				String url = "http://bbs.nju.edu.cn/"+substring;
 				getUrlHtml(url, Const.MSGPSTFILE);
 			}
+			else if (data.contains("bbsmail")) {
+				
+				//getUrlHtml(url, Const.MSGPSTFILE);
+				getUrlHtml(mailURL, Const.MSGMAIL);
+				displayMsg("删除成功！");
+				
+			}
 			
 			else
 			{
-			if (reid.equals("0")) {
-				// 发新文章完成
-				getUrlHtml(urlString, Const.MSGAREAPAGES);
-			} else {
-				// 回复完成
-				getUrlHtml(topicUrl + "&start=" + nowPos,
-						Const.MSGTOPICREFREASH);
-			}
+				if (reid.equals("0")) {
+					// 发新文章完成
+					getUrlHtml(urlString, Const.MSGAREAPAGES);
+					
+				} else {
+					// 回复完成
+					if( topicUrl.contains("bbstcon"))
+					{
+					getUrlHtml(topicUrl + "&start=" + nowPos,
+							Const.MSGTOPICREFREASH);
+					}
+					else if( topicUrl.contains("bbscon"))
+					{
+						getUrlHtml(urlString, Const.MSGAREA);
+					}
+				}
 			displayMsg("发文成功！");
 			}
-		}else if (data.contains("class=hand>[复制URL地址]")) {
+		}
+		else if (data.contains("class=hand>[复制URL地址]")) {
 			// 上传成功,将上传的文件地址回传到输入框
 			data = data.substring(data.indexOf("target=_blank>"));
 			String picurl = data.substring(14,data.indexOf("</a>"));
@@ -1975,23 +2085,20 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				titleEdit.append("\r\n"+picurl);
 			}
 			}
-			
-		} else if (data.contains("修改文章成功")) {
+		} 
+		else if (data.contains("修改文章成功")) {
 
 			// 修改完成
 			getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICREFREASH);
 
 			displayMsg("修改成功！");
 
-		} else if (data.contains("返回本讨论区")) {
-
+		} 
+		else if (data.contains("返回本讨论区")) {
 			// 回复完成
 			getUrlHtml(topicUrl + "&start=" + nowPos, Const.MSGTOPICREFREASH);
-
 			displayMsg("删除成功！");
-
 		}
-
 		else {
 			if (data.contains("两次发文间隔过密")) {
 				displayMsg("两次发文间隔过密, 请休息几秒后再试! ");
@@ -2040,19 +2147,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 			String url = "http://bbs.nju.edu.cn/bbstopb10";
 			getUrlHtml(url, Const.TOP20BOARD);
-			//getUrlHtml(synUrl, Const.MSGSYNFIRST);
-			// 如果收藏夹为空，则去服务器端取得
-			
-			/*
-			
-			if (areaNamList.size() < 1) {
-				getUrlHtml(synUrl, Const.MSGSYNFIRST);
-			} else {
-				//getUrlHtml(upUrl, Const.MSGUPDATE);
-				InitMain();
-			}
-			*/
-			// progressDialog.dismiss();
+
 
 		} else if (scs.size() == 1) {
 			if (data.contains("密码错误") || data.contains("错误的使用者帐号")) {
@@ -2123,32 +2218,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 			// 登录失败，要求重新登录
 			if (formData.contains("匆匆过客")) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						TestAndroidActivity.this);
-				builder.setMessage("匆匆过客不能写信~重新登录?")
-						.setPositiveButton("登录",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										if (isRem.equals("true")) {
-											// 自动登录的话，自动登录
-											String url = loginURL + "&id="
-													+ loginId + "&pw="
-													+ loginPwd;
-											getUrlHtml(url, Const.MSGAUTOLOGIN);
-										} else {
-											chaToLogin();
-										}
-									}
-								}).setNegativeButton("算了",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										dialog.cancel();
-									}
-								});
-				AlertDialog alert = builder.create();
-				alert.show();
+				getAutoLogin();
 			} else {
 				Toast.makeText(TestAndroidActivity.this, "由于未知错误发文失败",
 						Toast.LENGTH_SHORT).show();
@@ -2173,6 +2243,37 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 	}
 
+	private void getAutoLogin() {
+		// TODO Auto-generated method stub
+		AlertDialog.Builder builder = new AlertDialog.Builder(
+				TestAndroidActivity.this);
+		builder.setMessage("你还没登陆！~重新登录?")
+				.setPositiveButton("登录",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								if (isRem.equals("true")) {
+									// 自动登录的话，自动登录
+									String url = loginURL + "&id="
+											+ loginId + "&pw="
+											+ loginPwd;
+									getUrlHtml(url, Const.MSGAUTOLOGIN);
+								} else {
+									chaToLogin();
+								}
+							}
+						}).setNegativeButton("算了",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int id) {
+								dialog.cancel();
+							}
+						});
+		AlertDialog alert = builder.create();
+		alert.show();
+		
+		
+	}
 	String pid;
 	String reid;
 	String cont;
@@ -2191,34 +2292,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			if (ins.size() != 5) {
 				// 登录失败，要求重新登录
 				if (formData.contains("匆匆过客")) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							TestAndroidActivity.this);
-					builder.setMessage("你还没登陆呢~重新登录?")
-							.setPositiveButton("登录",
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											if (isRem.equals("true")) {
-												// 自动登录的话，自动登录
-												String url = loginURL + "&id="
-														+ loginId + "&pw="
-														+ loginPwd;
-												getUrlHtml(url,
-														Const.MSGAUTOLOGIN);
-											} else {
-												chaToLogin();
-											}
-
-										}
-									}).setNegativeButton("算了",
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											dialog.cancel();
-										}
-									});
-					AlertDialog alert = builder.create();
-					alert.show();
+					getAutoLogin();
 				} else if (formData.contains("您无权在此讨论区")) {
 					Toast.makeText(TestAndroidActivity.this, "您无权在此讨论区发文",
 							Toast.LENGTH_SHORT).show();
@@ -2326,7 +2400,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 											.findViewById(R.id.cb_recont);
 									if (cb.isChecked() && extraRecont != null
 											&& extraRecont.length() > 1) {
-										toCont += " " + extraRecont.substring(2);
+										toCont += " " + StringUtil.getStrBetter(extraRecont.substring(2));
 									}
 									sendTopic(title, toCont);
 								}
@@ -2455,7 +2529,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 	MyGridAdapter saImageItems;
 	private void getSmilyGrid() {
-		// TODO Auto-generated method stub
 		
 		   final Dialog dialog = new Dialog(TestAndroidActivity.this, R.style.FullHeightDialog);  
 		   dialog.setContentView(R.layout.smilydlg);  
@@ -2488,7 +2561,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
              findViewById.setOnItemClickListener(new OnItemClickListener() {  
                  public void onItemClick(AdapterView<?> parent, View view,  
                          int position, long id) {  
-                     // TODO Auto-generated method stub  
+                      
                 	 
                      EditText titleEdit = (EditText) acdlgView
 						.findViewById(R.id.edt_cont);
@@ -2615,10 +2688,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		else
 		
 		{
-		int s = ConstParam.sWidth;
-		ConstParam.sWidth = ConstParam.sLength;
-		
-		ConstParam.sLength = s;
+			
+			  if(((newConfig.orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE||newConfig.orientation == ActivityInfo.SCREEN_ORIENTATION_USER)&&ConstParam.sLength>ConstParam.sWidth)||
+			  (newConfig.orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT&&ConstParam.sWidth>ConstParam.sLength))
+
+			  { 
+				int s = ConstParam.sWidth;
+				ConstParam.sWidth = ConstParam.sLength;
+				
+				ConstParam.sLength = s;
+			  }
 		}
 	}
 
@@ -2830,7 +2909,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			if (split.length == 2) {
 				int re = Integer.parseInt(split[0]);
 				int watch = Integer.parseInt(split[1]);
-				if (re > 9 || watch > 500) {
+				if (re > 9 ) { //|| watch > 500
 					sp = new SpannableString(title + "[sm]");
 					sp.setSpan(hotTopicSpan, title.length(),
 							title.length() + 4,
@@ -2846,12 +2925,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 			map.put("topictitle", sp);
-			String place = "";
-			if (topicInfo.getNums() == null || topicInfo.getNums().equals("")) {
-				place = "";
-			} else {
-				place = topicInfo.getNums();
-			}
+//			String place = "";
+//			if (topicInfo.getNums() == null || topicInfo.getNums().equals("")) {
+//				place = "";
+//			} else {
+//				place = topicInfo.getNums();
+//			}
 
 			if (topicInfo.getMark().length() > 0) {
 				map.put("topicm", "[" + topicInfo.getMark() + "] ");
@@ -2859,7 +2938,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				map.put("topicm", "");
 
 			}
-			map.put("topicau", place + " 作者:" + topicInfo.getAuthor());
+			map.put("topicau",  "作者:" + topicInfo.getAuthor());
 			map.put("topicother", topicInfo.getPubDate());
 
 			list.add(map);
@@ -2884,12 +2963,22 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					if (topicUrl == null)
 						return;
 
-					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
+					
+					
 					curStatus = 2;
 					nowPos = 0;
 					scrollY = listView.getFirstVisiblePosition() + 1;
 
-					getUrlHtml(topicUrl, Const.MSGTOPIC);
+					if( urlString.contains("bbstdoc"))
+					{
+						huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
+						getUrlHtml(topicUrl, Const.MSGTOPIC);
+					}
+					else
+					{
+						huifuUrl = topicUrl.replace("bbscon?", "bbspst?");
+						getUrlHtml(topicUrl, Const.MSGTOPICSINGLE);
+					}
 
 				}
 			});
@@ -2987,7 +3076,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				//getToAreaWithName(inputPwd);
 			}
 		});
-		if (parentList == null || parentList.size() < 3)
+		//if (parentList == null || parentList.size() < 3)
 			initAllAreas();
 
 		android.widget.SimpleExpandableListAdapter adapter = new android.widget.SimpleExpandableListAdapter(
@@ -3206,6 +3295,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		parentList.add(parentData);
 
 		childList = new ArrayList<Map<String, Object>>();
+		
+		childData = new HashMap<String, Object>();
+		childData.put("TITLE", "我的博客");
+		childList.add(childData);
+		
 		for (String s : ConstParam.blogNamList) {
 			childData = new HashMap<String, Object>();
 			childData.put("TITLE", s);
@@ -3243,10 +3337,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	 * @param AreaData
 	 */
 	private void chaToArea(String AreaData) {
-
+		
 		if (AreaData != null && AreaData.contains("错误! 错误的讨论区")) {
 			Toast.makeText(TestAndroidActivity.this, "该讨论区不存在！",
 					Toast.LENGTH_SHORT).show();
+			return;
+		}
+		//会点到进版画面。。。检测 南京大学小百合站 -- 备忘录
+		if (AreaData != null &&AreaData.contains("自动跳转到版面<meta http-equiv='Refresh'"))
+		{
+			getUrlHtml(urlString, Const.MSGAREA);
 			return;
 		}
 
@@ -3264,7 +3364,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		btnPre.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
+				if(urlString.contains("bbstdoc"))
+				{
 				goToPage(-21);
+				}
+				else
+				{
+					goToPage(-41);
+				}
 			}
 		});
 
@@ -3272,7 +3379,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		btnNext.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				goToPage(21);
+				if(urlString.contains("bbstdoc"))
+				{
+					goToPage(21);
+				}
+				else
+				{
+					goToPage(41);
+				}
 			}
 		});
 
@@ -3280,14 +3394,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 
-		if (areaNamList.contains(curAreaName)) {
-			// btnLike.setBackgroundDrawable(drawableDis);
-			btnLike.setText("退 订");
-			btnLike.setIcon(R.drawable.fav);
+		if (urlString.contains("bbstdoc")) {
+			
+			btnLike.setText("一般模式");
+			btnLike.setIcon(R.drawable.sm);
 		} else {
-			// btnLike.setBackgroundDrawable(drawableFav);
-			btnLike.setText("收 藏");
-			btnLike.setIcon(R.drawable.unfav);
+			
+			btnLike.setText("主题模式");
+			btnLike.setIcon(R.drawable.tm);
 			
 		}
 
@@ -3295,32 +3409,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			public void onClick(View v) {
 				//ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 				
-				boolean endsWith = urlString.contains("bbstdoc");
-				if(endsWith)
+				boolean endsWith = urlString.contains("&type=tdoc");
+				//System.out.println(urlString);
+				if(!endsWith)
 				{
-					urlString = urlString.replaceAll("bbstdoc", "bbsdoc");
+					
+					urlString = urlString.replaceAll("bbstdoc", "bbsdoc")+"&type=tdoc";
 				}
 				else
 				{
 					urlString = urlString.replaceAll("bbsdoc", "bbstdoc");
+					urlString = urlString.substring(0,urlString.length()-10);
 				}
 				getUrlHtml(urlString, Const.MSGAREA);
-				/*
-				if (areaNamList.contains(curAreaName)) {
-					areaNamList.remove(curAreaName);
-					// btnLike.setBackgroundDrawable(drawableFav);
-					btnLike.setText("收 藏");
-					btnLike.setIcon(R.drawable.unfav);
-					
-
-				} else {
-					areaNamList.add(curAreaName);
-					// btnLike.setBackgroundDrawable(drawableDis);
-					btnLike.setText("退 订");
-					btnLike.setIcon(R.drawable.fav);
-				}
-				storeAreaName();
-				*/
 			}
 
 		});
@@ -3343,20 +3444,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			listView.setSelection(areaTopic.size() - 1);
 
 		}
-
-	}
-
-	private void storeAreaName() {
-		String areaName = "";
-		for (String name : areaNamList) {
-			areaName += name + ",";
-		}
-		if (areaName.length() > 1) {
-			areaName = areaName.substring(0, areaName.length() - 1);
-		}
-		Editor editor = sharedPreferences.edit();// 获取编辑器
-		editor.putString("areaName", areaName);
-		editor.commit();
 
 	}
 
@@ -3391,11 +3478,43 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		List<TopicInfo> tiList = new ArrayList<TopicInfo>();
 		Document doc = Jsoup.parse(data);
 		Elements tds = doc.getElementsByTag("td");
+		boolean tdoc = urlString.contains("bbstdoc");
 		int curPos = 0;
 		int getTopicNo = 0;
+		boolean isStart = false;
 		while (curPos < tds.size()) {
-			if (curPos != 0) {
+			String text = tds.get(curPos).text();
+			if(text.equals("序号"))
+			{
+				isStart = true;
+				if(!tdoc) 
+				{
+					curPos += 7;
+				}
+				else
+				{
+				curPos += 6;
+				}
+				
+			}
+			else if(isStart)
+			{
+				
 				TopicInfo ti = new TopicInfo();
+				
+				
+				ti.setAuthor(tds.get(curPos + 2).text());
+				ti.setMark(tds.get(curPos + 1).text());
+				String notext = tds.get(curPos).text();
+				ti.setNums(notext);
+				tiList.add(ti);
+				
+				if(!tdoc)
+				{
+					//一般模式
+					curPos++;
+				}
+				
 				ti.setLink((tds.get(curPos + 4).getElementsByTag("a")).get(0)
 						.attr("href"));// 设置title
 				ti.setTitle(tds.get(curPos + 4).text());// 设置title
@@ -3406,12 +3525,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					ti.setPubDate(tds.get(curPos + 3).text());
 				else
 					ti.setPubDate(date);
-				ti.setAuthor(tds.get(curPos + 2).text());
-				ti.setMark(tds.get(curPos + 1).text());
+				
 				ti.setHot(tds.get(curPos + 5).text());
-				String notext = tds.get(curPos).text();
-				ti.setNums(notext);
-				tiList.add(ti);
+				
+				
+				
+				
+				
 				if (getTopicNo == 0) {
 
 					if (notext != "" && Character.isDigit(notext.charAt(0))) {
@@ -3419,10 +3539,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						getTopicNo = 1;
 					}
 				}
-
+				curPos += 6;
+			}
+			else
+			{
+				curPos++;
 			}
 
-			curPos += 6;
+			
 		}
 
 		return tiList;
@@ -3757,15 +3881,17 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				}
 				
 
-				if (datamsg == Const.MSGTOPIC || datamsg == Const.MSGTOPICNEXT
+				if (datamsg == Const.MSGTOPIC || datamsg == Const.MSGTOPICNEXT || datamsg == Const.MSGTOPICSINGLE
 						|| datamsg == Const.MSGTOPICREFREASH) {
 
 					if (imageTrd != null && imageTrd.isAlive()) {
 						imageTrd.setName("NoUse");
 					}
 					topicWithImg = false;
+					
+					boolean isTopic =  topicUrl.contains("bbstcon");
 					final String topicDataInfo = StringUtil.getTopicInfo(data,
-							nowPos, isIP, 	ConstParam.isWifi, isPic, nowLoginId);
+							nowPos,nowLoginId,isTopic);
 					if (topicDataInfo != null) {
 						isNext = StringUtil.isNext;
 						if (StringUtil.curAreaName != null
@@ -3778,7 +3904,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						}
 						topicWithImg = StringUtil.topicWithImg;
 						pageNum = StringUtil.pageNum;
-
+						allTopicUrl = StringUtil.topicUrl;
 						actitle = StringUtil.actitle;
 						topicData =getSmilyStr(topicDataInfo);
 						if (topicWithImg) {
@@ -4136,6 +4262,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		// 以下是把图片转化为缩略图再加载
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
+		@SuppressWarnings("unused")
 		Bitmap bitmap = BitmapFactory.decodeByteArray(imageByte, 0,
 				imageByte.length, options);
 

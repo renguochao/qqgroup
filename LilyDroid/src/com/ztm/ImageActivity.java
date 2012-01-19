@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
@@ -59,6 +60,22 @@ public class ImageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		
+		 if(ConstParam.isFull.equals("3"))
+		{
+			
+	        //设置全屏  
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+		}
+		else if(ConstParam.isFull.equals("4"))
+		{
+			
+	        //设置全屏  
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+		}
 
 		setContentView(R.layout.image);
 

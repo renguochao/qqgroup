@@ -57,6 +57,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -91,6 +92,28 @@ public class BlogActivity extends Activity {
 		this.getWindow().setBackgroundDrawable(drawable);
 		
 		setContentView(R.layout.blogarea);
+		
+		if(ConstParam.isFull.equals("2"))
+		{
+			//设置无标题  
+	        requestWindowFeature(Window.FEATURE_NO_TITLE);  
+		}
+		else if(ConstParam.isFull.equals("3"))
+		{
+			//设置无标题  
+	        requestWindowFeature(Window.FEATURE_NO_TITLE);  
+	        //设置全屏  
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+		}
+		else if(ConstParam.isFull.equals("4"))
+		{
+			
+	        //设置全屏  
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,   
+	                WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+		}
+		
 		if(ConstParam.isChange)
 		{
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);

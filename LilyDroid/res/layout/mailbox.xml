@@ -6,6 +6,21 @@
      <LinearLayout
         android:id="@+id/linearLayout1"
         style="@style/normalTab"  >
+                <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"  
+    android:stretchColumns="0,1,2,3"     
+>  
+<TableRow>  
+    
+     <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn_search"
+            style="@style/normalBtn"
+            android:icon="@drawable/ser"
+            android:text="搜 索" >
+        </com.sonyericsson.zoom.ImageTextButton>
+    
+    
         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_pre"
             style="@style/normalBtn"
@@ -25,9 +40,11 @@
            
             android:icon="@drawable/mailback"
              style="@style/normalBtn"  
-           android:text="发信" 
+           android:text="发 信" 
 	   >
         </com.sonyericsson.zoom.ImageTextButton>
+                </TableRow>
+        </TableLayout>
     </LinearLayout>
     
     

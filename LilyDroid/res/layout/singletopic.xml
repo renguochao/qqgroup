@@ -12,23 +12,18 @@
     android:stretchColumns="0,1,2,3"     
 >  
 <TableRow>  
-    
-         <com.sonyericsson.zoom.ImageTextButton
-            android:id="@+id/btn_del"
-            style="@style/normalBtn"
-            android:icon="@drawable/rec"
-            android:text="删 除" >
-        </com.sonyericsson.zoom.ImageTextButton>
-    
         <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn_alltopic"
+            style="@style/normalBtn"
+            android:icon="@drawable/tm"
+            android:text="同主题阅读" >
+        </com.sonyericsson.zoom.ImageTextButton>
+         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_huifu"
             style="@style/normalBtn"
-            android:icon="@drawable/mailback"
-            android:text="回 信" >
+            android:icon="@drawable/huifu"
+            android:text="回复" >
         </com.sonyericsson.zoom.ImageTextButton>
-        
-       
-            
                 </TableRow>
         </TableLayout>
     </LinearLayout>

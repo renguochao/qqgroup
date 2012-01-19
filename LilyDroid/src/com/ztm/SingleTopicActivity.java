@@ -76,7 +76,7 @@ import android.widget.Toast;
 import android.widget.ZoomControls;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class BlogTopicActivity extends Activity  implements OnTouchListener,
+public class SingleTopicActivity extends Activity  implements OnTouchListener,
 OnGestureListener {
 	
 	private GestureDetector mGestureDetector;
@@ -91,11 +91,10 @@ OnGestureListener {
 		Resources res = getResources();
 		Drawable drawable = res.getDrawable(R.drawable.bkcolor);
 		this.getWindow().setBackgroundDrawable(drawable);
-		setTitle("博客浏览");
+		setTitle("文章浏览");
 		Intent intent = getIntent();
-		String result = intent.getStringExtra("withSmile");
-		topicUrl = intent.getStringExtra("topicUrl");
-
+		String topicData = intent.getStringExtra("data");
+		
 		
 		if(ConstParam.isFull.equals("2"))
 		{
@@ -119,7 +118,25 @@ OnGestureListener {
 		}
 		
 		
-		setContentView(R.layout.blogtopic);
+		char s = 10;
+		String backS = s + "";
+		String nbs = "<br>";
+		topicData = topicData.replaceAll(backS,nbs );
+		Document doc = Jsoup.parse(topicData);
+		Elements scs = doc.getElementsByTag("textarea");
+		
+			Element textArea = scs.get(0);
+			String infoView = nbs + textArea.text();
+
+
+			infoView = StringUtil.getBetterTopic(infoView);
+			
+			String withSmile = StringUtil.addSmileySpans(infoView,null);
+		
+		
+		
+
+		setContentView(R.layout.singletopic);
 		
 		if(ConstParam.isChange)
 		{
@@ -131,7 +148,7 @@ OnGestureListener {
 		
 		
 		TextView textView = (TextView) findViewById(R.id.label);
-		textView.setText(StringUtil.getSmilyStr(result,getResources()));
+		textView.setText(StringUtil.getSmilyStr(withSmile,getResources()));
 		textView.setTextSize(ConstParam.txtFonts);
 		if (ConstParam.isTouch) {
 		textView.setOnTouchListener(this);
@@ -139,42 +156,24 @@ OnGestureListener {
 		textView.setLongClickable(true);
 		}
 		
-		if(topicUrl!=null)
-		{
-			final String blogcocon = topicUrl.replace("blogcon", "blogcocon");
-			final String blogcomment = topicUrl.replace("blogcon", "blogcomment");
-			Button btnPre = (Button) findViewById(R.id.btn_read);
+		/*
+			final String blogcocon = topicUrl.replace("bbscon", "bbspst");
+			
+
+			Button btnPre = (Button) findViewById(R.id.btn_huifu);
 			btnPre.setOnClickListener(new OnClickListener() {
 	
 				public void onClick(View v) {
 					LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
 					 btnBarVis = View.GONE;
 					 mLoadingLayout.setVisibility(btnBarVis);
-					NetTraffic.getUrlHtml(BlogTopicActivity.this,blogcocon, Const.BLOGCOMT,handler);
+					NetTraffic.getUrlHtml(SingleTopicActivity.this,blogcocon, Const.BLOGRE,handler);
 				}
 			});
-			
-			btnPre = (Button) findViewById(R.id.btn_huifu);
-			btnPre.setOnClickListener(new OnClickListener() {
-	
-				public void onClick(View v) {
-					LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
-					 btnBarVis = View.GONE;
-					 mLoadingLayout.setVisibility(btnBarVis);
-					NetTraffic.getUrlHtml(BlogTopicActivity.this,blogcomment, Const.BLOGRE,handler);
-				}
-			});
-			
+			*/
 			
 
 			mLoadingLayout.setVisibility(btnBarVis);
-		}
-		else
-		{
-			//LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
-			mLoadingLayout.setVisibility(btnBarVis);
-			isNoBar = true;
-		}
 		
 		
 		
@@ -293,10 +292,10 @@ OnGestureListener {
 		{
 			final String blogcocon = topicUrl.replace("blogcon", "blogdocomment");
 			LayoutInflater factory = LayoutInflater
-			.from(BlogTopicActivity.this);
+			.from(SingleTopicActivity.this);
 			final View acdlgView = factory.inflate(R.layout.editdlg, null);
 			Builder altDlg = new AlertDialog.Builder(
-					BlogTopicActivity.this).setTitle("发表评论").setView(
+					SingleTopicActivity.this).setTitle("发表评论").setView(
 					acdlgView).setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
@@ -319,7 +318,7 @@ OnGestureListener {
 
 					
 
-							NetTraffic.postUrlHtml( BlogTopicActivity.this,url,newVp, Const.BLOGDORE,handler      );
+							NetTraffic.postUrlHtml( SingleTopicActivity.this,url,newVp, Const.BLOGDORE,handler      );
 							
 						}
 
@@ -350,7 +349,7 @@ OnGestureListener {
 	}
 	
 	private void displayMsg(String msg) {
-		Toast.makeText(BlogTopicActivity.this, msg, Toast.LENGTH_SHORT)
+		Toast.makeText(SingleTopicActivity.this, msg, Toast.LENGTH_SHORT)
 				.show();
 	}
 	
@@ -376,8 +375,8 @@ OnGestureListener {
 
 			String withSmile = StringUtil.addSmileySpans(infoView,null);
 			
-			Intent intent = new Intent(BlogTopicActivity.this,
-					BlogTopicActivity.class);
+			Intent intent = new Intent(SingleTopicActivity.this,
+					SingleTopicActivity.class);
 			
 			intent.putExtra("withSmile", withSmile);
 			startActivity(intent);

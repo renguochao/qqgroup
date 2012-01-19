@@ -7,13 +7,20 @@
     <LinearLayout
         android:id="@+id/linearLayout1"
         style="@style/normalTab" >
+                <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"  
+    android:stretchColumns="0,1,2,3"     
+>  
+<TableRow>  
         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_like"
             style="@style/normalBtn"
             android:icon="@drawable/fav"
             >
         </com.sonyericsson.zoom.ImageTextButton>
-
+        </TableRow>
+        </TableLayout>
     </LinearLayout>
     
 

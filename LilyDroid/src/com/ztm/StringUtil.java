@@ -30,6 +30,7 @@ public class StringUtil {
 	static String curAreaName;
 	static boolean topicWithImg = false;
 	static int pageNum;
+	static String topicUrl;
 	static String actitle;
 	static HashMap<String,String> picTempFiles;
 	static HashMap<String, Integer> smilyAll;
@@ -111,11 +112,23 @@ public class StringUtil {
 		String[] split = scon.split("\n");
 		StringBuilder allSb = new StringBuilder();
 		for (String sp : split) {
-			if(sp.startsWith(":")||sp.contains("※")||sp.startsWith("http://")) 
+			if(sp.contains("※")||sp.startsWith("http://")) 
 			{
 				allSb.append(sp+'\n');
 				continue;
 			}
+			
+			if(sp.startsWith(":")) 
+			{
+				if(sp.length()>40)
+				{
+					sp=sp.substring(0,40)+"...";
+				}
+				allSb.append(sp+"\n");
+				
+				continue;
+			}
+			
 			StringBuilder sb = new StringBuilder(sp);
 			int len = sp.length();
 			int tempLen = 0;
@@ -139,6 +152,18 @@ public class StringUtil {
 		string = allSb.toString();
 		return string;
 	}
+	
+	public static String getSpanedString(String data,String first,String last,int lastInt)
+	{
+		String ret = "";
+		int indexOf = data.lastIndexOf(first);
+		int indexOf2 = data.lastIndexOf(last);
+		if (indexOf>0&&indexOf2>0)
+		{
+			ret = data.substring(indexOf+first.length(),indexOf2+lastInt);
+		}
+		return ret;
+	}
 
 	/**
 	 * 解析获取的页面 处理某个特定的话题
@@ -146,7 +171,7 @@ public class StringUtil {
 	 * @param data
 	 * @return
 	 */
-	public static String getTopicInfo(String data,int nowPos,boolean isIP,boolean isWifi,String isPic,String nowLoginId) {
+	public static String getTopicInfo(String data,int nowPos,String nowLoginId,boolean isTopic) {
 		StringBuffer tiList = new StringBuffer("<br>");
 		char s = 10;
 		String backS = s + "";
@@ -176,6 +201,22 @@ public class StringUtil {
 				pageNum = Integer.parseInt(Num);
 			}
 		}
+		
+		topicUrl = "";
+		if(!isTopic)
+		{
+			lastIndexOf = data.lastIndexOf("' >同主题阅读</a>");
+			if(lastIndexOf>0)
+			{
+				String substring = data.substring(lastIndexOf-80, lastIndexOf);
+				int indexOf = substring.lastIndexOf("<a href='");
+				if (indexOf>0)
+				{
+					topicUrl = substring.substring(indexOf+9);
+				}
+			}
+		}
+		
 		        
 		        
 		Document doc = Jsoup.parse(data);
@@ -215,6 +256,12 @@ public class StringUtil {
 					{
 				 String area =text.substring(areaNo+4, titleNo); 
 				 curAreaName =  area.replaceAll("<br>", ""); 
+				 int indexOf = curAreaName.indexOf('.');
+				 if(indexOf>-1)
+				 {
+					 curAreaName = curAreaName.substring(0,indexOf);
+				 }
+					 
 				 curAreaName = curAreaName.toLowerCase();
 				 curAreaName = curAreaName.replaceFirst(
 						 curAreaName.substring(0, 1),
@@ -223,7 +270,7 @@ public class StringUtil {
 					}
 					else
 					{
-						curAreaName = "byztm";
+						curAreaName = "空";
 					}
 				 
 				 
@@ -359,7 +406,7 @@ public class StringUtil {
 
 					if (sconA.contains("来源:．"))
 					{
-						if(isIP)
+						if(ConstParam.isIP)
 						{
 							int ipIndex = sconA.indexOf("[FROM:");
 							if(ipIndex>0)
@@ -371,12 +418,26 @@ public class StringUtil {
 						}
 						continue;
 					}
-						if	(	sconA.contains("修改:．")
-							|| sconA.equals("--")) {
+					if	(sconA.contains("修改:．")) {
 						continue;
 					}
+					if	(sconA.equals("--")) {
+						
+						if(!isTopic)
+							sb.append(sconA+ nbs);
+						
+						continue;
+							
+					}
+					
+					if(sconA.startsWith(":"))
+					{
+						sb.append("<font color=#808080>"+sconA+"</font>"+ nbs);
+						continue;
+					}
+					
 					sconA = sconA.trim();
-					if(isPic.equals(Const.AllPic)||(isWifi &&isPic.equals(Const.WIFIPic)))
+					if(ConstParam.isPic.equals(Const.AllPic)||(	ConstParam.isWifi &&ConstParam.isPic.equals(Const.WIFIPic)))
 
 					{
 						if (sconA.toLowerCase().startsWith("http:")
@@ -526,13 +587,18 @@ public class StringUtil {
 			
 			
 			if (sconA.contains("来源:．")||sconA.contains("修改:．")||sconA.contains("者:")
-					|| sconA.equals("--"))
+					)
 			{
 				continue;
 			}
 			if(sconA.startsWith("[Head]"))
 			{
 				sb.append("[1;34m"+sconA.substring(6)+"[m"+ nbs);
+				continue;
+			}
+			if(sconA.startsWith(":"))
+			{
+				sb.append("<font color=#808080>"+sconA+"</font>"+ nbs);
 				continue;
 			}
 			

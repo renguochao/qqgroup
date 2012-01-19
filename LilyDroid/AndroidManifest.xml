@@ -45,6 +45,11 @@
             android:configChanges="orientation|keyboardHidden"
             android:name=".BlogTopicActivity" >
         </activity>
+         <activity
+            android:configChanges="orientation|keyboardHidden"
+            android:name=".SingleTopicActivity" >
+        </activity>
+            
     </application>
 
 </manifest>

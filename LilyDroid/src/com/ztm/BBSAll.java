@@ -4,6 +4,17 @@ import java.util.HashMap;
 
 public class BBSAll {
 	
+	/**
+	 * 得到更新信息
+	 */
+	public static String getUpdateInfo() {
+	
+		String update;
+		update = "修正如下bug：\r\n1.上传图片路径过长被截断\r\n2.在4.0系统上浏览主题界面右滑FC";
+		
+		
+		return update;
+	}
 	
 	/**
 	 * 表情集合
@@ -1006,4 +1017,6 @@ public class BBSAll {
 		
 		return hm;
 	}
+	
+	
 }

@@ -59,17 +59,28 @@ public class SimpleZoomListener implements View.OnTouchListener {
                 break;
 
             case MotionEvent.ACTION_MOVE: {
-                final float dx = (x - mX) / (v.getWidth()*mState.getZoom());
-                final float dy = (y - mY) / (mState.getmPicY()*(v.getWidth()/mState.getmPicX())*mState.getZoom());
+            	 float dx =0;
+            	 float dy = 0;
+            	if((mState.getmPicY()/v.getHeight())<(mState.getmPicX()/v.getWidth()))
+            	{
+            	
+                dx = (x - mX) / (v.getWidth()*mState.getZoom());
+                 dy = (y - mY) / (mState.getmPicY()*(v.getWidth()/mState.getmPicX())*mState.getZoom());
+            	}
+            	else
+            	{
+            		dx = (x - mX) / ( (mState.getmPicX()*(v.getHeight()/mState.getmPicY())  *mState.getZoom()));
+                    dy = (y - mY) / (v.getHeight()*mState.getZoom());
+            	}
 
-                if (mControlType == ControlType.ZOOM) {
-                    mState.setZoom(mState.getZoom() * (float)Math.pow(20, -dy));
-                    mState.notifyObservers();
-                } else {
+//                if (mControlType == ControlType.ZOOM) {
+//                    mState.setZoom(mState.getZoom() * (float)Math.pow(20, -dy));
+//                    mState.notifyObservers();
+//                } else {
                     mState.setPanX(mState.getPanX() - dx);
                     mState.setPanY(mState.getPanY() - dy);
                     mState.notifyObservers();
-                }
+               // }
 
                 mX = x;
                 mY = y;

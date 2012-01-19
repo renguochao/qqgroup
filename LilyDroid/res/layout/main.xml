@@ -6,7 +6,13 @@
     <LinearLayout
         android:id="@+id/linearLayout1"
         style="@style/normalTab" >
-<com.sonyericsson.zoom.ImageTextButton
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent"  
+    android:stretchColumns="0,1,2,3"     
+>  
+<TableRow>  
+		<com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_link"
             style="@style/normalBtn"
             android:icon="@drawable/top1"
@@ -33,6 +39,8 @@
             android:icon="@drawable/hot"
             android:text="@string/bbshot" >
         </com.sonyericsson.zoom.ImageTextButton>
+        </TableRow>
+        </TableLayout>
     </LinearLayout>
 
     <ListView

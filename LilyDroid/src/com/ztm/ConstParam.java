@@ -9,6 +9,10 @@ public class ConstParam {
 	public static  int sWidth = 480;
 	public static  int sLength = 800;
 	public static boolean isTouch;
+	public static String isPic;
+	
+	public static boolean isIP;
+	
 	public static int txtFonts;
 	public static boolean  isChange;
 	
@@ -21,6 +25,8 @@ public class ConstParam {
 	public static  String signColor;
 	
 	public static boolean isWifi = false;
+	
+	public static String isFull;
 	
 
 }
