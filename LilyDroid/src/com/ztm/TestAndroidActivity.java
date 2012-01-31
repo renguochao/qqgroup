@@ -83,6 +83,8 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -92,8 +94,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
 
@@ -122,6 +126,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private Button btnLink;
 	// 全局变量
 	private List<String> LinkAdr;
+	private List<String> LinkAreaAdr;
 	private String data;
 	private List<TopicInfo> top10TopicList;
 	private String topicUrl;
@@ -172,6 +177,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	SharedPreferences sharedPreferences;
 
 	List<String> areaNamList;
+	
+	List<String> localareaNamList;
 
 	String[] fastReList;
 
@@ -187,7 +194,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	boolean topicWithImg = false;
 	HashMap<String, String> bbsAll;
 	HashMap<String, String> bbsAllName;
-	HashMap<String, Integer> smilyAll;
 	ArrayAdapter<String> bbsAlladapter;
 	String bbsURL = "http://bbs.nju.edu.cn/";
 	String loginURL = "http://bbs.nju.edu.cn/bbslogin?type=2";
@@ -226,6 +232,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String allTopicUrl;
 	String actitle;
 
+	// 保存的图片存储位置
+	private static final File IMG_DIR = new File(Environment
+			.getExternalStorageDirectory()
+			+ "/lilyDroid/Images");
+	
+	
+	
 	// 拍照的照片存储位置
 	private static final File PHOTO_DIR = new File(Environment
 			.getExternalStorageDirectory()
@@ -277,7 +290,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		bbsAll = BBSAll.getBBSAll();
 		bbsAllName = BBSAll.getBBSRightName();
-		smilyAll = BBSAll.getSmilyAll();
 		String[] bbsAllArray = StringUtil.getArray(bbsAll);
 		bbsAlladapter = new ArrayAdapter<String>(TestAndroidActivity.this,
 				android.R.layout.simple_dropdown_item_1line, bbsAllArray);
@@ -324,7 +336,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		registerReceiver(mNetworkStateReceiver, filter); 
 
-		
+		//创建目录
+		createSDCardDir();
 		initfbAll();
 		StringUtil.initAll();
 
@@ -353,7 +366,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		{
 		if(curCode<vc)
 		{
-			
+			/*
 			LayoutInflater factory = LayoutInflater
 			.from(TestAndroidActivity.this);
 			final View info = factory.inflate(R.layout.infodlg, null);
@@ -374,8 +387,18 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
 			sv.scrollTo(0, 0);
 			textView.setText(Html.fromHtml(BBSAll.getUpdateInfo()));
+			*/
+			new AlertDialog.Builder(TestAndroidActivity.this).setTitle("更新说明：")
+			.setMessage(BBSAll.getUpdateInfo()).setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+
+						public void onClick(DialogInterface dialog,
+								int which) {
+						
+						}
+
+					}).show();
 		
-			dlg.show();
 			Editor editor = sharedPreferences.edit();// 获取编辑器
 			editor.putInt("curCode", vc);
 			editor.commit();
@@ -864,6 +887,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			String outFilePath = PHOTO_DIR+File.separator+getUpFileName();
 			FileOutputStream out;
 			out = new FileOutputStream(outFilePath);
+			///mnt/sdcard/lilyDroid/Photos/LilyDroid0131153742.jpg
 			photo.compress(Bitmap.CompressFormat.JPEG, 90, out);
 			uploadFileBBS(outFilePath);
 		} catch (Exception e) {
@@ -873,6 +897,23 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		
 	}
+	
+	
+	public void createSDCardDir() {
+			if (Environment.MEDIA_MOUNTED.equals(Environment
+					.getExternalStorageState())) {
+				if(!PHOTO_DIR.exists())
+					PHOTO_DIR.mkdirs();// 创建照片的存储目录
+				if(!TEMP_DIR.exists())
+					TEMP_DIR.mkdirs();
+				if(!IMG_DIR.exists())
+					IMG_DIR.mkdirs();
+				
+				
+			}
+	}
+	
+	
 	
 	File uploadFile = null;
 	private void uploadFileBBS(String outFilePath) {
@@ -1025,11 +1066,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void initAllParams() {
 		sharedPreferences = getSharedPreferences("LilyDroid",
 				Context.MODE_PRIVATE);
-		//String name = sharedPreferences.getString("areaName", "");
+		String name = sharedPreferences.getString("areaName", "");
 		//String blogName = sharedPreferences.getString("blogName", "");
 
-		//areaNamList = new ArrayList<String>();
-		
+		localareaNamList = new ArrayList<String>();
 		
 		curCode = sharedPreferences.getInt("curCode", 0);
 		isRem = sharedPreferences.getString("isRem", "false");
@@ -1048,6 +1088,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			ConstParam.isWifi = true;
 
 		} 
+		
+		if (name != null &&name.length() > 1)
+		{
+		String[] split = name.split(",");
+		for (String string : split) {
+			String string2 = bbsAllName.get(string.toLowerCase());
+			if(string2==null)
+				localareaNamList.add(string);
+			else
+				localareaNamList.add(string2);
+		}
+		}
+		
 		
 		
 		
@@ -1447,8 +1500,17 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		{
 			Intent intent = new Intent(TestAndroidActivity.this,
 			BlogActivity.class);
+
+			
 			intent.putExtra("data", data);
 			intent.putExtra("blogUserName", blogUserName);
+			
+//			if(isLogin&&blogUserName.equals(loginId))
+//			{
+//				
+//			}
+			
+			
 			runningTasks = 0;
 			progressDialog.dismiss();
 
@@ -2490,7 +2552,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			btnlog.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View arg0) {
-					doPickPhotoAction();
+					
+					String status=Environment.getExternalStorageState();
+					if(status.equals(Environment.MEDIA_MOUNTED)){//判断是否有SD卡
+						doPickPhotoAction();
+					}
+					else{
+						displayMsg("请插入SD卡");
+					}
+					
+					
 				}
 
 			});
@@ -2536,12 +2607,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		   GridView   findViewById =(GridView ) dialog.findViewById(R.id.updater_faceGrid);
 		   if(saImageItems==null)
 		   {
-		   Set<String> keySet = smilyAll.keySet();
+		   Set<String> keySet = StringUtil.smilyAll.keySet();
 		   ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();  
            
 		   for (String string : keySet) {
 			   HashMap<String, Object> map = new HashMap<String, Object>();  
-			   map.put("ItemImage", smilyAll.get(string));//添加图像资源的ID    
+			   map.put("ItemImage", StringUtil.smilyAll.get(string));//添加图像资源的ID    
 			   map.put("ItemText", string);//添加图像资源的ID    
 			   lstImageItem.add(map);
 		   }
@@ -2601,13 +2672,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 								doTakePhoto();// 用户点击了从照相机获取
 							}
 							else{
-								displayMsg("没有SD卡");
+								displayMsg("请插入SD卡");
 							}
 							break;
 							
 						}
 						case 1:
-							doPickPhotoFromGallery();// 从相册中去获取
+							String status=Environment.getExternalStorageState();
+							if(status.equals(Environment.MEDIA_MOUNTED)){//判断是否有SD卡
+								doPickPhotoFromGallery();// 从相册中去获取
+							}
+							else{
+								displayMsg("请插入SD卡");
+							}
 							break;
 						}
 					}
@@ -2631,8 +2708,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	protected void doTakePhoto() {
 		try {
 			// Launch camera to take photo for selected contact
-			if(!PHOTO_DIR.exists())
-				PHOTO_DIR.mkdirs();// 创建照片的存储目录
+			
 			mCurrentPhotoFile = PHOTO_DIR.getAbsolutePath()+File.separator+ getPhotoFileName("IMG");// 给新照的照片文件命名
 			Intent intent = getTakePickIntent(mCurrentPhotoFile);
 			startActivityForResult(intent, CAMERA_WITH_DATA);
@@ -2841,6 +2917,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void convtTopics() {
 
 		LinkAdr = new ArrayList<String>();
+		LinkAreaAdr = new ArrayList<String>();
 
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
@@ -2860,6 +2937,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			list.add(map);
 
 			LinkAdr.add("http://bbs.nju.edu.cn/" + topicInfo.getLink());
+			
+			LinkAreaAdr.add(topicInfo.getArea());
 
 		}
 		if (list.size() > 0) {
@@ -2884,8 +2963,41 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				}
 			});
+			
+			//长按事件
+			listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {   
+				public void onCreateContextMenu(ContextMenu menu, View arg1,
+						ContextMenuInfo arg2) {
+					// TODO Auto-generated method stub
+					
+					 menu.setHeaderTitle("版面");      
+		             menu.add(0, 0, 0, "访问该主题对应的版面");   
+				}   
+	        });    
+			
 		}
 	}
+	
+	//长按菜单响应函数   
+    @Override  
+    public boolean onContextItemSelected(MenuItem item) {   
+    	  AdapterView.AdapterContextMenuInfo menuInfo;
+          menuInfo =(AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+          //输出position
+          //Toast.makeText(TestAndroidActivity.this,String.valueOf(menuInfo.position), Toast.LENGTH_LONG).show();
+          String name = LinkAreaAdr.get(menuInfo.position);
+          
+			if (name != null&& name.length()> 2)
+			{
+				if(name.startsWith("["))
+					name = name.substring(1,name.length()-1);
+				Log.i("Area", name);
+				getToAreaWithName(name);
+			}
+        return super.onContextItemSelected(item); 
+    }   
+	
+	
 
 	/**
 	 * 将由HTML页面转出的数据转化为ListView可读的形式 供讨论区使用
@@ -2992,6 +3104,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		LinkAdr = new ArrayList<String>();
 
+		LinkAreaAdr = new ArrayList<String>();
+		
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
 		for (TopicInfo topicInfo : hotList) {
@@ -3010,7 +3124,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			list.add(map);
 
 			LinkAdr.add("http://bbs.nju.edu.cn/" + topicInfo.getLink());
-
+			LinkAreaAdr.add(topicInfo.getArea());
 		}
 		if (list.size() > 0) {
 
@@ -3037,6 +3151,18 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				}
 			});
+			
+			//长按事件
+			listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {   
+				public void onCreateContextMenu(ContextMenu menu, View arg1,
+						ContextMenuInfo arg2) {
+					// TODO Auto-generated method stub
+					 menu.setHeaderTitle("版面");      
+		             menu.add(0, 0, 0, "访问该主题对应的版面");   
+				}   
+	        });
+			
+			
 		}
 	}
 	int lastPar = -1;
@@ -3086,7 +3212,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				new int[] { android.R.id.text1 });
 		// create child's OnChildClickListener
 		android.widget.ExpandableListView listView = (android.widget.ExpandableListView) findViewById(R.id.area_view);
-
+		listView.setChildDivider(this.getResources().getDrawable(R.color.divider));
 		// Adapter set
 		listView.setAdapter(adapter);
 		listView.setOnChildClickListener(new android.widget.ExpandableListView.OnChildClickListener() {
@@ -3235,7 +3361,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		allChildList = new ArrayList<List<Map<String, Object>>>();
 		Map<String, Object> childData ;
 		Map<String, Object> parentData = new HashMap<String, Object>();
-		parentData.put("TITLE", "版面收藏");
+		parentData.put("TITLE", "预定版面");
 		parentList.add(parentData);
 
 		List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
@@ -3246,6 +3372,23 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			childList.add(childData);
 		}
 		allChildList.add(childList);
+		
+		
+		if (localareaNamList != null&&localareaNamList.size()>0) {
+			parentData = new HashMap<String, Object>();
+			parentData.put("TITLE", "本地收藏");
+			parentList.add(parentData);
+
+			childList = new ArrayList<Map<String, Object>>();
+			for (String s : localareaNamList) {
+				 childData = new HashMap<String, Object>();
+				childData.put("TITLE", s);
+				childList.add(childData);
+			}
+			allChildList.add(childList);
+		}
+		
+		
 
 		if (top20List != null) {
 			parentData = new HashMap<String, Object>();
@@ -3394,34 +3537,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 
-		if (urlString.contains("bbstdoc")) {
-			
-			btnLike.setText("一般模式");
-			btnLike.setIcon(R.drawable.sm);
-		} else {
-			
-			btnLike.setText("主题模式");
-			btnLike.setIcon(R.drawable.tm);
-			
-		}
+
 
 		btnLike.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				//ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
-				
-				boolean endsWith = urlString.contains("&type=tdoc");
-				//System.out.println(urlString);
-				if(!endsWith)
-				{
-					
-					urlString = urlString.replaceAll("bbstdoc", "bbsdoc")+"&type=tdoc";
-				}
-				else
-				{
-					urlString = urlString.replaceAll("bbsdoc", "bbstdoc");
-					urlString = urlString.substring(0,urlString.length()-10);
-				}
-				getUrlHtml(urlString, Const.MSGAREA);
+				doAreaJump();
 			}
 
 		});
@@ -3446,6 +3566,107 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 
 	}
+	
+	
+	private void doAreaJump() {
+		String[] choices;
+		choices = new String[2];
+		
+		if (urlString.contains("bbstdoc")) {
+			choices[0] = "切换到一般模式";
+		} 
+		else 
+		{
+		choices[0] = "切换到主题模式";
+		}
+
+		if (localareaNamList.contains(curAreaName)) {
+			// btnLike.setBackgroundDrawable(drawableDis);
+			choices[1] = "取消本地收藏";
+		} else {
+			// btnLike.setBackgroundDrawable(drawableFav);
+			
+			choices[1] = "加入本地收藏";
+		}
+
+		
+		//choices[2] = "版内查询";
+		final ListAdapter adapter = new ArrayAdapter<String>( TestAndroidActivity.this,
+				android.R.layout.simple_dropdown_item_1line, choices);
+
+		final AlertDialog.Builder builder = new AlertDialog.Builder(
+				 TestAndroidActivity.this);
+		
+		builder.setSingleChoiceItems(adapter, -1,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						switch (which) {
+						case 0:{
+							boolean endsWith = urlString.contains("&type=tdoc");
+							if(!endsWith)
+							{
+								
+								urlString = urlString.replaceAll("bbstdoc", "bbsdoc")+"&type=tdoc";
+							}
+							else
+							{
+								urlString = urlString.replaceAll("bbsdoc", "bbstdoc");
+								urlString = urlString.substring(0,urlString.length()-10);
+							}
+							getUrlHtml(urlString, Const.MSGAREA);
+							break;
+						}
+						case 1:{
+							
+							
+							if (localareaNamList.contains(curAreaName)) {
+								localareaNamList.remove(curAreaName);
+								displayMsg("版面 "+curAreaName+" 已从收藏中去除");
+								
+
+							} else {
+								localareaNamList.add(curAreaName);
+								displayMsg("版面 "+curAreaName+" 已加入收藏");
+								
+							}
+							storeAreaName();
+							
+							
+							break;
+						}
+						case 2:{
+							
+							break;
+						}
+						}
+					}
+				});
+		builder.setNegativeButton("返回", new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int which) {
+			
+			}
+
+			
+		});
+		builder.create().show();
+	}
+	
+	private void storeAreaName() {
+		String areaName = "";
+		for (String name : localareaNamList) {
+			areaName += name + ",";
+		}
+		if (areaName.length() > 1) {
+			areaName = areaName.substring(0, areaName.length() - 1);
+		}
+		Editor editor = sharedPreferences.edit();// 获取编辑器
+		editor.putString("areaName", areaName);
+		editor.commit();
+
+	}
+	
 
 	/**
 	 * 讨论区界面翻页
@@ -4048,7 +4269,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		Drawable drawable = null;
 		if (source.startsWith("[")) {
 			Resources res = getResources();
-			Integer i = smilyAll.get(source);
+			Integer i = StringUtil.smilyAll.get(source);
 			if (i != null) {
 				drawable = res.getDrawable(i);
 			} else

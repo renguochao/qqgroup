@@ -16,5 +16,7 @@
     <color name="traffic_bg">#ffecf0f1</color>
     <color name="traffic_txt">#ff414141</color>
     <color name="traffic_data">#ff666666</color>
+    <color name="divider">#90EE90</color>
+       
     
 </resources>

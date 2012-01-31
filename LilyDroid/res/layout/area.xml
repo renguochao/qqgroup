@@ -15,8 +15,8 @@
         <com.sonyericsson.zoom.ImageTextButton
             android:id="@+id/btn_like"
             style="@style/normalBtn"
-            android:icon="@drawable/fav"
-            >
+           android:icon="@drawable/tag"
+            android:text="操 作" >
         </com.sonyericsson.zoom.ImageTextButton>
 
         <com.sonyericsson.zoom.ImageTextButton

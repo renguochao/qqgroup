@@ -14,11 +14,34 @@
 >  
 <TableRow>  
         <com.sonyericsson.zoom.ImageTextButton
-            android:id="@+id/btn_like"
+            android:id="@+id/btnNew"
             style="@style/normalBtn"
-            android:icon="@drawable/fav"
-            >
+           android:icon="@drawable/blognew"
+            android:text="撰 写" >
         </com.sonyericsson.zoom.ImageTextButton>
+        
+       <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn100"
+            style="@style/normalBtn"
+           android:icon="@drawable/b100"
+            android:text="私人区" >
+        </com.sonyericsson.zoom.ImageTextButton>
+        
+        <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn101"
+            style="@style/normalBtn"
+           android:icon="@drawable/b101"
+            android:text="公开区" >
+        </com.sonyericsson.zoom.ImageTextButton>
+        
+        <com.sonyericsson.zoom.ImageTextButton
+            android:id="@+id/btn102"
+            style="@style/normalBtn"
+           android:icon="@drawable/b102"
+            android:text="好友区" >
+        </com.sonyericsson.zoom.ImageTextButton>
+            
+            
         </TableRow>
         </TableLayout>
     </LinearLayout>

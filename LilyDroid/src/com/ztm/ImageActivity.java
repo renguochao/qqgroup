@@ -415,53 +415,29 @@ public class ImageActivity extends Activity {
 
 	String newPath = "";
 
-	public void createSDCardDir() {
 
-		if (getSDPath() == null) {
-
-			Toast.makeText(this, "未找到SD卡", 1000).show();
-
-		} else {
-
-			if (Environment.MEDIA_MOUNTED.equals(Environment
-					.getExternalStorageState())) {
-
-				// 创建一个文件夹对象，赋值为外部存储器的目录
-
-				File sdcardDir = Environment.getExternalStorageDirectory();
-
-				// 得到一个路径，内容是sdcard的文件夹路径和名字
-
-				newPath = sdcardDir.getPath() + "/lilyDroid/Images/";// newPath在程序中要声明
-
-				File path1 = new File(newPath);
-
-				if (!path1.exists()) {
-
-					// 若不存在，创建目录，可以在应用启动的时候创建
-
-					path1.mkdirs();
-
-					System.out.println("paht ok,path:" + newPath);
-
-				}
-
-			}
-
-			else {
-
-				System.out.println("false");
-
-			}
-
-		}
-
-	}
 
 	public void saveMyBitmap(String bitName) throws IOException {
 
 		Bitmap bmp = image;
-		createSDCardDir();
+		//createSDCardDir();
+		
+		String status=Environment.getExternalStorageState();
+		if(status.equals(Environment.MEDIA_MOUNTED)){//判断是否有SD卡
+			
+		}
+		else{
+			Toast.makeText(ImageActivity.this, "请插入SD卡", Toast.LENGTH_SHORT)
+			.show();
+			return;
+		}
+		
+		
+		File sdcardDir = Environment.getExternalStorageDirectory();
+		
+		newPath = sdcardDir.getPath() + "/lilyDroid/Images";// newPath在程序中要声明
+
+		
 		File f = new File(newPath + bitName + ".jpg");
 
 		f.createNewFile();

@@ -10,9 +10,7 @@ public class BBSAll {
 	public static String getUpdateInfo() {
 	
 		String update;
-		update = "修正如下bug：\r\n1.上传图片路径过长被截断\r\n2.在4.0系统上浏览主题界面右滑FC";
-		
-		
+		update = "主要更新:\r\n1.恢复了本地收藏功能\r\n2.发表博客\r\n3.修正了无法本地上传图片的bug\r\n4.长按直接访问版面";
 		return update;
 	}
 	
