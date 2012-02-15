@@ -34,6 +34,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -41,7 +42,7 @@ import java.util.Observer;
 /**
  * View capable of drawing an image at different zoom state levels
  */
-public class ImageZoomView extends View implements Observer {
+public class ImageZoomView extends ImageView implements Observer {
 
     /** Paint object used when drawing bitmap. */
     private final Paint mPaint = new Paint(Paint.FILTER_BITMAP_FLAG);

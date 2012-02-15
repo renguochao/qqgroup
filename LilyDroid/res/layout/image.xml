@@ -10,10 +10,11 @@
         <com.sonyericsson.zoom.ImageZoomView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pic"
+            android:scaleType="matrix" 
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" >
         </com.sonyericsson.zoom.ImageZoomView>
-
+		<!-- 
         <ZoomControls
             android:id="@+id/zoomCtrl"
             android:layout_width="wrap_content"
@@ -21,6 +22,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true" >
         </ZoomControls>
+         -->
     </RelativeLayout>
 
 </LinearLayout>

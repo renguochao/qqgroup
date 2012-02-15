@@ -57,7 +57,8 @@ public class Const {
 	public static final int MSGTOPICSINGLE = 0x000027;
 	public static final int MSGTOPICGROUP = 0x000028;
 	public static final int BLOGNEW = 0x000029;
-	public  static final int BLOGDONEW = 0x000030;
+	public static final int BLOGDONEW = 0x000030;
+	public static final int MSGTOPICSIN2ALL =0x000031;
 	
 	
 

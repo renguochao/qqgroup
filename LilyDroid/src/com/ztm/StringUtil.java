@@ -270,7 +270,7 @@ public class StringUtil {
 					}
 					else
 					{
-						curAreaName = "Пе";
+						curAreaName = "byztm";
 					}
 				 
 				 

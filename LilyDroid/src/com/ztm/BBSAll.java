@@ -10,7 +10,9 @@ public class BBSAll {
 	public static String getUpdateInfo() {
 	
 		String update;
-		update = "主要更新:\r\n1.恢复了本地收藏功能\r\n2.发表博客\r\n3.修正了无法本地上传图片的bug\r\n4.长按直接访问版面";
+		
+		
+		update = "主要更新:\r\n1.长按主题可访问主题全文\r\n2.从十大或热点访问讨论区正确返回";
 		return update;
 	}
 	

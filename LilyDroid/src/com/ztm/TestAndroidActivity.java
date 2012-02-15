@@ -71,6 +71,8 @@ import android.provider.MediaStore.Images.Media;
 
 import android.text.ClipboardManager;
 import android.text.Html;
+import android.text.Layout;
+import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -133,8 +135,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private String newUrl;
 	private String huifuUrl;
 	
-	// 1 表示从10大跳转过去的，2表示从讨论区跳转过去的，3表示从各区热点跳过去
-	int curStatus = 0;
+	// 1 表示从10大跳转过去的，2表示从讨论区跳转过去的，3表示从各区热点跳过去,4表示从版面页面跳转过去的
+	int curTopicStatus = 0;
+	
+	int curAreaStatus = 0;
 
 	List<TopicInfo> areaTopic;
 
@@ -493,7 +497,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		isLogin = false;
 		nowLoginId = null;
 		setTitle("小百合");
-		curStatus = 0;
+		curTopicStatus = 0;
 		Button btnlog = (Button) findViewById(R.id.btn_login);
 		btnlog.setOnClickListener(new OnClickListener() {
 
@@ -577,8 +581,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	 */
 	private void chaToMain() {
 		setContentView(R.layout.main);
-
-		curStatus = 0;
+		curAreaStatus=1;
+		curTopicStatus = 0;
 		setTitle("全站十大");
 		// 注意界面控件的初始化的位置,不要放在setContentView()前面
 		listView = (ListView) findViewById(R.id.topicList);
@@ -1042,24 +1046,36 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	
 	private void retBtn()
 	{
-	
-		
-		if (curStatus == 1) {
+		if (curTopicStatus == 1) {
 			chaToMain();
 			if (top10TopicList != null) {
 				convtTopics();
 			}
-		} else if (curStatus == 2) {
+		} else if (curTopicStatus == 2) {
 			chaToArea(null);
-		} else if (curStatus == 3) {
+		} else if (curTopicStatus == 3) {
 			chaToHot(null);
-		} else if (curStatus == 4) {
-			chaToAreaToGo();
-		} else if (curStatus == 5) {
+		} else if (curTopicStatus == 4) {
+			if(curAreaStatus==1)
+			{
+				chaToMain();
+				if (top10TopicList != null) {
+					convtTopics();
+				}
+			}
+			else if(curAreaStatus==2)
+			{
+				chaToHot(null);
+			}
+			else
+			{
+				chaToAreaToGo();
+			}
+		} else if (curTopicStatus == 5) {
 			chaToMailBox(null);
 		}
 
-		else if (curStatus == 0) {
+		else if (curTopicStatus == 0) {
 			exitPro();
 		}
 	}
@@ -1293,6 +1309,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					chaToTopicSin(data);
 					break;
 					
+				case Const.MSGTOPICSIN2ALL:
+					getSINURL(data);
+					break;
+					
+					
 				case Const.MSGUPDATE:
 					checkUpdate(data);
 					
@@ -1313,6 +1334,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 
 		}
+
+		
 
 		
 	
@@ -1401,6 +1424,43 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		
 	}
+	
+	
+	private void getSINURL(String data) {
+		if(data.contains("文章不存在!"))
+		{
+			displayMsg("文章不存在!");
+			return;
+		}
+		else
+		{
+			
+			topicUrl = "";
+
+			int	lastIndexOf = data.lastIndexOf("' >同主题阅读</a>");
+				if(lastIndexOf>0)
+				{
+					String substring = data.substring(lastIndexOf-80, lastIndexOf);
+					int indexOf = substring.lastIndexOf("<a href='");
+					if (indexOf>0)
+					{
+						topicUrl = substring.substring(indexOf+9);
+					}
+				}
+			if(topicUrl.length()>1)
+			{
+				getUrlHtml("http://bbs.nju.edu.cn/"+topicUrl+"&start=-1", Const.MSGTOPICGROUP);
+			}
+			else
+			{
+				displayMsg("同主题访问出错!");
+				
+			}
+		}
+		
+	}
+	
+	
 
 	private void chaToTopicSin(String data) {
 		if(data.contains("文章不存在!"))
@@ -1682,7 +1742,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		setTitle("我的邮箱");
 		setContentView(R.layout.mailbox);
-		curStatus = 1;
+		curTopicStatus = 1;
 		LinkAdr = new ArrayList<String>();
 
 		listView = (ListView) findViewById(R.id.topicList);
@@ -1746,7 +1806,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					if (topicUrl == null)
 						return;
 
-					curStatus = 5;
+					curTopicStatus = 5;
 
 					scrollY = listView.getFirstVisiblePosition() + 1;
 
@@ -1803,7 +1863,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		if (tds.size() < 7) {
 			
 			if (data.contains("您尚未登录")) {
-				displayMsg("您尚未登录");
+				//displayMsg("您尚未登录");
+				getAutoLogin();
 			}
 			else
 			{
@@ -2957,7 +3018,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					if (topicUrl == null)
 						return;
 					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
-					curStatus = 1;
+					curTopicStatus = 1;
 					nowPos = 0;
 					getUrlHtml(topicUrl, Const.MSGTOPIC);
 
@@ -2970,8 +3031,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						ContextMenuInfo arg2) {
 					// TODO Auto-generated method stub
 					
-					 menu.setHeaderTitle("版面");      
-		             menu.add(0, 0, 0, "访问该主题对应的版面");   
+					 menu.setHeaderTitle("操作");      
+		             menu.add(0, 90, 0, "访问该主题对应的版面");   
+		             menu.add(0, 91, 1, "查看该主题全部");   
 				}   
 	        });    
 			
@@ -2983,17 +3045,66 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
     public boolean onContextItemSelected(MenuItem item) {   
     	  AdapterView.AdapterContextMenuInfo menuInfo;
           menuInfo =(AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-          //输出position
-          //Toast.makeText(TestAndroidActivity.this,String.valueOf(menuInfo.position), Toast.LENGTH_LONG).show();
-          String name = LinkAreaAdr.get(menuInfo.position);
+          int position = item.getItemId();
+          int groupId = item.getGroupId();
+          if(listView!=null)
+          {
+				scrollY = listView.getFirstVisiblePosition() + 1;
+          }
+
+          if(position==90)
+          {
+	          //输出position
+	          //Toast.makeText(TestAndroidActivity.this,String.valueOf(menuInfo.position), Toast.LENGTH_LONG).show();
+	          String name = LinkAreaAdr.get(menuInfo.position);
+	          
+				if (name != null&& name.length()> 1)
+				{
+					if(name.startsWith("["))
+						name = name.substring(1,name.length()-1);
+					Log.i("Area", name);
+					getToAreaWithName(name);
+				}
+          }
+          if(position==91)
+          {
+        	  
+        	  topicUrl = LinkAdr.get(menuInfo.position);
+
+				if (topicUrl != null)
+				{
+					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
+					nowPos = -1;
+					
+					
+					if(groupId==0)
+						curTopicStatus = 1;
+					else if(groupId==10)
+					{
+						curTopicStatus = 3;
+					}
+					else if(groupId==20)
+					{
+						curTopicStatus = 2;
+
+					}
+					
+					isNext = false;
+					boolean isDoc = urlString.contains("&type=tdoc");
+					
+					if(groupId==20&&isDoc)
+					{
+						getUrlHtml(topicUrl, Const.MSGTOPICSIN2ALL);
+					}
+					else
+					{
+					
+						getUrlHtml(topicUrl+ "&start=-1", Const.MSGTOPIC);
+					}
+				}
+        	  
           
-			if (name != null&& name.length()> 2)
-			{
-				if(name.startsWith("["))
-					name = name.substring(1,name.length()-1);
-				Log.i("Area", name);
-				getToAreaWithName(name);
-			}
+          }
         return super.onContextItemSelected(item); 
     }   
 	
@@ -3077,7 +3188,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 					
 					
-					curStatus = 2;
+					curTopicStatus = 2;
 					nowPos = 0;
 					scrollY = listView.getFirstVisiblePosition() + 1;
 
@@ -3094,6 +3205,18 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 				}
 			});
+			
+
+			//长按事件
+			listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {   
+				public void onCreateContextMenu(ContextMenu menu, View arg1,
+						ContextMenuInfo arg2) {
+					// TODO Auto-generated method stub
+					
+					 menu.setHeaderTitle("操作");      
+		             menu.add(20, 91, 1, "查看该主题全部");   
+				}   
+	        });   
 		}
 	}
 
@@ -3144,7 +3267,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						return;
 
 					huifuUrl = topicUrl.replace("bbstcon?", "bbspst?");
-					curStatus = 3;
+					curTopicStatus = 3;
 					nowPos = 0;
 					scrollY = listView.getFirstVisiblePosition();
 					getUrlHtml(topicUrl, Const.MSGTOPIC);
@@ -3157,8 +3280,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				public void onCreateContextMenu(ContextMenu menu, View arg1,
 						ContextMenuInfo arg2) {
 					// TODO Auto-generated method stub
-					 menu.setHeaderTitle("版面");      
-		             menu.add(0, 0, 0, "访问该主题对应的版面");   
+					 menu.setHeaderTitle("操作");      
+		             menu.add(10, 90, 0, "访问该主题对应的版面");   
+		             menu.add(10, 91, 1, "查看该主题全部");   
 				}   
 	        });
 			
@@ -3170,8 +3294,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void chaToAreaToGo() {
 
 		setTitle("跳转讨论区");
-
-		curStatus = 1;
+		curAreaStatus = 0;
+		curTopicStatus = 1;
 		setContentView(R.layout.gotoarea);
 
 		AutoCompleteTextView secondPwd = (AutoCompleteTextView) findViewById(R.id.area_edit);
@@ -3461,8 +3585,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void chaToHot(String HotData) {
 
 		setTitle("各区热点");
-
-		curStatus = 1;
+		curAreaStatus=2;
+		curTopicStatus = 1;
 		setContentView(R.layout.hot);
 
 		listView = (ListView) findViewById(R.id.topicList);
@@ -3494,7 +3618,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 
 		setContentView(R.layout.area);
-		curStatus = 4;
+		curTopicStatus = 4;
 		Button btnBack = (Button) findViewById(R.id.btn_back);
 		btnBack.setOnClickListener(new OnClickListener() {
 
@@ -4567,12 +4691,42 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		System.exit(0);
 
 	}
-
+	boolean beginSelect = false;
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		try {
 			if(arg1!=null)
 			{
-			return mGestureDetector.onTouchEvent(arg1);
+				if(beginSelect)
+				{
+					int curOff = 0;
+					Spannable text;
+					int action = arg1.getAction();
+					Layout layout = textView.getLayout();
+					int line = 0;
+					switch (action) {
+					case MotionEvent.ACTION_MOVE:
+						line = layout.getLineForVertical(textView.getScrollY() + (int) arg1.getY());
+						curOff = layout
+								.getOffsetForHorizontal(line, (int) arg1.getX());
+						 text = (Spannable)textView.getText();
+						Selection.setSelection(text, off, curOff);
+						break;
+						
+						
+					case MotionEvent.ACTION_UP:
+						line = layout.getLineForVertical(textView.getScrollY() + (int) arg1.getY());
+						curOff = layout
+								.getOffsetForHorizontal(line, (int) arg1.getX());
+						 text = (Spannable)textView.getText();
+						Selection.setSelection(text, off, curOff);
+						beginSelect = false;
+					}
+					return false;
+				}
+				else
+				{
+					return mGestureDetector.onTouchEvent(arg1);
+				}
 			}
 			
 		} catch (Exception e) {
@@ -4617,9 +4771,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 		
 	}
-
+	int line = 0;
+	private int off; // 字符串的偏移值
 	public void onLongPress(MotionEvent arg0) {
-
+		
+		line = textView.getLayout().getLineForVertical(textView.getScrollY() + (int) arg0.getY());
+		off = textView.getLayout().getOffsetForHorizontal(line, (int) arg0.getX());
+		Spannable text = (Spannable)textView.getText();
+		Selection.setSelection(text, off);
+		beginSelect = true;
 	}
 
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,

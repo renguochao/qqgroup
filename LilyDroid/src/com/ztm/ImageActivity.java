@@ -38,6 +38,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.ZoomControls;
+import android.widget.ImageView.ScaleType;
 
 public class ImageActivity extends Activity {
 
@@ -101,10 +102,11 @@ public class ImageActivity extends Activity {
 		image = drawableToBitmap(drawable);
 		mZoomView.setImage(image);
 
-	
+		//mZoomView.setScaleType(ScaleType.MATRIX);
 		mZoomView.setOnTouchListener(mZoomListener);
 		resetZoomState();
 
+		/*
 		ZoomControls zoomCtrl = (ZoomControls) findViewById(R.id.zoomCtrl);
 		zoomCtrl.setOnZoomInClickListener(new OnClickListener() {
 
@@ -129,6 +131,7 @@ public class ImageActivity extends Activity {
 			}
 
 		});
+		*/
 
 	}
 	

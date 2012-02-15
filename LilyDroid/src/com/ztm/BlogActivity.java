@@ -348,16 +348,19 @@ public class BlogActivity extends Activity {
 				public void onClick(View arg0) {
 					if(newVisitType.equals("101"))
 					{
+						displayMsg("发表至 好友区");
 						newVisitType = "102";
 						btnlog.setImageResource(R.drawable.b1022);
 					}
 					else if(newVisitType.equals("100"))
 					{
+						displayMsg("发表至 公开区");
 						newVisitType = "101";
 						btnlog.setImageResource(R.drawable.b1012);
 					}
 					else if(newVisitType.equals("102"))
 					{
+						displayMsg("发表至 私人区");
 						newVisitType = "100";
 						btnlog.setImageResource(R.drawable.b1002);
 					}
@@ -392,7 +395,7 @@ public class BlogActivity extends Activity {
 		}
 		else
 		{
-			displayMsg("无权发表评论");
+			displayMsg("无权发表博客");
 			return;
 		}
 		//text 
