@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.httpclient.NameValuePair;
 
@@ -353,7 +355,24 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		
 		
+		if(ConstParam.newmail<700000)
+		{
+			mailtimer.schedule(mailtask, ConstParam.newmail*1000,ConstParam.newmail*1000);  
+		}
+		
+		
 	}
+	
+	Timer mailtimer = new Timer();   
+	TimerTask mailtask = new TimerTask(){   
+		  
+		       public void run() {   
+		    	   checkMail();
+	     }   
+		        
+		   };   
+	
+	
 	int vc;
 	private void getUpdateInfo(String upUrl2) {
 		
@@ -370,28 +389,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		{
 		if(curCode<vc)
 		{
-			/*
-			LayoutInflater factory = LayoutInflater
-			.from(TestAndroidActivity.this);
-			final View info = factory.inflate(R.layout.infodlg, null);
-			Builder dlg = new AlertDialog.Builder(TestAndroidActivity.this)
-					.setTitle("更新说明").setView(info).setNegativeButton("干得好！",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int whichButton) {
-						}
-					});
-		
 			
-		
-		
-			dlg.create();
-			// 发彩照功能
-			textView = (TextView) info.findViewById(R.id.tvInfo);
-			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
-			sv.scrollTo(0, 0);
-			textView.setText(Html.fromHtml(BBSAll.getUpdateInfo()));
-			*/
 			new AlertDialog.Builder(TestAndroidActivity.this).setTitle("更新说明：")
 			.setMessage(BBSAll.getUpdateInfo()).setPositiveButton("确定",
 					new DialogInterface.OnClickListener() {
@@ -427,6 +425,39 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			acTrd.start();
 		}
 	}
+	
+	
+	private void getNewMailCount() {
+
+		
+			acTrd = new Thread() {
+
+				@Override
+				public void run() {
+					
+					checkMail();
+					
+				}
+			};
+			acTrd.start();
+		
+	}
+	
+	private void checkMail()
+	{
+		if(!isLogin) return;
+		String url = "http://bbs.nju.edu.cn/bbsmail";
+		try {
+			data = NetTraffic.getHtmlContent(url);
+		} catch (Exception e) {
+			data = "error";
+		}
+		if(data.contains("<img src=/image/unread_mail.gif>"))
+		{
+		sendMsg(Const.MSGNEWMAILCOUNT);
+		}
+	}
+	
 
 	private void InitMain() {
 		chaToMain();
@@ -1129,6 +1160,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				Context.MODE_PRIVATE);
 		ConstParam.isPic = sp.getString("picDS", "1");
 		ConstParam.isFull = sp.getString("isFull", "1");
+		
+		String mailString = sp.getString("newmail", "30000");
+		
+		ConstParam.newmail = Long.parseLong(mailString);
+		
 		barStat = sp.getString("barStat", "1");
 		
 		ConstParam.isTouch = sp.getBoolean("isTouch", true);
@@ -1179,7 +1215,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 			if(msg.what != Const.MSGUPDATE)
 			{
-			runningTasks--;
+				runningTasks--;
 			}
 
 			if (msg.what != Const.MSGPSTNEW && data.equals("error")) {
@@ -1301,15 +1337,18 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					break;
 					
 				case Const.BLOGAREA:
+					//博客
 					chaToBlog(data);
 					break;
 					
 					
 				case Const.MSGTOPICSINGLE:
+					//一般模式阅读
 					chaToTopicSin(data);
 					break;
 					
 				case Const.MSGTOPICSIN2ALL:
+					//一般模式转主题模式
 					getSINURL(data);
 					break;
 					
@@ -1322,8 +1361,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				case Const.MSGTOPICGROUP:
 					checkTopicGroup(data);
 					break;
-					
-					
+				case Const.MSGNEWMAILCOUNT:
+					displayMsg("您有新邮件！请注意查收");
+					break;
 				default:
 					break;
 				}
@@ -2256,6 +2296,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					Toast.LENGTH_SHORT).show();
 			isLogin = true;
 			nowLoginId = loginId;
+			getNewMailCount();
 
 			Editor editor = sharedPreferences.edit();// 获取编辑器
 			editor.putString("isRem", isRem);
@@ -2315,6 +2356,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			Toast.makeText(TestAndroidActivity.this, "登录成功！",
 					Toast.LENGTH_SHORT).show();
 			isLogin = true;
+			getNewMailCount();
+			
 			nowLoginId = loginId;
 		} else if (scs.size() == 1) {
 			if (data.contains("密码错误") || data.contains("错误的使用者帐号")) {
@@ -3827,18 +3870,36 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		int curPos = 0;
 		int getTopicNo = 0;
 		boolean isStart = false;
+		boolean isMaster = false;//判断是否版主
 		while (curPos < tds.size()) {
 			String text = tds.get(curPos).text();
 			if(text.equals("序号"))
 			{
 				isStart = true;
+				
+				text = tds.get(curPos+7).text();
+				if(text.equals("管理"))
+				{
+					isMaster = true;
+				}
+				
 				if(!tdoc) 
 				{
-					curPos += 7;
+					//如果是版主，+8
+					if(isMaster)
+					{
+						curPos += 8;
+					}
+					else
+					{
+						curPos += 7;
+					}
+					
+					
 				}
 				else
 				{
-				curPos += 6;
+					curPos += 6;
 				}
 				
 			}
@@ -3884,7 +3945,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						getTopicNo = 1;
 					}
 				}
-				curPos += 6;
+				if(isMaster)
+				{
+					curPos += 7;
+				}
+				else
+				{
+					curPos += 6;
+				}
+				
+				
 			}
 			else
 			{
@@ -3913,6 +3983,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			// ds.setColor(Color.rgb(0, 0, 237));// 改变链接的颜色设置
 		}
 
+		
+		
 		@Override
 		public void onClick(View widget) {
 			// 此处写你的处理逻辑
@@ -3926,6 +3998,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				Intent intent = new Intent(TestAndroidActivity.this,
 						ImageActivity.class);
 				intent.putExtra("mUrl", mUrl);
+				
+				
 
 				startActivity(intent);
 			} else if (mUrl.contains("bbsqry?userid")) {
@@ -4064,7 +4138,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		});
 		builder.create().show();
 	}
-
+	ScrollView sv;
 	/**
 	 * 跳转到某个话题界面
 	 * 
@@ -4086,6 +4160,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		textView.setText(urlChanged);
 		textView.setTextSize(ConstParam.txtFonts);
 		textView.setMovementMethod(LinkMovementMethod.getInstance());
+		
+		sv = (ScrollView) findViewById(R.id.scrollView);
 
 		if(actitle!=null&&actitle.length()>1)
 		{
@@ -4093,6 +4169,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		textView.getBackground().setAlpha(backAlpha);
 		if (ConstParam.isTouch) {
+			//sv.setOnTouchListener(this);
 			textView.setOnTouchListener(this);
 			textView.setFocusable(true);
 			textView.setLongClickable(true);
@@ -4692,6 +4769,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	}
 	boolean beginSelect = false;
+	float firtick = 0f;
+	float sectick = 0f;
+	
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		try {
 			if(arg1!=null)
@@ -4704,29 +4784,48 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					Layout layout = textView.getLayout();
 					int line = 0;
 					switch (action) {
-					case MotionEvent.ACTION_MOVE:
+					
+					//case MotionEvent.:
+					
+					case MotionEvent.ACTION_DOWN:
+						if (firtick == 0l) {
+							firtick = System.currentTimeMillis();// 前一次点击的时间
+							System.out.println("touch");
+						} else if (sectick == 0l) {// 后一次点击时间
+							sectick = System.currentTimeMillis();
+							float distance = sectick - firtick;
+							if (distance > 0l && distance < 500l) {
+								// 时间范围自由设定，如果为true表明是连续点击；
+								System.out.println("double");
+								firtick = 0l;
+								sectick = 0l;
+								beginSelect = false;
+								displayMsg("复制到剪贴板喽!");
+								
+								
+							} else {
+								System.out.println(distance);
+								// 不是连续点击
+								firtick = System.currentTimeMillis();// 重新获取前一次点击的时间
+								sectick = 0l;
+							}
+						}
+						
+					default:
 						line = layout.getLineForVertical(textView.getScrollY() + (int) arg1.getY());
 						curOff = layout
 								.getOffsetForHorizontal(line, (int) arg1.getX());
 						 text = (Spannable)textView.getText();
 						Selection.setSelection(text, off, curOff);
-						break;
 						
 						
-					case MotionEvent.ACTION_UP:
-						line = layout.getLineForVertical(textView.getScrollY() + (int) arg1.getY());
-						curOff = layout
-								.getOffsetForHorizontal(line, (int) arg1.getX());
-						 text = (Spannable)textView.getText();
-						Selection.setSelection(text, off, curOff);
-						beginSelect = false;
+						
+						
 					}
-					return false;
+					return true;
 				}
-				else
-				{
-					return mGestureDetector.onTouchEvent(arg1);
-				}
+				
+				return mGestureDetector.onTouchEvent(arg1);
 			}
 			
 		} catch (Exception e) {
@@ -4774,12 +4873,17 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	int line = 0;
 	private int off; // 字符串的偏移值
 	public void onLongPress(MotionEvent arg0) {
+		/*
+		if(beginSelect==false)
+		{
 		
-		line = textView.getLayout().getLineForVertical(textView.getScrollY() + (int) arg0.getY());
-		off = textView.getLayout().getOffsetForHorizontal(line, (int) arg0.getX());
-		Spannable text = (Spannable)textView.getText();
-		Selection.setSelection(text, off);
-		beginSelect = true;
+			line = textView.getLayout().getLineForVertical(textView.getScrollY() + (int) arg0.getY());
+			off = textView.getLayout().getOffsetForHorizontal(line, (int) arg0.getX());
+			Spannable text = (Spannable)textView.getText();
+			Selection.setSelection(text, off);
+			beginSelect = true;
+		}
+		*/
 	}
 
 	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,

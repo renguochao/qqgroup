@@ -28,5 +28,9 @@ public class ConstParam {
 	
 	public static String isFull;
 	
+	public static Long newmail;
+	
+	public static List<TopicPics> tpList;
+	
 
 }

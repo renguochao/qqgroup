@@ -178,6 +178,9 @@ public class StringUtil {
 		topicWithImg = false;
 		data = data.replaceAll(backS, "<br>");
 		
+		ConstParam.tpList = new ArrayList<TopicPics>();
+		int curNo = 1;
+		
 		//分析回复本文   功能<a href='bbspst?board=Pictures&file=M.1323243608.A'>回复本文</a>
 		
 		Pattern rePat = Pattern.compile("bbspst\\?.*?\\.A"); 
@@ -193,7 +196,7 @@ public class StringUtil {
 		int lastIndexOf = data.lastIndexOf(" 篇文章.");
 		if(lastIndexOf>0)
 		{
-			String substring = data.substring(lastIndexOf-5, lastIndexOf);
+			String substring = data.substring(lastIndexOf-6, lastIndexOf);
 			int indexOf = substring.indexOf(" ");
 			if (indexOf>0)
 			{
@@ -437,9 +440,7 @@ public class StringUtil {
 					}
 					
 					sconA = sconA.trim();
-					if(ConstParam.isPic.equals(Const.AllPic)||(	ConstParam.isWifi &&ConstParam.isPic.equals(Const.WIFIPic)))
-
-					{
+					
 						if (sconA.toLowerCase().startsWith("http:")
 								&& (sconA.toLowerCase().endsWith(".jpg") 
 										|| sconA.toLowerCase().endsWith(".png")
@@ -447,11 +448,29 @@ public class StringUtil {
 										||sconA.toLowerCase().endsWith(".gif")
 										))
 						{
-							sb.append("<a href='"+sconA+"'><img src='").append(sconA).append("'></a><br>");
-							topicWithImg = true;
-							continue;
+							
+							TopicPics tp  = new TopicPics();
+							
+							tp.setNo(curNo);
+							curNo++;
+							tp.setLink(sconA);
+							
+							ConstParam.tpList.add(tp);
+							
+							
+							if(ConstParam.isPic.equals(Const.AllPic)||(	ConstParam.isWifi &&ConstParam.isPic.equals(Const.WIFIPic)))
+
+							{
+								sb.append("<a href='"+sconA+"'><img src='").append(sconA).append("'></a><br>");
+								topicWithImg = true;
+								continue;
+							}
+							
+							
+								
+						
 						}
-					}
+					
 
 					tempBr = 0;
 					String scon = "";

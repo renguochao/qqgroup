@@ -59,6 +59,7 @@ public class Const {
 	public static final int BLOGNEW = 0x000029;
 	public static final int BLOGDONEW = 0x000030;
 	public static final int MSGTOPICSIN2ALL =0x000031;
+	public static final int MSGNEWMAILCOUNT = 0x000032;
 	
 	
 

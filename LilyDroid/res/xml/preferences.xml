@@ -141,6 +141,19 @@
         
 <PreferenceCategory   
         android:title="其他相关设置">   
+        
+    
+     <ListPreference
+        android:dialogTitle="选择检查新邮件的间隔"
+        android:defaultValue="1"
+        android:entries="@array/newmail_text"
+        android:entryValues="@array/newmail_value"
+        android:key="newmail"
+        android:summary="设置检查邮件的时间间隔"
+        android:title="邮件提醒(需重启)" >
+    </ListPreference>
+    
+    
    <ListPreference
         android:dialogTitle="选择显示模式"
         android:defaultValue="1"

@@ -55,6 +55,8 @@ public class ImageActivity extends Activity {
 	private SimpleZoomListener mZoomListener;
 
 	String url = "";
+	
+	private int curNo = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,17 @@ public class ImageActivity extends Activity {
 
 		url = result != null ? result
 				: "http://bbs.nju.edu.cn/file/T/tiztm/belldandy.jpg";
+		
+		if(ConstParam.tpList!=null&&ConstParam.tpList.size()>0)
+		{
+			for (TopicPics tp : ConstParam.tpList) {
+				if(tp.equals(url))
+				{
+					curNo = tp.getNo();
+					break;
+				}
+			}
+		}
 
 		mZoomView = (ImageZoomView) findViewById(R.id.pic);
 		
@@ -97,14 +110,50 @@ public class ImageActivity extends Activity {
 
 		
 
-		Drawable drawable = fetchDrawable(url);
-
-		image = drawableToBitmap(drawable);
-		mZoomView.setImage(image);
-
-		//mZoomView.setScaleType(ScaleType.MATRIX);
 		mZoomView.setOnTouchListener(mZoomListener);
-		resetZoomState();
+		//Drawable drawable = 
+
+		
+		
+		setMyBitMapFromUrl(url);
+		
+		
+		
+		Button btn = (Button) findViewById(R.id.btn_pre);
+		btn.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				if(curNo<2) 
+				{
+					Toast.makeText(ImageActivity.this, "这是第一张照片!", Toast.LENGTH_SHORT)
+					.show();
+					return;
+				}
+					curNo--;
+					setMyBitMapFromNo(curNo);
+			}
+		});
+		btn = (Button) findViewById(R.id.btn_next);
+		btn.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				if(curNo>ConstParam.tpList.size()-1) 
+				{
+					Toast.makeText(ImageActivity.this, "这是最后一张照片!", Toast.LENGTH_SHORT)
+					.show();
+					return;
+				}
+					curNo++;
+					setMyBitMapFromNo(curNo);
+					
+			}
+
+		
+		});
+		
+		
+		
+		
 
 		/*
 		ZoomControls zoomCtrl = (ZoomControls) findViewById(R.id.zoomCtrl);
@@ -133,6 +182,32 @@ public class ImageActivity extends Activity {
 		});
 		*/
 
+	}
+	
+	private void setMyBitMapFromNo(int curNo) {
+		// TODO Auto-generated method stub
+		String url="";
+		if(ConstParam.tpList!=null&&ConstParam.tpList.size()>0)
+		{
+			for (TopicPics tp : ConstParam.tpList) {
+				if(curNo == tp.getNo())
+				{
+					url = tp.getLink();
+					break;
+				}
+			}
+		}
+		
+		setMyBitMapFromUrl(url);
+		
+	}
+	
+	
+	private void setMyBitMapFromUrl(String url)
+	{
+		image = fetchDrawable(url);
+		mZoomView.setImage(image);
+		resetZoomState();
 	}
 	
 	
@@ -220,9 +295,9 @@ public class ImageActivity extends Activity {
         return b;  
     }  
 
-	public Drawable fetchDrawable(String source) {
+	public Bitmap fetchDrawable(String source) {
 
-		Drawable drawable = null;
+		Bitmap drawable = null;
 		if (source.startsWith("http")) {
 			
 			String  path =StringUtil.picTempFiles.get(source);
@@ -331,7 +406,7 @@ public class ImageActivity extends Activity {
 	 *            网络图片地址数组
 	 * @return 返回Bitmap数据类型的数组
 	 */
-	public Drawable zoomDrawable(String urlPath) {
+	public Bitmap zoomDrawable(String urlPath) {
 
 		
 
@@ -344,7 +419,7 @@ public class ImageActivity extends Activity {
 	}
 	
 
-	public Drawable getDrawFromByte(byte[] imageByte )
+	public Bitmap getDrawFromByte(byte[] imageByte )
 	{
 		Bitmap bitmaps;
 
@@ -383,7 +458,7 @@ public class ImageActivity extends Activity {
 			bitmaps = null;
 		}
 		
-		return new BitmapDrawable(this.getResources(), bitmaps);
+		return  bitmaps;
 	}
 	
 
