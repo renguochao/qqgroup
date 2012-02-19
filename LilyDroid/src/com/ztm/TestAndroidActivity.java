@@ -197,6 +197,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	int backAlpha;
 	Spanned topicData;
 	int scrollY = 0;
+	int scrollYArea = 0;
+	
 	boolean topicWithImg = false;
 	HashMap<String, String> bbsAll;
 	HashMap<String, String> bbsAllName;
@@ -3072,7 +3074,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {   
 				public void onCreateContextMenu(ContextMenu menu, View arg1,
 						ContextMenuInfo arg2) {
-					// TODO Auto-generated method stub
 					
 					 menu.setHeaderTitle("操作");      
 		             menu.add(0, 90, 0, "访问该主题对应的版面");   
@@ -3233,7 +3234,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					
 					curTopicStatus = 2;
 					nowPos = 0;
-					scrollY = listView.getFirstVisiblePosition() + 1;
+					scrollYArea = listView.getFirstVisiblePosition() + 1;
 
 					if( urlString.contains("bbstdoc"))
 					{
@@ -3254,7 +3255,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {   
 				public void onCreateContextMenu(ContextMenu menu, View arg1,
 						ContextMenuInfo arg2) {
-					// TODO Auto-generated method stub
+					
 					
 					 menu.setHeaderTitle("操作");      
 		             menu.add(20, 91, 1, "查看该主题全部");   
@@ -3322,7 +3323,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			listView.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {   
 				public void onCreateContextMenu(ContextMenu menu, View arg1,
 						ContextMenuInfo arg2) {
-					// TODO Auto-generated method stub
 					 menu.setHeaderTitle("操作");      
 		             menu.add(10, 90, 0, "访问该主题对应的版面");   
 		             menu.add(10, 91, 1, "查看该主题全部");   
@@ -3723,7 +3723,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		if (AreaData == null) {
 			// listView.requestFocusFromTouch();
 
-			listView.setSelection(scrollY);
+			listView.setSelection(scrollYArea);
 			//listView.getSelectedView().
 			//listView.p
 		} else {

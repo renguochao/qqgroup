@@ -5,41 +5,57 @@
 
     <LinearLayout
         android:id="@+id/topicll"
-        style="@style/imgTab" >
+           android:layout_width="fill_parent"  
+    		android:layout_height="44dp"  
+    		android:background="@drawable/image_view_toolbar_bg"
+    		android:layout_alignParentBottom = "true"
+         >
         <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"  
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent"  
-    android:stretchColumns="0,1,2,3,4,5"     
+    android:stretchColumns="0,1,2,3,4"     
 >  
 <TableRow>  
        
 
-         <com.sonyericsson.zoom.ImageTextButton
+         <ImageButton
             android:id="@+id/btn_pre"
-            style="@style/imgBtn"
-            android:icon="@drawable/prev">
-        </com.sonyericsson.zoom.ImageTextButton>
+            android:layout_width="0.0dip" 
+           android:layout_height="wrap_content"
+            android:icon="@drawable/image_pr">
+        </ImageButton>
         
-        <com.sonyericsson.zoom.ImageTextButton
-            android:id="@+id/btn_smail"
-            style="@style/imgBtn"
-            android:icon="@drawable/tag" >
-        </com.sonyericsson.zoom.ImageTextButton>
+          <ImageButton
+            android:id="@+id/btn_next"
+            android:layout_width="0.0dip" 
+           android:layout_height="wrap_content"
+            android:icon="@drawable/image_next" >
+        </ImageButton>
              
                   
-         <com.sonyericsson.zoom.ImageTextButton
-            android:id="@+id/btn_big"
-            style="@style/imgBtn"
-            android:icon="@drawable/huifu" >
-        </com.sonyericsson.zoom.ImageTextButton>
+          <ImageButton
+            android:id="@+id/btn_zoomIn"
+           android:layout_width="0.0dip" 
+           android:layout_height="wrap_content"
+            android:icon="@drawable/image_zoomin" >
+        </ImageButton>
 
-        <com.sonyericsson.zoom.ImageTextButton
-            android:id="@+id/btn_next"
-            style="@style/imgBtn"
-            android:icon="@drawable/next" >
-        </com.sonyericsson.zoom.ImageTextButton>
+          <ImageButton
+            android:id="@+id/btn_zoomOut"
+            android:layout_width="0.0dip" 
+           android:layout_height="wrap_content"
+            android:icon="@drawable/image_zoomout" >
+        </ImageButton>
 
-
+  		   <ImageButton
+            android:id="@+id/btn_save"
+            android:layout_width="0.0dip" 
+           android:layout_height="wrap_content"
+            android:icon="@drawable/image_download" >
+        </ImageButton>
+            
+            
+            
                 </TableRow>
         </TableLayout>
     </LinearLayout>
@@ -48,7 +64,6 @@
          <com.sonyericsson.zoom.ImageZoomView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pic"
-            android:scaleType="matrix" 
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" >
         </com.sonyericsson.zoom.ImageZoomView>

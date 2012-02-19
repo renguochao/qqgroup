@@ -221,17 +221,19 @@ public class StringUtil {
 		}
 		
 		        
-		        
-		Document doc = Jsoup.parse(data);
-		Elements tds = doc.getElementsByTag("textarea");
-//		if(tds.size()>reList.size())
-//			return null;
+		
+		
+		rePat = Pattern.compile("class=hide>.*?</textarea></table>"); 
+        matcher = rePat.matcher(data);
+        
+	
 		
 		String lz = "";
 		int k = 0;
-		for (Element element : tds) {
+		  while (matcher.find()) {
 			
-			String text = element.text();
+			  String sss = matcher.group();
+	        	String text = sss.substring(11,sss.length()-20);
 			String content = "";
 			String userId ="";
 			content = text;
@@ -244,17 +246,10 @@ public class StringUtil {
 				}
 
 			}
-			if (k == tds.size() - 1) {
-				if (k < 30) {
-					isNext = false;
-				} else {
-					isNext = true;
-				}
-
-			}
+			
 			 if(k==0) {
 				 int areaNo = text.indexOf("信区:");
-					int titleNo = text.indexOf("标 题:"); 
+					int titleNo = text.indexOf("<br>标"); 
 					if(areaNo>0&&titleNo>0)
 					{
 				 String area =text.substring(areaNo+4, titleNo); 
@@ -524,6 +519,12 @@ public class StringUtil {
 			
 			
 		}
+		  
+			if (k < 31) {
+				isNext = false;
+			} else {
+				isNext = true;
+			}
 		
 		String ss = tiList.toString()
 //		+"<a href='curArea'>[<font color=#0000EE >本讨论区</font>]</a>&nbsp;&nbsp;"

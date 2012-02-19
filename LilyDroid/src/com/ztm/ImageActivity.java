@@ -29,6 +29,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 import android.widget.ImageView.ScaleType;
@@ -92,7 +94,7 @@ public class ImageActivity extends Activity {
 		if(ConstParam.tpList!=null&&ConstParam.tpList.size()>0)
 		{
 			for (TopicPics tp : ConstParam.tpList) {
-				if(tp.equals(url))
+				if(tp.getLink().equals(url))
 				{
 					curNo = tp.getNo();
 					break;
@@ -116,10 +118,10 @@ public class ImageActivity extends Activity {
 		
 		
 		setMyBitMapFromUrl(url);
+		 View findViewById = findViewById(R.id.topicll);
 		
-		
-		
-		Button btn = (Button) findViewById(R.id.btn_pre);
+		 findViewById.bringToFront();
+		ImageButton btn = (ImageButton) findViewById(R.id.btn_pre);
 		btn.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -130,10 +132,11 @@ public class ImageActivity extends Activity {
 					return;
 				}
 					curNo--;
+					Log.d("curNo", curNo+"");
 					setMyBitMapFromNo(curNo);
 			}
 		});
-		btn = (Button) findViewById(R.id.btn_next);
+		btn = (ImageButton) findViewById(R.id.btn_next);
 		btn.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -151,36 +154,52 @@ public class ImageActivity extends Activity {
 		
 		});
 		
-		
-		
-		
+		btn = (ImageButton) findViewById(R.id.btn_zoomIn);
+		btn.setOnClickListener(new OnClickListener() {
 
-		/*
-		ZoomControls zoomCtrl = (ZoomControls) findViewById(R.id.zoomCtrl);
-		zoomCtrl.setOnZoomInClickListener(new OnClickListener() {
-
-			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-
+			public void onClick(View v) {
 				float z = mZoomState.getZoom() + 0.25f;
 				mZoomState.setZoom(z);
 				mZoomState.notifyObservers();
-
 			}
 
+		
 		});
-		zoomCtrl.setOnZoomOutClickListener(new OnClickListener() {
+		
+		
+		btn = (ImageButton) findViewById(R.id.btn_zoomOut);
+		btn.setOnClickListener(new OnClickListener() {
 
-			public void onClick(View arg0) {
-
+			public void onClick(View v) {
 				float z = mZoomState.getZoom() - 0.25f;
 				mZoomState.setZoom(z);
 				mZoomState.notifyObservers();
-
 			}
 
+		
 		});
-		*/
+		
+
+		btn = (ImageButton) findViewById(R.id.btn_save);
+		btn.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				try {
+					saveMyBitmap(url.substring(url.lastIndexOf('/'),url.lastIndexOf('.')));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		
+		});
+		
+		
+		
+		
+		
+
 
 	}
 	
