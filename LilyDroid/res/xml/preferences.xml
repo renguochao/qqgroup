@@ -145,7 +145,7 @@
     
      <ListPreference
         android:dialogTitle="选择检查新邮件的间隔"
-        android:defaultValue="1"
+        android:defaultValue="300"
         android:entries="@array/newmail_text"
         android:entryValues="@array/newmail_value"
         android:key="newmail"

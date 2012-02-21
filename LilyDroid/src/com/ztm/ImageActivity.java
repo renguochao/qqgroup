@@ -127,7 +127,7 @@ public class ImageActivity extends Activity {
 			public void onClick(View v) {
 				if(curNo<2) 
 				{
-					Toast.makeText(ImageActivity.this, "这是第一张照片!", Toast.LENGTH_SHORT)
+					Toast.makeText(ImageActivity.this, "这是第一张图片!", Toast.LENGTH_SHORT)
 					.show();
 					return;
 				}
@@ -142,7 +142,7 @@ public class ImageActivity extends Activity {
 			public void onClick(View v) {
 				if(curNo>ConstParam.tpList.size()-1) 
 				{
-					Toast.makeText(ImageActivity.this, "这是最后一张照片!", Toast.LENGTH_SHORT)
+					Toast.makeText(ImageActivity.this, "这是最后一张图片!", Toast.LENGTH_SHORT)
 					.show();
 					return;
 				}

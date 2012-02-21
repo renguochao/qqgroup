@@ -20,38 +20,43 @@
 
          <ImageButton
             android:id="@+id/btn_pre"
-            android:layout_width="0.0dip" 
-           android:layout_height="wrap_content"
-            android:icon="@drawable/image_pr">
+            android:layout_width="wrap_content" 
+           android:layout_height="42dp"
+           android:background="#00000000"
+           android:src="@drawable/image_pr">
         </ImageButton>
         
           <ImageButton
             android:id="@+id/btn_next"
-            android:layout_width="0.0dip" 
-           android:layout_height="wrap_content"
-            android:icon="@drawable/image_next" >
+            android:layout_width="wrap_content" 
+           android:layout_height="42dp"
+            android:background="#00000000"
+           android:src="@drawable/image_next" >
         </ImageButton>
              
                   
           <ImageButton
             android:id="@+id/btn_zoomIn"
-           android:layout_width="0.0dip" 
-           android:layout_height="wrap_content"
-            android:icon="@drawable/image_zoomin" >
+           android:layout_width="wrap_content" 
+           android:background="#00000000"
+         android:layout_height="42dp"
+           android:src="@drawable/image_zoomin" >
         </ImageButton>
 
           <ImageButton
             android:id="@+id/btn_zoomOut"
-            android:layout_width="0.0dip" 
-           android:layout_height="wrap_content"
-            android:icon="@drawable/image_zoomout" >
+            android:layout_width="wrap_content" 
+            android:background="#00000000"
+           android:layout_height="42dp"
+           android:src="@drawable/image_zoomout" >
         </ImageButton>
 
   		   <ImageButton
             android:id="@+id/btn_save"
-            android:layout_width="0.0dip" 
-           android:layout_height="wrap_content"
-            android:icon="@drawable/image_download" >
+            android:layout_width="wrap_content" 
+            android:background="#00000000"
+           android:layout_height="42dp"
+           android:src="@drawable/image_download" >
         </ImageButton>
             
             

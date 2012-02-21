@@ -146,7 +146,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	int areaNowTopic = 0;
 
-	//boolean isWifi = false;
+	boolean isNewMail = false;
 
 	private int nowPos;
 
@@ -357,7 +357,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		
 		
-		if(ConstParam.newmail<700000)
+		if(ConstParam.newmail>10&&ConstParam.newmail<700000)
 		{
 			mailtimer.schedule(mailtask, ConstParam.newmail*1000,ConstParam.newmail*1000);  
 		}
@@ -657,8 +657,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 
 		if (i != 3) {
-			Button btnLike = (Button) findViewById(R.id.btn_like);
+			ImageTextButton btnLike = (ImageTextButton) findViewById(R.id.btn_like);
 
+			if(isNewMail)
+				btnLike.setIcon(R.drawable.mail);
+			
+			
 			btnLike.setOnClickListener(new OnClickListener() {
 
 				public void onClick(View arg0) {
@@ -1163,7 +1167,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		ConstParam.isPic = sp.getString("picDS", "1");
 		ConstParam.isFull = sp.getString("isFull", "1");
 		
-		String mailString = sp.getString("newmail", "30000");
+		String mailString = sp.getString("newmail", "300");
 		
 		ConstParam.newmail = Long.parseLong(mailString);
 		
@@ -1215,7 +1219,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			{
 				return;
 			}
-			if(msg.what != Const.MSGUPDATE)
+			if(msg.what != Const.MSGUPDATE&&msg.what !=Const.MSGNEWMAILCOUNT)
 			{
 				runningTasks--;
 			}
@@ -1286,12 +1290,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					checkSyn(data);
 					break;
 					*/
-				case Const.MSGSYNFIRST:
-					//获得收藏夹
-					checkSyn(data);
-					InitMain();
-					break;
-
+				
 				case Const.MSGHOT:
 					//热门讨论区
 					bbsHot();
@@ -1319,6 +1318,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					convtBlogFav(data);
 					getUrlHtml(synUrl, Const.MSGSYNFIRST);
 					break;
+					
+				case Const.MSGSYNFIRST:
+					//获得收藏夹
+					checkSyn(data);
+					InitMain();
+					break;
+
 					
 				case Const.MSGMAIL:
 					//收邮件
@@ -1365,6 +1371,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					break;
 				case Const.MSGNEWMAILCOUNT:
 					displayMsg("您有新邮件！请注意查收");
+					isNewMail = true;
 					break;
 				default:
 					break;
@@ -1783,6 +1790,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	private void chaToMailBox(String place) {
 
 		setTitle("我的邮箱");
+		isNewMail = false;
 		setContentView(R.layout.mailbox);
 		curTopicStatus = 1;
 		LinkAdr = new ArrayList<String>();
@@ -3947,12 +3955,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				}
 				if(isMaster)
 				{
-					curPos += 7;
+					notext = tds.get(curPos+6).text();
+					if (notext != "" && !Character.isDigit(notext.charAt(0))) {
+						curPos ++;
+					}
 				}
-				else
-				{
+				
 					curPos += 6;
-				}
+				
 				
 				
 			}
