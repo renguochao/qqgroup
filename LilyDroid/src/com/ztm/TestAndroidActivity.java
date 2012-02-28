@@ -449,14 +449,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	{
 		if(!isLogin) return;
 		String url = "http://bbs.nju.edu.cn/bbsmail";
+		String mailData;
 		try {
-			data = NetTraffic.getHtmlContent(url);
+			mailData = NetTraffic.getHtmlContent(url);
 		} catch (Exception e) {
-			data = "error";
+			mailData = "error";
 		}
-		if(data.contains("<img src=/image/unread_mail.gif>"))
+		if(mailData.contains("<img src=/image/unread_mail.gif>"))
 		{
-		sendMsg(Const.MSGNEWMAILCOUNT);
+			sendMsg(Const.MSGNEWMAILCOUNT);
 		}
 	}
 	

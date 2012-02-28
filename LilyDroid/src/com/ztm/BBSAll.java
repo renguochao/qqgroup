@@ -10,9 +10,7 @@ public class BBSAll {
 	public static String getUpdateInfo() {
 	
 		String update;
-		
-		
-		update = "主要更新:\r\n1.长按主题可选择访问主题全文\r\n2.从十大或热点访问讨论区正确返回\r\n3.图片浏览功能强化\r\n4.解析主题效率提升\r\n5.版主的一般模式修正\r\n6.新邮件提示";
+		update = "主要更新:\r\n1.今日热门乱码的bug修正\r\n2.版主版面一般模式可用";
 		return update;
 	}
 	
