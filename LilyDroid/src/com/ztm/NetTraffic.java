@@ -167,7 +167,7 @@ public class NetTraffic {
 		return httpClient;
 	}
 
-	static HttpClient httpClient = null;
+	
 
 	/**
 	 * 根据url取得其对应的response
@@ -178,7 +178,7 @@ public class NetTraffic {
 		String result = "";// 返回的结果
 		StringBuffer resultBuffer = new StringBuffer();
 
-		httpClient = getClient();
+		HttpClient httpClient = getClient();
 		// 创建GET方法的实例
 		GetMethod getMethod = new GetMethod(url);
 		// getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
@@ -225,7 +225,7 @@ public class NetTraffic {
 		String result = "";// 返回的结果
 		StringBuffer resultBuffer = new StringBuffer();
 
-		httpClient = getClient();
+		HttpClient httpClient = getClient();
 		// 创建GET方法的实例
 		PostMethod post = new PostMethod(url);
 		// getMethod.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
@@ -272,7 +272,7 @@ public class NetTraffic {
 		String result = "";// 返回的结果
 		StringBuffer resultBuffer = new StringBuffer();
 
-		httpClient = getClient();
+		HttpClient httpClient = getClient();
 		
 		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(20000);
 		httpClient.getHttpConnectionManager().getParams().setSoTimeout(20000);

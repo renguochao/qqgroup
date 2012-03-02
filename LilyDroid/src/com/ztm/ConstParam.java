@@ -2,6 +2,8 @@ package com.ztm;
 
 import java.util.List;
 
+import android.graphics.drawable.Drawable;
+
 public class ConstParam {
 	
 	public static List<String> blogNamList;
@@ -31,6 +33,10 @@ public class ConstParam {
 	public static Long newmail;
 	
 	public static List<TopicPics> tpList;
+
+	public static boolean isAutoLogin;
+	
+	public static Drawable misphotoDraw;
 	
 
 }

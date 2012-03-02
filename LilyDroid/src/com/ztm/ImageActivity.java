@@ -221,10 +221,12 @@ public class ImageActivity extends Activity {
 		
 	}
 	
-	
+	boolean canRec =true;
 	private void setMyBitMapFromUrl(String url)
 	{
+		canRec = true;
 		image = fetchDrawable(url);
+		
 		mZoomView.setImage(image);
 		resetZoomState();
 	}
@@ -381,7 +383,8 @@ public class ImageActivity extends Activity {
 		} finally {
 			conn.disconnect();
 			try {
-				is.close();
+				if(is!=null)
+					is.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -440,11 +443,21 @@ public class ImageActivity extends Activity {
 
 	public Bitmap getDrawFromByte(byte[] imageByte )
 	{
+		
+		
+		
 		Bitmap bitmaps;
 
+		if(imageByte==null)
+		{
+			canRec = false;
+			bitmaps = drawableToBitmap(ConstParam.misphotoDraw	);
+			return bitmaps;
+		}
 		// 以下是把图片转化为缩略图再加载
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
+		
 		Bitmap bitmap = BitmapFactory.decodeByteArray(imageByte, 0,
 				imageByte.length, options);
 		
@@ -580,8 +593,10 @@ public class ImageActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-
+		if(canRec)
+		{
 		image.recycle();
+		}
 		mZoomView.setOnTouchListener(null);
 		mZoomState.deleteObservers();
 	}

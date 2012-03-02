@@ -1,6 +1,7 @@
 package com.ztm;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.URLSpan;
+import android.util.Log;
 
 public class StringUtil {
 	
@@ -165,6 +167,26 @@ public class StringUtil {
 		return ret;
 	}
 
+	
+	 public static String ToSBC(String input) {
+		  // 半角转全角：
+		  char[] c = input.toCharArray();
+		  for (int i = 0; i < c.length; i++) {
+
+		   if (c[i] == 32) {
+		    c[i] = (char) 12288;
+		    continue;
+		   }
+		   if (c[i] < 127 && c[i]>32)
+		    c[i] = (char) (c[i] + 65248);
+
+		  }
+		  return new String(c);
+		 }
+
+
+	
+	
 	/**
 	 * 解析获取的页面 处理某个特定的话题
 	 * 
@@ -227,7 +249,7 @@ public class StringUtil {
         matcher = rePat.matcher(data);
         
 	
-		
+        Log.d("1", new java.util.Date().getTime()+"");
 		String lz = "";
 		int k = 0;
 		  while (matcher.find()) {
@@ -313,7 +335,7 @@ public class StringUtil {
 				int tempBr = 0;
 				StringBuffer sb = new StringBuffer();
 				for (String sconA : split) {
-
+					
 					if (j < 3) {
 						j++;
 						if (j == 1) {
@@ -390,9 +412,12 @@ public class StringUtil {
 									sconA ="发信于："+sconA;		
 								else
 									sconA ="发信于："+date;
+							 sconA+=nbs;
+							 tempBr = 1;
 						 }
 
 						sb.append(sconA).append(nbs);
+						
 						continue;
 					} else if (sconA.length() < 1) {
 						if (tempBr == 0) {
@@ -460,6 +485,11 @@ public class StringUtil {
 								topicWithImg = true;
 								continue;
 							}
+							else
+							{
+								sb.append("<a href='"+sconA+"'><img src='nopic'></a><br>");
+								continue;
+							}
 							
 							
 								
@@ -468,14 +498,21 @@ public class StringUtil {
 					
 
 					tempBr = 0;
-					String scon = "";
+//					String scon = "";
+//					try {
+//						scon = new String(sconA.getBytes("gb2312"),
+//								"iso-8859-1");
+//					} catch (UnsupportedEncodingException e) {
+//						e.printStackTrace();
+//					}
+					int la = 0;
 					try {
-						scon = new String(sconA.getBytes("gb2312"),
-								"iso-8859-1");
+						la = sconA.getBytes("gb2312").length;
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
 					}
-					if (scon.length() < 71 || scon.length() > 89) {
+					//sconA = ToSBC(sconA);
+					if (la < 71 || la > 89) {
 						sb.append(sconA + nbs);
 					} else {
 						sb.append(sconA);
@@ -508,7 +545,7 @@ public class StringUtil {
 			}
 			else
 			{
-				if(reList.size()>0)
+				if(reList.size()>0&&k<=reList.size())
 				{
 				tiList.append("<a href='http://bbs.nju.edu.cn/"+reList.get(k-1)+"'>[<font color=#0000EE >回复</font>]</a>");
 				}
@@ -525,7 +562,7 @@ public class StringUtil {
 			} else {
 				isNext = true;
 			}
-		
+			 Log.d("2", new java.util.Date().getTime()+"");
 		String ss = tiList.toString()
 //		+"<a href='curArea'>[<font color=#0000EE >本讨论区</font>]</a>&nbsp;&nbsp;"
 //		+"<a href='prev'>[<font color=#0000EE >上一页</font>]</a>&nbsp;&nbsp;"

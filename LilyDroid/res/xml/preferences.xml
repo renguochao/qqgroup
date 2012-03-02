@@ -172,6 +172,16 @@
         android:title="保持竖屏(需重启)" >
     </CheckBoxPreference>   
     
+        
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="isAutoLogin"
+        android:summaryOff="关闭"
+        android:summaryOn="打开"
+        android:title="静默登录" >
+    </CheckBoxPreference>   
+        
+    
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="isAuto"

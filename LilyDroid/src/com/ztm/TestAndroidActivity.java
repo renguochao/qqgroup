@@ -224,6 +224,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	ImageSpan mailSpan;
 	Drawable xianDraw;
 	
+	Drawable noPicDraw;
 	int sdensity;
 	
 	ForegroundColorSpan listColorSpan;
@@ -290,6 +291,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		TMStr = "℡";
 
 		xianDraw = res.getDrawable(R.drawable.xian);
+		
+		noPicDraw = res.getDrawable(R.drawable.nophoto);
+		ConstParam.misphotoDraw			= res.getDrawable(R.drawable.misphoto);
 		DisplayMetrics metric = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(metric);
 		ConstParam.sWidth = metric.widthPixels - 30; // 屏幕宽度（像素）
@@ -1053,7 +1057,16 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			
 	}
 	
-	
+	private boolean getToolMenu()
+	{
+		LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+		if(mLoadingLayout!=null)
+		{
+			mLoadingLayout.setVisibility(getBtnRevtVis());
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * 捕获按键事件
@@ -1065,10 +1078,14 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			return true;
 
 		} else if (keyCode == KeyEvent.KEYCODE_MENU) {
-			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
-			if(mLoadingLayout!=null)
+//			LinearLayout mLoadingLayout=(LinearLayout)findViewById(R.id.topicll);
+//			if(mLoadingLayout!=null)
+//			{
+//				mLoadingLayout.setVisibility(getBtnRevtVis());
+//				return true;
+//			}
+			if(getToolMenu())
 			{
-				mLoadingLayout.setVisibility(getBtnRevtVis());
 				return true;
 			}
 			else
@@ -1171,6 +1188,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		String mailString = sp.getString("newmail", "300");
 		
 		ConstParam.newmail = Long.parseLong(mailString);
+		ConstParam.isAutoLogin = sp.getBoolean("isAutoLogin", true);
 		
 		barStat = sp.getString("barStat", "1");
 		
@@ -2364,7 +2382,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 			setCookies(element.substring(27, element.length() - 12));
 
-			Toast.makeText(TestAndroidActivity.this, "登录成功！",
+			Toast.makeText(TestAndroidActivity.this, "账号： "+loginId+ " 登录成功！ ",
 					Toast.LENGTH_SHORT).show();
 			isLogin = true;
 			getNewMailCount();
@@ -2422,6 +2440,18 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	private void getAutoLogin() {
 		// TODO Auto-generated method stub
+		
+		
+		
+		if (ConstParam.isAutoLogin&&isRem.equals("true")) {
+			// 自动登录的话，自动登录
+			String url = loginURL + "&id="
+					+ loginId + "&pw="
+					+ loginPwd;
+			getUrlHtml(url, Const.MSGAUTOLOGIN);
+		} else {
+		
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder(
 				TestAndroidActivity.this);
 		builder.setMessage("你还没登陆！~重新登录?")
@@ -2448,7 +2478,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						});
 		AlertDialog alert = builder.create();
 		alert.show();
-		
+		}
 		
 	}
 	String pid;
@@ -4364,6 +4394,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 														drawable.setBounds(0,
 																0, ConstParam.sWidth, 2);
 													}
+													
+													
 
 													else if (source
 															.startsWith("http")
@@ -4442,7 +4474,15 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 							if ("xian".equals(source)) {
 								drawable = xianDraw;
 								drawable.setBounds(0, 0, ConstParam.sWidth, 2);
-							} else	if (source.startsWith("[")) {
+							} 
+							
+							else if ("nopic".equals(source)) {
+								drawable = noPicDraw;
+								drawable.setBounds(0,
+										0, 128, 128);
+							}
+							
+							else	if (source.startsWith("[")) {
 								try {
 									drawable = fetchDrawable(source);
 								} catch (Exception e) {
@@ -4505,7 +4545,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 			else
 			{
-			drawable = zoomDrawable(source);
+				drawable = zoomDrawable(source);
 			}
 			}
 		} else {
@@ -4555,6 +4595,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		} finally {
 			conn.disconnect();
 			try {
+				if(is!=null)
 				is.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -4606,8 +4647,10 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		
 		byte[] imageByte = getImageFromURL(urlPath.trim());
-		
-		
+		if(imageByte==null)
+		{
+			return ConstParam.misphotoDraw;
+		}
 		String filePath = TEMP_DIR+File.separator+"TEMP"+fileNamei;
 		fileNamei++;
 		StringUtil.picTempFiles.put(urlPath, filePath);
@@ -4690,7 +4733,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	public Drawable getDrawFromByte(byte[] imageByte )
 	{
 		Bitmap bitmaps;
-
+		
 
 		// 以下是把图片转化为缩略图再加载
 		BitmapFactory.Options options = new BitmapFactory.Options();
