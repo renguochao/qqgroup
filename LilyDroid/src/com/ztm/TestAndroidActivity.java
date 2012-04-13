@@ -73,8 +73,6 @@ import android.provider.MediaStore.Images.Media;
 
 import android.text.ClipboardManager;
 import android.text.Html;
-import android.text.Layout;
-import android.text.Selection;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -1385,6 +1383,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					
 					break;
 					
+				case Const.MSGOA:
+					displayOAList(data);
+					break;
+					
+					
+					
 				case Const.MSGTOPICGROUP:
 					checkTopicGroup(data);
 					break;
@@ -1403,6 +1407,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 		}
 
+	
 		
 
 		
@@ -1410,6 +1415,11 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		
 
 	};
+	
+	private void displayOAList(String data) {
+		
+	}
+
 	
 	private void checkTopicGroup(String data) {
 		
@@ -1538,25 +1548,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		}
 		else
 		{
-//			Intent intent = new Intent(TestAndroidActivity.this,
-//			SingleTopicActivity.class);
-//			intent.putExtra("data", data);
-//			runningTasks = 0;
-//			progressDialog.dismiss();
-//
-//			startActivity(intent);
 			setTitle("文章浏览");
-			
-			
-			
-			
-
 			setContentView(R.layout.singletopic);
-			
-		
-			
-			
-
 			SpannableStringBuilder urlChanged = getURLChanged(topicData);
 
 			textView = (TextView) findViewById(R.id.label);
@@ -3465,8 +3458,72 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 						
 						
 							String name = (String) childMap.get("TITLE");
-							if (name == null || name.length() < 1||name.contains("※"))
+							if (name == null || name.length() < 1)
 								return false;
+							if(name.contains("※"))
+							{
+								int nameSort = 0;
+								if(name.contains("本站系统"))
+								{
+									nameSort =0;
+								}
+								else if(name.contains("南京大学"))
+								{
+									nameSort =1;
+								}
+								else if(name.contains("乡情校谊"))
+								{
+									nameSort =2;
+								}
+								else if(name.contains("电脑技术"))
+								{
+									nameSort =3;
+								}
+								else if(name.contains("学术科学"))
+								{
+									nameSort =4;
+								}
+								else if(name.contains("文化艺术"))
+								{
+									nameSort =5;
+								}
+								else if(name.contains("体育娱乐"))
+								{
+									nameSort =6;
+								}
+								else if(name.contains("感性休闲"))
+								{
+									nameSort =7;
+								}
+								else if(name.contains("新闻信息"))
+								{
+									nameSort =8;
+								}
+								else if(name.contains("百合广角"))
+								{
+									nameSort =9;
+								}
+								else if(name.contains("校务信箱"))
+								{
+									nameSort =10;
+								}
+								else if(name.contains("社团群体"))
+								{
+									nameSort =11;
+								}
+								else if(name.contains("冷门讨论区"))
+								{
+									nameSort =12;
+								}
+								String bbsOaStr = "http://bbs.nju.edu.cn/vd73240/bbsboa?sec=";
+								bbsOaStr +=nameSort;
+								
+								getUrlHtml(bbsOaStr, Const.MSGOA);
+								
+								displayMsg(nameSort+"");
+								return false;
+							}
+							
 							int indexOf = name.indexOf('(');
 							if (indexOf > 0) {
 								name = name.substring(0, indexOf);
@@ -4020,12 +4077,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		@Override
 		public void updateDrawState(TextPaint ds) {
 			super.updateDrawState(ds);
-			ds.setUnderlineText(underline);// 一般链下面都有一条线，挺恶心， 该方法可以去掉那条线
-			// ds.setColor(Color.rgb(0, 0, 237));// 改变链接的颜色设置
+			ds.setUnderlineText(underline);
 		}
 
-		
-		
 		@Override
 		public void onClick(View widget) {
 			// 此处写你的处理逻辑
@@ -4039,9 +4093,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				Intent intent = new Intent(TestAndroidActivity.this,
 						ImageActivity.class);
 				intent.putExtra("mUrl", mUrl);
-				
-				
-
 				startActivity(intent);
 			} else if (mUrl.contains("bbsqry?userid")) {
 				// 查看用户
@@ -4050,11 +4101,19 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 				// 回复
 				getUrlHtml(mUrl, Const.MSGPST);
 			}
-
 			else if (mUrl.contains("bbsedit?board")) {
 				// 修改
 				getUrlHtml(mUrl, Const.MSGPST);
 			}
+			else if (mUrl.contains("next")) {
+				// 下一页 
+				if (isNext&&nowPos!=-1) {
+					nowPos = nowPos + 30;
+					getUrlHtml(topicUrl + "&start=" + nowPos,
+							Const.MSGTOPICNEXT);
+				} 
+			}
+
 
 			else if (mUrl.contains("bbsdel?board")) {
 				// 删除
@@ -4822,7 +4881,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		System.exit(0);
 
 	}
-	boolean beginSelect = false;
+	//boolean beginSelect = false;
 	float firtick = 0f;
 	float sectick = 0f;
 	
@@ -4830,6 +4889,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		try {
 			if(arg1!=null)
 			{
+				/*
 				if(beginSelect)
 				{
 					int curOff = 0;
@@ -4878,6 +4938,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					}
 					return true;
 				}
+				*/
 				
 				return mGestureDetector.onTouchEvent(arg1);
 			}

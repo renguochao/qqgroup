@@ -196,6 +196,7 @@ public class StringUtil {
 	public static String getTopicInfo(String data,int nowPos,String nowLoginId,boolean isTopic) {
 		StringBuffer tiList = new StringBuffer("<br>");
 		char s = 10;
+		int nowPosForNext = nowPos;
 		String backS = s + "";
 		topicWithImg = false;
 		data = data.replaceAll(backS, "<br>");
@@ -249,7 +250,7 @@ public class StringUtil {
         matcher = rePat.matcher(data);
         
 	
-        Log.d("1", new java.util.Date().getTime()+"");
+       // Log.d("1", new java.util.Date().getTime()+"");
 		String lz = "";
 		int k = 0;
 		  while (matcher.find()) {
@@ -260,6 +261,7 @@ public class StringUtil {
 			String userId ="";
 			content = text;
 			String nowP = "";
+			
 			if(nowPos<0) nowPos=0;
 			{
 				nowP = (nowPos + k) + "";
@@ -498,13 +500,6 @@ public class StringUtil {
 					
 
 					tempBr = 0;
-//					String scon = "";
-//					try {
-//						scon = new String(sconA.getBytes("gb2312"),
-//								"iso-8859-1");
-//					} catch (UnsupportedEncodingException e) {
-//						e.printStackTrace();
-//					}
 					int la = 0;
 					try {
 						la = sconA.getBytes("gb2312").length;
@@ -562,13 +557,18 @@ public class StringUtil {
 			} else {
 				isNext = true;
 			}
-			 Log.d("2", new java.util.Date().getTime()+"");
+			// Log.d("2", new java.util.Date().getTime()+"");
 		String ss = tiList.toString()
 //		+"<a href='curArea'>[<font color=#0000EE >本讨论区</font>]</a>&nbsp;&nbsp;"
 //		+"<a href='prev'>[<font color=#0000EE >上一页</font>]</a>&nbsp;&nbsp;"
-//		+"<a href='next'>[<font color=#0000EE >下一页</font>]</a>&nbsp;&nbsp;"
+		
 //		+"<a href='huifu'>[<font color=#0000EE >回复</font>]</a>"
 		;
+		
+		if (isNext&&nowPosForNext!=-1) {
+			ss+="&nbsp;<a href='next'>[<font color=#0000EE >浏览下30条回复</font>]</a><br>";
+		}
+		
 		return addSmileySpans(ss,null);
 	}
 
