@@ -74,7 +74,7 @@ public class StringUtil {
 	
 	public static Spanned getSmilyStr(String string,Resources res ) {
 		final Resources resou = res;
-		 return Html.fromHtml(string,
+		 return Html.fromHtml(string.replaceAll("<", " <").replaceAll(">", "> "),
 					new Html.ImageGetter() {
 						public Drawable getDrawable(String source) {
 

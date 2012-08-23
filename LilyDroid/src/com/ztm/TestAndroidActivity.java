@@ -2193,7 +2193,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			textView = (TextView) info.findViewById(R.id.tvInfo);
 			ScrollView sv = (ScrollView) info.findViewById(R.id.svInfo);
 			sv.scrollTo(0, 0);
-			textView.setText(Html.fromHtml(withSmile));
+			textView.setText(Html.fromHtml(withSmile.replaceAll("<", " <").replaceAll(">", "> ")));
 
 			dlg.show();
 
@@ -2432,10 +2432,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	}
 
 	private void getAutoLogin() {
-		// TODO Auto-generated method stub
-		
-		
-		
+
 		if (ConstParam.isAutoLogin&&isRem.equals("true")) {
 			// 自动登录的话，自动登录
 			String url = loginURL + "&id="
@@ -4441,7 +4438,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 								@Override
 								public void run() {
 									// 需要花时间计算的方法
-									topicData = Html.fromHtml(topicDataInfo,
+									topicData = Html.fromHtml(topicDataInfo.replaceAll("<", " <").replaceAll(">", "> "),
 											new Html.ImageGetter() {
 
 												public Drawable getDrawable(
@@ -4522,10 +4519,9 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 
 	HashMap<String, SoftReference<Drawable>> drawableMap = new HashMap<String, SoftReference<Drawable>>();
 	
-
 	
 	public Spanned getSmilyStr(String string) {
-		 return Html.fromHtml(string,
+		 return Html.fromHtml(string.replaceAll("<", " <").replaceAll(">", "> "),
 					new Html.ImageGetter() {
 						public Drawable getDrawable(String source) {
 
