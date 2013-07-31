@@ -10,7 +10,7 @@ public class BBSAll {
 	public static String getUpdateInfo() {
 	
 		String update;
-		update = "主要更新:\r\n1.今日热门乱码的bug修正\r\n2.版主版面一般模式可用";
+		update = "主要更新:\r\n1.修复回复文章报错";
 		return update;
 	}
 	

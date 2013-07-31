@@ -61,6 +61,7 @@ public class Const {
 	public static final int MSGTOPICSIN2ALL =0x000031;
 	public static final int MSGNEWMAILCOUNT = 0x000032;
 	public static final int MSGOA = 0x000033;
+	public static final int MSGFIND = 0x000034;
 	
 	
 

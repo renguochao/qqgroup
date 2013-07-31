@@ -139,6 +139,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	int curTopicStatus = 0;
 	
 	int curAreaStatus = 0;
+	
+	int curFindStatus = 0;
 
 	List<TopicInfo> areaTopic;
 
@@ -211,7 +213,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 	String bbsTop10String = "http://bbs.nju.edu.cn/bbstop10";
 	String mailURL = "http://bbs.nju.edu.cn/bbsmail";
 	String upUrl = "http://bbs.nju.edu.cn/vd73240/blogcon?userid=tiztm&file=1326295902";
-	
+	String bbsFindUrl = "http://bbs.nju.edu.cn/bbsbfind?type=1";
 	
 	HashMap<String, Integer> fbAll = new HashMap<String, Integer>();
 	HashMap<String, String> fbNameAll = new HashMap<String, String>();
@@ -1127,6 +1129,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		} else if (curTopicStatus == 5) {
 			chaToMailBox(null);
 		}
+		else if (curTopicStatus == 6) {
+			if(curFindStatus == 0)
+				chaToArea(null);
+		}
+		
+		
 
 		else if (curTopicStatus == 0) {
 			exitPro();
@@ -1396,6 +1404,12 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 					displayMsg("您有新邮件！请注意查收");
 					isNewMail = true;
 					break;
+					
+				case Const.MSGFIND:
+					chaToFoundArea(data);
+					break;
+					
+					
 				default:
 					break;
 				}
@@ -1406,6 +1420,8 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			}
 
 		}
+
+		
 
 	
 		
@@ -2484,7 +2500,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		Document doc = Jsoup.parse(formData);
 		Elements ins = doc.getElementsByTag("input");
 		// progressDialog.dismiss();
-		if (ins.size() != 12) {
+		if (ins.size() < 10) {
 
 			if (ins.size() != 5) {
 				// 登录失败，要求重新登录
@@ -3733,6 +3749,61 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		setIndexBtns(4);
 
 	}
+	
+	/**
+	 * 跳转到讨论区查找结果界面
+	 * 
+	 * @param AreaData
+	 */
+	private void chaToFoundArea(String data) {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.topic);
+
+		
+		textView = (TextView) findViewById(R.id.label);
+		textView.setText(data);
+		textView.setTextSize(ConstParam.txtFonts);
+		textView.setMovementMethod(LinkMovementMethod.getInstance());
+		
+	}
+	
+	/**
+	 * 跳转到讨论区查找界面
+	 * 
+	 * @param AreaData
+	 */
+	private void chaToFind() {
+		// TODO Auto-generated method stub
+		setContentView(R.layout.areafind);
+		curTopicStatus = 6;
+		Button btnBack = (Button) findViewById(R.id.btn_find);
+		btnBack.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				
+				EditText textName = (EditText) findViewById(R.id.textName);
+				EditText textAuth = (EditText) findViewById(R.id.textAuth);
+				
+				String nameStr = textName.getText().toString();
+				String authStr = textAuth.getText().toString();
+				String dtStr = "7";
+					
+					
+				
+				String findUrl = bbsFindUrl+"&board="+curAreaName+
+				"&title="+nameStr+
+				"&userid="+authStr+
+				"&dt="+dtStr;
+				
+				displayMsg(findUrl);
+				getUrlHtml(findUrl, Const.MSGFIND);
+				
+				
+			}
+		});
+		
+	}
+	
 
 	/**
 	 * 跳转到讨论区界面
@@ -3837,7 +3908,7 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 		} 
 		else 
 		{
-		choices[0] = "切换到主题模式";
+			choices[0] = "切换到主题模式";
 		}
 
 		if (localareaNamList.contains(curAreaName)) {
@@ -3848,7 +3919,6 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 			
 			choices[1] = "加入本地收藏";
 		}
-
 		
 		//choices[2] = "版内查询";
 		final ListAdapter adapter = new ArrayAdapter<String>( TestAndroidActivity.this,
@@ -3896,11 +3966,13 @@ public class TestAndroidActivity extends Activity implements OnTouchListener,
 							break;
 						}
 						case 2:{
-							
+							chaToFind();
 							break;
 						}
 						}
 					}
+
+					
 				});
 		builder.setNegativeButton("返回", new DialogInterface.OnClickListener() {
 
